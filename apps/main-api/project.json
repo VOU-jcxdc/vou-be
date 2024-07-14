@@ -19,6 +19,12 @@
           "buildTarget": "main-api:build:production"
         }
       }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["apps/main-api/**/*.ts"]
+      }
     }
   }
 }
