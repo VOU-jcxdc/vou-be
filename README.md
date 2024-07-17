@@ -10,35 +10,45 @@ Enhance your Nx experience by installing [Nx Console](https://nx.dev/nx-console)
 provides an interactive UI to view your projects, run tasks, generate code, and more! Available for VSCode, IntelliJ and
 comes with a LSP for Vim users.
 
-## Start the application
-
-Run `yarn start main-api` to start the development server. Happy coding!
-
-## Build for production
-
-Run `yarn build main-api` to build the application. The build artifacts are stored in the output directory (e.g. `dist/` or `build/`), ready to be deployed.
-
 ## Running tasks
 
 To execute tasks with Nx use the following syntax:
 
 ```
-npx nx <target> <project> <...options>
+yarn start-service <service>
 ```
 
-You can also run multiple targets:
+You can also run all services:
 
 ```
-npx nx run-many -t <target1> <target2>
-```
-
-..or add `-p` to filter specific projects
-
-```
-npx nx run-many -t <target1> <target2> -p <proj1> <proj2>
+yarn start-app
 ```
 
 Targets can be defined in the `package.json` or `projects.json`. Learn more [in the docs](https://nx.dev/features/run-tasks).
+
+## Migration
+
+! Remember to create folder named **migrations** under the **src** folder of each service
+
+To create migration file in target service, use this following command:
+
+```
+nx run <service>:create-migration <filename>
+```
+
+To apply migration to database, use this syntax (suppose you are in the root folder of project):
+
+- Win
+
+```
+.\scripts\migration.bat
+```
+
+- Unix
+
+```
+bash ./scripts/migration.sh
+```
 
 ## Set up CI!
 
