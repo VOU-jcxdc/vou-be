@@ -1,1 +1,2 @@
-export * from "./lib/database.module";
+export * from "./postgre-database.module";
+export * from "./entities";

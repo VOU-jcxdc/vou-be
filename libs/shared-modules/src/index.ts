@@ -1,1 +1,2 @@
-export * from "./lib/shared-modules.module";
+export * from "./rabbit-mq";
+export * from "./redis";
