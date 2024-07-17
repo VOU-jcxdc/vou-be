@@ -10,11 +10,11 @@ const entities = (Object.keys(dbEntites) as Array<keyof typeof dbEntites>).map((
     TypeOrmModule.forRootAsync({
       useFactory: async (configService: ConfigService) => ({
         type: "postgres",
-        host: configService.get("POSTGRES_HOST"),
-        port: configService.get("POSTGRES_PORT"),
-        username: configService.get("POSTGRES_USER"),
-        password: configService.get("POSTGRES_PASSWORD"),
-        database: configService.get("POSTGRES_DB"),
+        host: configService.get("POSTGRE_HOST"),
+        port: configService.get("POSTGRE_PORT"),
+        username: configService.get("POSTGRE_USER"),
+        password: configService.get("POSTGRE_PASSWORD"),
+        database: configService.get("POSTGRE_DB"),
         entities,
       }),
       inject: [ConfigService],

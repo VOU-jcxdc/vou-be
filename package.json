@@ -4,7 +4,8 @@
   "license": "MIT",
   "scripts": {
     "build": "nx build",
-    "start": "nx serve",
+    "start-service": "nx serve",
+    "start-app": "nx run-many --target=serve --all --maxParallel=100 --parallel",
     "typeorm": "typeorm-ts-node-commonjs",
     "migrate": "npx typeorm-ts-node-commonjs migration:run -d apps/${SERVICE}/typeorm.config.ts",
     "start:migrate-app": "nx serve migrate-app",

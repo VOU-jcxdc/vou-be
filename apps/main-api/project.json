@@ -25,6 +25,14 @@
       "options": {
         "lintFilePatterns": ["apps/main-api/**/*.ts"]
       }
+    },
+    "create-migration": {
+      "executor": "nx:run-commands",
+      "outputs": [],
+      "options": {
+        "command": "typeorm migration:create",
+        "cwd": "apps/main-api/src/migrations"
+      }
     }
   }
 }
