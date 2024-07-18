@@ -1,7 +1,7 @@
 {
-  "name": "main-api",
+  "name": "account-service",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/main-api/src",
+  "sourceRoot": "apps/account-service/src",
   "projectType": "application",
   "tags": [],
   "targets": {
@@ -9,15 +9,15 @@
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "main-api:build"
+        "buildTarget": "account-service:build"
       },
       "configurations": {
         "development": {
-          "buildTarget": "main-api:build:development",
-          "port": 9228
+          "buildTarget": "account-service:build:development",
+          "port": 9229
         },
         "production": {
-          "buildTarget": "main-api:build:production"
+          "buildTarget": "account-service:build:production"
         }
       }
     },
@@ -32,7 +32,7 @@
       "outputs": [],
       "options": {
         "command": "typeorm migration:create",
-        "cwd": "apps/main-api/src/migrations"
+        "cwd": "apps/account-service/src/migrations"
       }
     },
     "typecheck": {
