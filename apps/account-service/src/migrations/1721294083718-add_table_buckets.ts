@@ -1,10 +1,10 @@
 import { MigrationInterface, QueryRunner, Table } from "typeorm";
 
-export class AddTableUsers1721228258313 implements MigrationInterface {
+export class AddTableBuckets1721294083718 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: "users",
+        name: "buckets",
         columns: [
           {
             name: "id",
@@ -13,12 +13,16 @@ export class AddTableUsers1721228258313 implements MigrationInterface {
             isGenerated: true,
             generationStrategy: "uuid",
           },
+          {
+            name: "filename",
+            type: "varchar",
+            length: "255",
+            isNullable: false,
+          },
         ],
       })
     );
   }
 
-  public async down(queryRunner: QueryRunner): Promise<void> {
-    throw new Error("Method not implemented.");
-  }
+  public async down(queryRunner: QueryRunner): Promise<void> {}
 }
