@@ -11,14 +11,7 @@
     "start:migrate-app": "nx serve migrate-app",
     "prepare": "husky install",
     "lint": "nx lint && nx format:check",
-    "pretty": "nx format:write",
-    "lint-staged:nx": "bash scripts/lint-staged-nx.sh"
-  },
-  "lint-staged": {
-    "*.ts": [
-      "nx format:write",
-      "yarn run lint-staged:nx"
-    ]
+    "pretty": "nx format:write"
   },
   "private": true,
   "dependencies": {
