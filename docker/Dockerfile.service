@@ -4,10 +4,6 @@ ARG SERVICE_NAME
 
 ARG STAGE
 
-ARG NODE_MODULE_PATH
-
-ARG IS_RUN_MIGRATION
-
 ENV BUILD_PATH='./src/dist'
 
 WORKDIR /src
@@ -21,8 +17,6 @@ COPY ./*.lock /src/
 COPY ./apps/${SERVICE_NAME} /src/apps/${SERVICE_NAME}
 
 COPY ./libs /src/libs
-
-RUN apk add --no-cache bash
 
 RUN echo "building service: ${SERVICE_NAME} with stage: ${STAGE} "
 

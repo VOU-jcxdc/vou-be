@@ -1,0 +1,22 @@
+FROM node:18.20
+
+# Create app directory
+WORKDIR /src
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install app dependencies
+RUN yarn install --frozen-lockfile
+
+# Copy apps and scripts
+COPY ./apps /src/apps
+
+COPY ./scripts /src/scripts
+
+# Run migration
+RUN chmod +x /src/scripts/migration-docker.sh
+
+COPY yarn.lock /src/yarn.lock
+
+CMD ["bash", "/src/scripts/migration-docker.sh"]
