@@ -1,10 +1,8 @@
-import { BaseEntity } from "typeorm";
 import { AccountRoleEnum, AccountStatusEnum } from "../enum";
 import { IBrandInfo } from "./brand_info.interface";
-import { IBucket } from "./bucket.interface";
 import { IPlayerInfo } from "./player_info.interface";
 
-export interface IAccount extends BaseEntity {
+export interface IAccount {
   id: string;
   username: string;
   email: string;
@@ -19,7 +17,6 @@ export interface IAccount extends BaseEntity {
   bucketId: string;
 
   // Relations
-  readonly bucket: IBucket;
   readonly brandInfo: IBrandInfo;
   readonly playerInfo: IPlayerInfo;
 }
