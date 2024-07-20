@@ -12,7 +12,6 @@ import {
 } from "typeorm";
 import { BrandInfo } from "./brand_info.entity";
 import { PlayerInfo } from "./player_info.entity";
-import { Bucket } from "./bucket.entity";
 
 @Entity({ name: "accounts" })
 export class Account extends BaseEntity implements IAccount {
@@ -55,13 +54,9 @@ export class Account extends BaseEntity implements IAccount {
   @Column({ name: "updated_by", type: "varchar", length: 255, nullable: true })
   updatedBy: string;
 
-  @OneToOne(() => Bucket)
-  @JoinColumn({ name: "bucket_id" })
-  bucket: Bucket;
-
   @OneToOne(() => BrandInfo)
-  brandInfo: BrandInfo;
+  readonly brandInfo: BrandInfo;
 
   @OneToOne(() => PlayerInfo)
-  playerInfo: PlayerInfo;
+  readonly playerInfo: PlayerInfo;
 }

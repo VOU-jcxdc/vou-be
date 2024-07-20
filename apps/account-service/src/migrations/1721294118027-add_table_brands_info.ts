@@ -2,6 +2,7 @@ import { MigrationInterface, QueryRunner, Table } from "typeorm";
 
 export class AddTableBrandsInfo1721294118027 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query("CREATE EXTENSION IF NOT EXISTS postgis");
     await queryRunner.createTable(
       new Table({
         name: "brands_info",
@@ -55,5 +56,7 @@ export class AddTableBrandsInfo1721294118027 implements MigrationInterface {
     );
   }
 
-  public async down(queryRunner: QueryRunner): Promise<void> {}
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
 }

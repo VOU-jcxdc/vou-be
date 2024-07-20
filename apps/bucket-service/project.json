@@ -1,0 +1,47 @@
+{
+  "name": "bucket-service",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/bucket-service/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "bucket-service:build",
+        "port": 9931
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "bucket-service:build:development"
+        },
+        "production": {
+          "buildTarget": "bucket-service:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["apps/main-api/**/*.ts"]
+      }
+    },
+    "create-migration": {
+      "executor": "nx:run-commands",
+      "outputs": [],
+      "options": {
+        "command": "typeorm migration:create",
+        "cwd": "apps/bucket-service/src/migrations"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": ["tsc -p tsconfig.app.json --noEmit"],
+        "cwd": "apps/main-api",
+        "forwardAllArgs": false
+      }
+    }
+  }
+}
