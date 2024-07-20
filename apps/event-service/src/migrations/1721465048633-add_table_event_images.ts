@@ -25,6 +25,7 @@ export class AddTableEventImages1721465048633 implements MigrationInterface {
         ],
         foreignKeys: [
           {
+            name: "FK_EVENT_IMAGES_EVENT_ID",
             columnNames: ["event_id"],
             referencedColumnNames: ["id"],
             referencedTableName: "events",
