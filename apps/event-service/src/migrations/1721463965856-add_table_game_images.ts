@@ -19,7 +19,7 @@ export class AddTableGameImages1721463965856 implements MigrationInterface {
             isNullable: false,
           },
           {
-            name: "bucket",
+            name: "bucket_id",
             type: "uuid",
             isNullable: false,
           },

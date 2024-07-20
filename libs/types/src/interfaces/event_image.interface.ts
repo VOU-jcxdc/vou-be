@@ -1,7 +1,6 @@
-import { BaseEntity } from "typeorm";
 import { IEvent } from "./event.interface";
 
-export interface IEventImage extends BaseEntity {
+export interface IEventImage {
   id: string;
   eventId: string;
   bucketId: string;

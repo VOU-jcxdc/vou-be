@@ -25,7 +25,7 @@ export class AddTableFavoriteEvents1721465757535 implements MigrationInterface {
         ],
         foreignKeys: [
           {
-            name: "FK_FAVORITE_EVENTS_ACCOUNT_ID",
+            name: "FK_FAVORITE_EVENTS_EVENT_ID",
             columnNames: ["event_id"],
             referencedColumnNames: ["id"],
             referencedTableName: "events",

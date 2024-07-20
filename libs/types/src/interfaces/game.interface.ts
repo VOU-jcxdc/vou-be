@@ -1,8 +1,7 @@
-import { BaseEntity } from "typeorm";
 import { GameTypeEnum } from "../enum";
 import { IGameImage } from "./game_image.interface";
 
-export interface IGame extends BaseEntity {
+export interface IGame {
   id: string;
   name: string;
   type: GameTypeEnum;

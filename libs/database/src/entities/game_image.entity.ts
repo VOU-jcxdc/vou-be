@@ -10,7 +10,7 @@ export class GameImage extends BaseEntity implements IGameImage {
   @Column({ name: "game_id", type: "uuid", nullable: false })
   gameId: string;
 
-  @Column({ name: "bucket", type: "uuid", nullable: false })
+  @Column({ name: "bucket_id", type: "uuid", nullable: false })
   bucketId: string;
 
   @ManyToOne(() => Game, (game) => game.images)

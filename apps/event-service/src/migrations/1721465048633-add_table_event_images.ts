@@ -18,7 +18,7 @@ export class AddTableEventImages1721465048633 implements MigrationInterface {
             isNullable: false,
           },
           {
-            name: "bucket",
+            name: "bucket_id",
             type: "varchar",
             isNullable: false,
           },
@@ -29,7 +29,6 @@ export class AddTableEventImages1721465048633 implements MigrationInterface {
             referencedColumnNames: ["id"],
             referencedTableName: "events",
             onDelete: "CASCADE",
-            onUpdate: "CASCADE",
           },
         ],
       })

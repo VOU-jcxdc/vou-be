@@ -1,7 +1,6 @@
-import { BaseEntity } from "typeorm";
 import { IEvent } from "./event.interface";
 
-export interface IFavoriteEvent extends BaseEntity {
+export interface IFavoriteEvent {
   id: string;
   accountId: string;
   eventId: string;
