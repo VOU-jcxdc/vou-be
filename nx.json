@@ -36,7 +36,7 @@
       },
       "exclude": [
         "apps/main-api-e2e/**/*",
-        "apps/account-service-e2e/**/*", 
+        "apps/account-service-e2e/**/*",
         "apps/bucket-service-e2e/**/*",
         "apps/event-service-e2e/**/*"
       ]
