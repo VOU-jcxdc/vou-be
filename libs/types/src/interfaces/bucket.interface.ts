@@ -1,6 +1,4 @@
-import { BaseEntity } from "typeorm";
-
-export interface IBucket extends BaseEntity {
+export interface IBucket {
   id: string;
   filename: string;
 }

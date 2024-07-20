@@ -25,5 +25,7 @@ export class AddTableBuckets1721294083718 implements MigrationInterface {
     );
   }
 
-  public async down(queryRunner: QueryRunner): Promise<void> {}
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
 }

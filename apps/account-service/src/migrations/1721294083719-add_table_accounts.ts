@@ -86,15 +86,6 @@ export class AddTableAccounts1721294083719 implements MigrationInterface {
             isNullable: true,
           },
         ],
-        foreignKeys: [
-          {
-            name: "FK_ACCOUNTS_BUCKET",
-            columnNames: ["bucket_id"],
-            referencedColumnNames: ["id"],
-            referencedTableName: "buckets",
-            onDelete: "SET NULL",
-          },
-        ],
       })
     );
   }

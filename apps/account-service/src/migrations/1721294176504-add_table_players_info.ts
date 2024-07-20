@@ -45,5 +45,7 @@ export class AddTablePlayersInfo1721294176504 implements MigrationInterface {
     );
   }
 
-  public async down(queryRunner: QueryRunner): Promise<void> {}
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
 }
