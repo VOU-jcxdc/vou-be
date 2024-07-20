@@ -92,6 +92,46 @@ services:
     networks:
       - vou-network
 
+  event-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_NAME: event-service
+        STAGE: dev
+    ports:
+      - "3002:3002"
+    env_file:
+      - ./apps/event-service/.env.build
+    container_name: event-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migration:
+        condition: service_completed_successfully
+    networks:
+      - vou-network
+
+  bucket-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_NAME: bucket-service
+        STAGE: dev
+    ports:
+      - "3003:3003"
+    env_file:
+      - ./apps/bucket-service/.env.build
+    container_name: bucket-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migration:
+        condition: service_completed_successfully
+    networks:
+      - vou-network
+
 volumes:
   postgres-data:
   rabbitmq-data:
