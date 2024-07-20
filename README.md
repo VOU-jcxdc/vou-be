@@ -47,7 +47,7 @@ To apply migration to database, use this syntax (suppose you are in the root fol
 - Unix
 
 ```
-bash ./scripts/migration.sh
+bash ./scripts/migration.sh <service>
 ```
 
 ## Set up CI!

@@ -2,3 +2,8 @@ export * from "./account.entity";
 export * from "./bucket.entity";
 export * from "./brand_info.entity";
 export * from "./player_info.entity";
+export * from "./event.entity";
+export * from "./event_image.entity";
+export * from "./game.entity";
+export * from "./game_image.entity";
+export * from "./favorite_event.entity";
