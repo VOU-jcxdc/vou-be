@@ -1,5 +1,5 @@
 import { BaseEntity } from "typeorm";
-import { IGame } from "@types";
+import { IGame } from "./game.interface";
 
 export interface IGameImage extends BaseEntity {
   id: string;

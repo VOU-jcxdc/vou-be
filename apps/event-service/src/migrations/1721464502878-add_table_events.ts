@@ -58,7 +58,7 @@ export class AddTableEvents1721464502878 implements MigrationInterface {
     );
   }
 
-  public async down(queryRunner: QueryRunner): Promise<void> {
+  public async down(_: QueryRunner): Promise<void> {
     throw new Error("Method not implemented.");
   }
 }

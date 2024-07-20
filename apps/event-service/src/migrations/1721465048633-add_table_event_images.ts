@@ -36,7 +36,7 @@ export class AddTableEventImages1721465048633 implements MigrationInterface {
     );
   }
 
-  public async down(queryRunner: QueryRunner): Promise<void> {
+  public async down(_: QueryRunner): Promise<void> {
     throw new Error("Method not implemented.");
   }
 }

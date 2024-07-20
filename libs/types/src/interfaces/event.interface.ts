@@ -1,5 +1,7 @@
 import { BaseEntity } from "typeorm";
-import { IEventImage, IFavoriteEvent, IGame } from "@types";
+import { IEventImage } from "./event_image.interface";
+import { IFavoriteEvent } from "./favorite_event.interface";
+import { IGame } from "./game.interface";
 
 export interface IEvent extends BaseEntity {
   id: string;
