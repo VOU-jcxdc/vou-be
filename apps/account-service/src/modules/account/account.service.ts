@@ -8,4 +8,10 @@ export class AccountService {
   async findAll() {
     return this.userRepository.findAll();
   }
+
+  async getUser(id: string) {
+    const user = await this.userRepository.findOne({ where: { id } });
+    console.log("user: ", user);
+    return user;
+  }
 }
