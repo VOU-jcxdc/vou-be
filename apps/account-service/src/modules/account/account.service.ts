@@ -1,32 +1,23 @@
-import { Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, Logger, UnauthorizedException } from "@nestjs/common";
 import { AccountRepository } from "../repository/account.repository";
-import { BrandInfoRepository } from "../repository/brand-info.repository";
-import { PlayerInfoRepository } from "../repository/player-info.repository";
-import { AccountRoleEnum, CreateAccountDto, CreatePlayerInfoDto, CreateBrandInfoDto } from "@types";
+import { CreateAccountDto } from "@types";
 import { AccountHelper } from "./account.helper";
-import * as bcrypt from "bcrypt";
 @Injectable()
 export class AccountService {
   private readonly logger: Logger;
-  constructor(
-    private readonly accountRepository: AccountRepository,
-    private readonly brandInfoRepository: BrandInfoRepository,
-    private readonly playerInfoRepository: PlayerInfoRepository,
-
-    private readonly accountHelper: AccountHelper
-  ) {
+  constructor(private readonly accountRepository: AccountRepository, private readonly accountHelper: AccountHelper) {
     this.logger = new Logger(AccountService.name);
   }
 
   async createAccount(value: CreateAccountDto) {
     try {
       const { password, data, ...rest } = value;
-      const hashedPassword = await this.hashPassword(password);
+      const hashedPassword = await this.accountHelper.hashPassword(password);
       const newAccount = await this.accountRepository.createAccount({
         ...rest,
         password: hashedPassword,
       });
-      await this.createInfoData(value.role, value.data, newAccount.id);
+      await this.accountHelper.createInfoData(value.role, value.data, newAccount.id);
       return this.accountHelper.buildCreateAccountResponse(newAccount);
     } catch (error) {
       this.logger.error(error);
@@ -34,21 +25,17 @@ export class AccountService {
     }
   }
 
-  async createInfoData(role: AccountRoleEnum, data: CreateBrandInfoDto | CreatePlayerInfoDto, accountId: string) {
-    if (role === AccountRoleEnum.BRAND) {
-      const brandData = data as CreateBrandInfoDto;
-      return this.brandInfoRepository.createBrandInfo(brandData, accountId);
-    } else if (role === AccountRoleEnum.PLAYER) {
-      const playerData = data as CreatePlayerInfoDto;
-      return this.playerInfoRepository.create({
-        accountId,
-        ...playerData,
-      });
+  async verifyAccount(phone: string, password: string) {
+    try {
+      const account = await this.accountRepository.getExistedAccount(phone);
+      const isPasswordValid = await this.accountHelper.verifyPassword(password, account.password);
+      if (!isPasswordValid) {
+        throw new UnauthorizedException("Password is incorrect");
+      }
+      return this.accountHelper.buildLoginResponse(account);
+    } catch (error) {
+      this.logger.error(error);
+      throw new InternalServerErrorException();
     }
-  }
-
-  async hashPassword(password: string) {
-    const saltOrRounds = await bcrypt.genSalt();
-    return bcrypt.hash(password, saltOrRounds);
   }
 }

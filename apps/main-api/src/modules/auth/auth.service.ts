@@ -12,4 +12,8 @@ export class AuthService {
   async signup(data: CreateAccountDto) {
     return this._client.send({ cmd: "create_new_account" }, data).pipe();
   }
+
+  async login(phone: string, password: string) {
+    return this._client.send({ cmd: "verify_account" }, { phone, password }).pipe();
+  }
 }

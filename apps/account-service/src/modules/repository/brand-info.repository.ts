@@ -18,10 +18,10 @@ export class BrandInfoRepository extends BaseRepository<BrandInfo> {
       coordinates: [data.location.lng, data.location.lat],
     };
 
-    await this._repository.save({
+    await this.create({
       ...data,
       accountId,
-      location: pointObject,
+      gps: pointObject,
     });
   }
 }
