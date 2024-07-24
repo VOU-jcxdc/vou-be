@@ -1,4 +1,4 @@
-import { GameTypeEnum } from "../enum";
+import { GameTypeEnum } from "../enums";
 import { IGameImage } from "./game_image.interface";
 
 export interface IGame {

@@ -1,17 +1,15 @@
-import { Controller, Get } from "@nestjs/common";
+import { Body, ClassSerializerInterceptor, Controller, Post, UseInterceptors } from "@nestjs/common";
 import { AccountService } from "./account.service";
 import { MessagePattern } from "@nestjs/microservices";
+import { CreateAccountDto } from "@types";
 
 @Controller("account")
 export class AccountController {
   constructor(private readonly userService: AccountService) {}
-  @Get()
-  findAll() {
-    return this.userService.findAll();
-  }
 
-  @MessagePattern({ cmd: "get_user" })
-  async getUser(data: { id: string }) {
-    return this.userService.getUser(data.id);
+  @Post()
+  @MessagePattern({ cmd: "create_new_account" })
+  async createAccount(@Body() data: CreateAccountDto) {
+    return this.userService.createAccount(data);
   }
 }
