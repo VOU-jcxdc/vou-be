@@ -3,7 +3,7 @@ import { BaseEntity, Repository, FindOneOptions } from "typeorm";
 
 @Injectable()
 export class BaseRepository<T extends BaseEntity> {
-  constructor(private repository: Repository<T>) {}
+  constructor(protected repository: Repository<T>) {}
 
   findAll(): Promise<T[]> {
     return this.repository.find();
