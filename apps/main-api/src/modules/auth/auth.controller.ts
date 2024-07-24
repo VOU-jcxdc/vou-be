@@ -6,8 +6,13 @@ import { CreateAccountDto } from "@types";
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post("signup")
+  @Post("sign-up")
   async signup(@Body() data: CreateAccountDto) {
     return this.authService.signup(data);
+  }
+
+  @Post("sign-in")
+  async login(@Body() data: { phone: string; password: string }) {
+    return this.authService.login(data.phone, data.password);
   }
 }
