@@ -18,7 +18,6 @@ async function bootstrap() {
   });
 
   app.useGlobalPipes(new ValidationPipe());
-
   await app.startAllMicroservices();
   await app.init();
 
