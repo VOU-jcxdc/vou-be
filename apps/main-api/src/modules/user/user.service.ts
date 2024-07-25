@@ -10,6 +10,6 @@ export class UserService {
   }
 
   async getUser(id: string) {
-    return this.client.send({ cmd: "get_user" }, id).pipe();
+    return "User";
   }
 }
