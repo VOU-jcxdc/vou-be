@@ -9,12 +9,12 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 @Module({
   imports: [
     AccountRepositoryModule,
+    ConfigModule,
     JwtModule.registerAsync({
-      imports: [ConfigModule],
+      inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get("JWT_SECRET"),
       }),
-      inject: [ConfigService],
     }),
   ],
   controllers: [AccountController],

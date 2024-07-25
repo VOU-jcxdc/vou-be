@@ -1,21 +1,21 @@
-import { Body, ClassSerializerInterceptor, Controller, Post, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, Post } from "@nestjs/common";
 import { AccountService } from "./account.service";
 import { MessagePattern } from "@nestjs/microservices";
 import { CreateAccountDto } from "@types";
 
 @Controller("account")
 export class AccountController {
-  constructor(private readonly userService: AccountService) {}
+  constructor(private readonly accountService: AccountService) {}
 
-  @Post("sign-up")
-  @MessagePattern({ cmd: "create_new_account" })
+  @Post("create-account")
+  @MessagePattern({ method: "POST", path: "/account/create-account" })
   async createAccount(@Body() data: CreateAccountDto) {
-    return this.userService.createAccount(data);
+    return this.accountService.createAccount(data);
   }
 
-  @Post("sign-in")
-  @MessagePattern({ cmd: "verify_account" })
+  @Post("verify-account")
+  @MessagePattern({ method: "POST", path: "/account/verify-account" })
   async verifyAccount(@Body() data: { phone: string; password: string }) {
-    return this.userService.verifyAccount(data.phone, data.password);
+    return this.accountService.verifyAccount(data.phone, data.password);
   }
 }

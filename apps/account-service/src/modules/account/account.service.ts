@@ -1,7 +1,8 @@
-import { Injectable, InternalServerErrorException, Logger, UnauthorizedException } from "@nestjs/common";
+import { Injectable, Logger, UnauthorizedException } from "@nestjs/common";
 import { AccountRepository } from "../repository/account.repository";
 import { CreateAccountDto } from "@types";
 import { AccountHelper } from "./account.helper";
+import { RpcException } from "@nestjs/microservices";
 @Injectable()
 export class AccountService {
   private readonly logger: Logger;
@@ -21,7 +22,7 @@ export class AccountService {
       return this.accountHelper.buildCreateAccountResponse(newAccount);
     } catch (error) {
       this.logger.error(error);
-      throw new InternalServerErrorException();
+      throw new RpcException(error);
     }
   }
 
@@ -35,7 +36,7 @@ export class AccountService {
       return this.accountHelper.buildLoginResponse(account);
     } catch (error) {
       this.logger.error(error);
-      throw new InternalServerErrorException();
+      throw new RpcException(error);
     }
   }
 }
