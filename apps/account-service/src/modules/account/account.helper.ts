@@ -4,14 +4,13 @@ import { AccountRoleEnum, CreateBrandInfoDto, CreatePlayerInfoDto } from "@types
 import { BrandInfoRepository } from "../repository/brand-info.repository";
 import { PlayerInfoRepository } from "../repository/player-info.repository";
 import * as bcrypt from "bcrypt";
-import { JwtService } from "@nestjs/jwt";
 @Injectable()
 export class AccountHelper {
   constructor(
     private readonly brandInfoRepository: BrandInfoRepository,
-    private readonly playerInfoRepository: PlayerInfoRepository,
-    private readonly jwtService: JwtService
+    private readonly playerInfoRepository: PlayerInfoRepository
   ) {}
+
   buildCreateAccountResponse(data: IAccount) {
     return {
       id: data.id,
@@ -22,12 +21,10 @@ export class AccountHelper {
     };
   }
 
-  buildLoginResponse(data: IAccount) {
+  buildVerifyAccountResponse(data: IAccount) {
     return {
-      access_token: this.jwtService.sign({
-        id: data.id,
-        role: data.role,
-      }),
+      id: data.id,
+      role: data.role,
     };
   }
 
