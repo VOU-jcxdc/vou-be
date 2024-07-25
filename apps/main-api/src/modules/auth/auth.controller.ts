@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, Get, Post, Query } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { CreateAccountDto } from "@types";
 
@@ -14,5 +14,10 @@ export class AuthController {
   @Post("sign-in")
   async login(@Body() data: { phone: string; password: string }) {
     return this.authService.login(data.phone, data.password);
+  }
+
+  @Get("otp")
+  async sendOTP(@Query("phone") phone: string) {
+    return this.authService.sendOTP(phone);
   }
 }

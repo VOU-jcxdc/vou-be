@@ -3,11 +3,17 @@ import { JwtService } from "@nestjs/jwt";
 import { ClientOptions, ClientProxy, ClientProxyFactory } from "@nestjs/microservices";
 import { CreateAccountDto, ILoginResponse } from "@types";
 import { catchError, lastValueFrom } from "rxjs";
+import otpGenerator from "otp-generator";
+import { RedisService } from "@shared-modules";
 
 @Injectable()
 export class AuthService {
   private _client: ClientProxy;
-  constructor(@Inject("USER_SERVICE") options: ClientOptions, private readonly jwtService: JwtService) {
+  constructor(
+    @Inject("USER_SERVICE") options: ClientOptions,
+    private readonly jwtService: JwtService,
+    private readonly redisService: RedisService
+  ) {
     this._client = ClientProxyFactory.create(options);
   }
 
@@ -41,5 +47,15 @@ export class AuthService {
       role: data.role,
     });
     return loginResponse;
+  }
+
+  async sendOTP(phone: string) {
+    const otp = otpGenerator.generate(6, {
+      digits: true,
+      upperCaseAlphabets: false,
+      lowerCaseAlphabets: false,
+      specialChars: false,
+    });
+    console.log(otp);
   }
 }

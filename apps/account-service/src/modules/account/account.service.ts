@@ -5,10 +5,8 @@ import { AccountHelper } from "./account.helper";
 import { RpcException } from "@nestjs/microservices";
 @Injectable()
 export class AccountService {
-  private readonly logger: Logger;
-  constructor(private readonly accountRepository: AccountRepository, private readonly accountHelper: AccountHelper) {
-    this.logger = new Logger(AccountService.name);
-  }
+  private readonly logger: Logger = new Logger(AccountService.name);
+  constructor(private readonly accountRepository: AccountRepository, private readonly accountHelper: AccountHelper) {}
 
   async createAccount(value: CreateAccountDto) {
     try {

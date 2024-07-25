@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { ClientOptions, Transport } from "@nestjs/microservices";
 import { JwtModule } from "@nestjs/jwt";
 import { JwtStrategy } from "../../strategies";
+import { RedisModule } from "@shared-modules";
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { JwtStrategy } from "../../strategies";
         },
       }),
     }),
+    RedisModule,
   ],
   controllers: [AuthController],
   providers: [

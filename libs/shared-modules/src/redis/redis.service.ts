@@ -1,11 +1,13 @@
-import { Inject, Injectable, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
+import { Inject, Injectable, Logger, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { RedisClientType } from "@redis/client";
 import { REDIS_PROVIDER } from "@types";
 import { RedisClientOptions, createClient } from "redis";
+import { isNil } from "lodash";
 
 @Injectable()
 export class RedisService implements OnModuleInit, OnModuleDestroy {
-  private client: RedisClientType | null = null;
+  private client: RedisClientType;
+  private readonly logger = new Logger(RedisService.name);
 
   constructor(@Inject(REDIS_PROVIDER) private readonly options: RedisClientOptions) {}
 
@@ -20,6 +22,27 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   async onModuleDestroy() {
     if (this.client) {
       await this.client.disconnect();
+    }
+  }
+
+  async set(key: string, value: any, ttlInSecond = 300) {
+    try {
+      const stringValue = JSON.stringify(value);
+      await this.client.set("key", stringValue, { EX: ttlInSecond });
+      return true;
+    } catch (error) {
+      this.logger.error(error);
+      return false;
+    }
+  }
+
+  async get(key: string) {
+    try {
+      const value = await this.client.get(key);
+      return !isNil(value) && JSON.parse(value);
+    } catch (error) {
+      this.logger.error(error);
+      return null;
     }
   }
 }
