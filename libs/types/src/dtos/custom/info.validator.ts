@@ -12,7 +12,7 @@ import {
   CreateBrandInfoDto,
   CreatePlayerInfoDto,
   DEFAULT_INVALID_MESSAGE,
-} from "../../../src";
+} from "../..";
 
 @ValidatorConstraint({ async: true })
 export class InfoValidation implements ValidatorConstraintInterface {
@@ -32,8 +32,25 @@ export class InfoValidation implements ValidatorConstraintInterface {
 
   defaultMessage(args: ValidationArguments) {
     const firstError = this._validationErrors[0];
-    return firstError.constraints
-      ? firstError.constraints[Object.keys(firstError.constraints)[0]]
-      : DEFAULT_INVALID_MESSAGE;
+    const firstConstraint = this.getContraints(firstError);
+
+    return firstConstraint ? firstConstraint[Object.keys(firstConstraint)[0]] : DEFAULT_INVALID_MESSAGE;
+  }
+
+  getContraints(error: ValidationError): Record<string, string> {
+    if (error.constraints) {
+      return error.constraints;
+    }
+
+    let contrains = {};
+    if (error.children) {
+      for (const child of error.children) {
+        contrains = {
+          ...contrains,
+          ...this.getContraints(child),
+        };
+      }
+    }
+    return contrains;
   }
 }

@@ -1,11 +1,11 @@
 import { Type } from "class-transformer";
-import { IsNotEmpty, ValidateNested } from "class-validator";
+import { IsLatitude, IsLongitude, IsNotEmpty, ValidateNested } from "class-validator";
 
 class LocationDto {
-  @IsNotEmpty({ message: "Lng is required" })
+  @IsLongitude({ message: "Longtitude is invalid" })
   lng: number;
 
-  @IsNotEmpty({ message: "Lat is required" })
+  @IsLatitude({ message: "Latitude is invalid" })
   lat: number;
 }
 
