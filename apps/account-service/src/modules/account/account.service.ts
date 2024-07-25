@@ -33,7 +33,7 @@ export class AccountService {
       if (!isPasswordValid) {
         throw new UnauthorizedException("Password is incorrect");
       }
-      return this.accountHelper.buildLoginResponse(account);
+      return this.accountHelper.buildVerifyAccountResponse(account);
     } catch (error) {
       this.logger.error(error);
       throw new RpcException(error);
