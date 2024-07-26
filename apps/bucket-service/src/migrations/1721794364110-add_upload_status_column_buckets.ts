@@ -6,8 +6,8 @@ export class AddUploadStatusColumnBuckets1721794364110 implements MigrationInter
       "buckets",
       new TableColumn({
         name: "upload_status",
-        type: "varchar",
-        length: "255",
+        type: "enum",
+        enum: ["pending", "uploaded"],
         isNullable: false,
         default: "'pending'",
       })

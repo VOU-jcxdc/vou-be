@@ -1,13 +1,15 @@
-import { Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { InjectS3, S3 } from "nestjs-s3";
 import { BucketRepository } from "../repository/bucket.repository";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { DeleteObjectCommand, GetObjectCommand, HeadObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { ConfirmUploadDto, UpdateFileDto, UploadFileDto, UploadStatusEnum } from "@types";
 import { ConfigService } from "@nestjs/config";
+import { RpcException } from "@nestjs/microservices";
 
 @Injectable()
 export class AppService {
+  private logger = new Logger("BucketService");
   private bucketName: string = "";
 
   constructor(
@@ -21,7 +23,7 @@ export class AppService {
   async getPresignedUploadUrl(body: UploadFileDto): Promise<{ id: string; url: string }> {
     try {
       const { filename } = body;
-      const data = await this.bucketRepository.create({
+      const data = await this.bucketRepository.save({
         filename,
       });
       const command = new PutObjectCommand({ Bucket: this.bucketName, Key: `${data.id}` });
@@ -29,8 +31,9 @@ export class AppService {
         id: data.id,
         url: await getSignedUrl(this.s3, command, { expiresIn: 3600 }),
       };
-    } catch (_: unknown) {
-      throw new InternalServerErrorException();
+    } catch (error) {
+      this.logger.error(error);
+      throw new RpcException(error);
     }
   }
 
@@ -39,7 +42,7 @@ export class AppService {
       const data = await this.bucketRepository.findOne({ where: { id } });
 
       if (!data || data.uploadStatus === UploadStatusEnum.PENDING) {
-        throw new InternalServerErrorException("File not found");
+        throw new RpcException("File not found");
       }
 
       const command = new GetObjectCommand({
@@ -49,8 +52,9 @@ export class AppService {
       });
 
       return await getSignedUrl(this.s3, command, { expiresIn: 3600 });
-    } catch (_: unknown) {
-      throw new InternalServerErrorException();
+    } catch (error) {
+      this.logger.error(error);
+      throw new RpcException(error);
     }
   }
 
@@ -63,8 +67,9 @@ export class AppService {
       }
 
       return { affected: data.affected };
-    } catch (_: unknown) {
-      throw new InternalServerErrorException();
+    } catch (error) {
+      this.logger.error(error);
+      throw new RpcException(error);
     }
   }
 
@@ -74,7 +79,7 @@ export class AppService {
       const data = await this.bucketRepository.findOne({ where: { id } });
 
       if (!data) {
-        throw new InternalServerErrorException();
+        throw new RpcException("File not found");
       }
 
       data.filename = filename;
@@ -85,8 +90,9 @@ export class AppService {
         id: data.id,
         url: await getSignedUrl(this.s3, command, { expiresIn: 3600 }),
       };
-    } catch (_: unknown) {
-      throw new InternalServerErrorException();
+    } catch (error) {
+      this.logger.error(error);
+      throw new RpcException(error);
     }
   }
 
@@ -95,7 +101,7 @@ export class AppService {
       const data = await this.bucketRepository.findOne({ where: { id: body.id } });
 
       if (!data) {
-        throw new InternalServerErrorException();
+        throw new RpcException("File not found");
       }
 
       const command = new HeadObjectCommand({ Bucket: this.bucketName, Key: data.id });
@@ -105,8 +111,9 @@ export class AppService {
       await this.bucketRepository.save(data);
 
       return "OK";
-    } catch (_: unknown) {
-      throw new InternalServerErrorException();
+    } catch (error) {
+      this.logger.error(error);
+      throw new RpcException(error);
     }
   }
 }

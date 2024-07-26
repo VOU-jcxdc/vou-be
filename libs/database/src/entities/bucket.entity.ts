@@ -9,6 +9,6 @@ export class Bucket extends BaseEntity implements IBucket {
   @Column({ name: "filename", type: "varchar", length: 255, nullable: false })
   filename: string;
 
-  @Column({ name: "upload_status", type: "varchar", length: 255, nullable: false, default: UploadStatusEnum.PENDING })
+  @Column({ name: "upload_status", type: "enum", enum: UploadStatusEnum, default: UploadStatusEnum.PENDING })
   uploadStatus: string;
 }
