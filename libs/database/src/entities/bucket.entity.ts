@@ -1,4 +1,4 @@
-import { IBucket } from "@types";
+import { IBucket, UploadStatusEnum } from "@types";
 import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: "buckets" })
@@ -8,4 +8,7 @@ export class Bucket extends BaseEntity implements IBucket {
 
   @Column({ name: "filename", type: "varchar", length: 255, nullable: false })
   filename: string;
+
+  @Column({ name: "upload_status", type: "enum", enum: UploadStatusEnum, default: UploadStatusEnum.PENDING })
+  uploadStatus: string;
 }
