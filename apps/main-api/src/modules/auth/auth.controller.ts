@@ -20,4 +20,9 @@ export class AuthController {
   async sendOTP(@Query("phone") phone: string) {
     return this.authService.sendOTP(phone);
   }
+
+  @Post("otp")
+  async verifyOTP(@Body() data: { phone: string; otp: string }) {
+    return this.authService.verifyOTP(data.phone, data.otp);
+  }
 }

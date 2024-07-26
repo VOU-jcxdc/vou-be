@@ -15,7 +15,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     if (!this.client) {
       this.client = createClient(this.options) as unknown as RedisClientType;
       await this.client.connect();
-      console.log("Redis connected");
+      this.logger.log("Redis connected");
     }
   }
 
@@ -28,7 +28,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   async set(key: string, value: any, ttlInSecond = 300) {
     try {
       const stringValue = JSON.stringify(value);
-      await this.client.set("key", stringValue, { EX: ttlInSecond });
+      await this.client.set(key, stringValue, { EX: ttlInSecond });
       return true;
     } catch (error) {
       this.logger.error(error);
