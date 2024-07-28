@@ -39,7 +39,7 @@ export class AccountHelper {
       return this.brandInfoRepository.createBrandInfo(brandData, accountId);
     } else if (role === AccountRoleEnum.PLAYER) {
       const playerData = data as CreatePlayerInfoDto;
-      return this.playerInfoRepository.create({
+      return this.playerInfoRepository.save({
         accountId,
         ...playerData,
       });

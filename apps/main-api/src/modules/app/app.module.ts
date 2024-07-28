@@ -5,7 +5,7 @@ import { BucketModule } from "../bucket/bucket.module";
 import { AuthModule } from "../auth/auth.module";
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), UserModule, BucketModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), UserModule, BucketModule, AuthModule],
   controllers: [],
   providers: [],
 })

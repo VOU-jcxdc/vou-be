@@ -18,7 +18,7 @@ export class AccountRepository extends BaseRepository<Account> {
       throw new NotAcceptableException("Account existed");
     }
 
-    return this.create(data);
+    return this.save(data);
   }
 
   async getExistedAccount(phone: string) {

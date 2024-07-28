@@ -1,11 +1,20 @@
 import { Injectable } from "@nestjs/common";
-import { BaseEntity, Repository, FindOneOptions, DeepPartial, DeleteResult, ObjectId, FindOptionsWhere } from "typeorm";
+import {
+  BaseEntity,
+  Repository,
+  FindOneOptions,
+  FindManyOptions,
+  DeepPartial,
+  DeleteResult,
+  ObjectId,
+  FindOptionsWhere,
+} from "typeorm";
 
 @Injectable()
 export class BaseRepository<T extends BaseEntity> {
   constructor(protected repository: Repository<T>) {}
 
-  findAll(option?: FindManyOptions): Promise<T[]> {
+  findAll(option?: FindManyOptions<T>): Promise<T[]> {
     return this.repository.find(option);
   }
 

@@ -36,6 +36,7 @@ export class AuthService {
     const pattern = { method: "POST", path: "/account/verify-account" };
     const res = this._client.send(pattern, { phone, password }).pipe(
       catchError((error) => {
+        console.log(error);
         const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
         const message = error.message || "An error occurred";
 
