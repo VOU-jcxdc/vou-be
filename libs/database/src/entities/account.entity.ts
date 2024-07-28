@@ -21,7 +21,7 @@ export class Account extends BaseEntity implements IAccount {
   @Column({ name: "username", type: "varchar", length: 255, unique: true, nullable: false })
   username: string;
 
-  @Column({ name: "password", type: "varchar", length: 255, nullable: false })
+  @Column({ name: "password", type: "varchar", length: 255, nullable: false, select: false })
   password: string;
 
   @Column({ name: "email", type: "varchar", length: 255, unique: true, nullable: false })
@@ -55,8 +55,10 @@ export class Account extends BaseEntity implements IAccount {
   updatedBy: string;
 
   @OneToOne(() => BrandInfo)
+  @JoinColumn({ name: "id", referencedColumnName: "accountId" })
   readonly brandInfo: BrandInfo;
 
   @OneToOne(() => PlayerInfo)
+  @JoinColumn({ name: "id", referencedColumnName: "accountId" })
   readonly playerInfo: PlayerInfo;
 }

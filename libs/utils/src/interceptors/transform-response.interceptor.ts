@@ -1,4 +1,5 @@
 import { CallHandler, ExecutionContext, HttpStatus, Injectable, NestInterceptor } from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
 import { ISuccessResponse } from "@types";
 import { isNil } from "lodash";
 import { Observable, map } from "rxjs";
@@ -22,8 +23,16 @@ const transform = <T extends DataType>(rawData: T): ISuccessResponse<T> => {
 };
 
 @Injectable()
-export class TransformResponseInterceptor<T extends DataType> implements NestInterceptor<T, ISuccessResponse<T>> {
-  intercept(context: ExecutionContext, next: CallHandler<T>): Observable<ISuccessResponse<T>> {
+export class TransformResponseInterceptor<T extends DataType> implements NestInterceptor<T, ISuccessResponse<T> | T> {
+  constructor(private reflector: Reflector) {}
+
+  intercept(context: ExecutionContext, next: CallHandler<T>): Observable<ISuccessResponse<T>> | Observable<T> {
+    const bypassTransformResponse = this.reflector
+      ? this.reflector.get<boolean>("bypass-transform-response", context.getHandler())
+      : false;
+    if (bypassTransformResponse) {
+      return next.handle();
+    }
     return next.handle().pipe(map((data) => transform(data)));
   }
 }

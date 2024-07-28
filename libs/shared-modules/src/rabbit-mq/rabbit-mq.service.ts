@@ -9,7 +9,7 @@ export class RabbitMqService implements OnModuleInit, OnModuleDestroy {
   async onModuleInit() {
     try {
       await this.client.connect();
-      this.client.emit<any>("testEvent", "Test message").subscribe({
+      this.client.emit("testEvent", "Test message").subscribe({
         next: (val) => console.log(`next: ${val}`),
         error: (err) => console.log(`error: ${err}`),
         complete: () => console.log("complete"),

@@ -15,3 +15,6 @@ export * from "./game_image.interface";
 export * from "./event.interface";
 export * from "./event_image.interface";
 export * from "./favorite_event.interface";
+
+export * from "./current_user.interface";
+export * from "./login_response.interface";

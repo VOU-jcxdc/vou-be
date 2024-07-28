@@ -20,7 +20,7 @@ COPY ./libs /src/libs
 
 RUN echo "building service: ${SERVICE_NAME} with stage: ${STAGE} "
 
-RUN yarn install
+RUN yarn install --frozen-lockfile
 
 RUN yarn build:${STAGE} ${SERVICE_NAME}
 
