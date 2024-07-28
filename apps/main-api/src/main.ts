@@ -10,7 +10,7 @@ import { AppModule } from "./modules/app/app.module";
 import { ExceptionHandlerInterceptor, ThrowFirstErrorValidationPipe, TransformResponseInterceptor } from "@utils";
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: true });
   const globalPrefix = "api";
   app.setGlobalPrefix(globalPrefix);
   app.useGlobalInterceptors(new TransformResponseInterceptor(new Reflector()));
