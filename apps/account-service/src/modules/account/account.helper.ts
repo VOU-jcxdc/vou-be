@@ -28,6 +28,11 @@ export class AccountHelper {
     };
   }
 
+  buildGetAccountInfoResponse(data: IAccount) {
+    const { brandInfo, playerInfo, ...rest } = data;
+    return data.role === AccountRoleEnum.PLAYER ? { ...rest, info: playerInfo } : { ...rest, info: brandInfo };
+  }
+
   async createInfoData(role: AccountRoleEnum, data: CreateBrandInfoDto | CreatePlayerInfoDto, accountId: string) {
     if (role === AccountRoleEnum.BRAND) {
       const brandData = data as CreateBrandInfoDto;
@@ -38,6 +43,20 @@ export class AccountHelper {
         accountId,
         ...playerData,
       });
+    }
+  }
+
+  async updateInfoData(
+    data: Partial<CreateBrandInfoDto | CreatePlayerInfoDto>,
+    accountId: string,
+    role: AccountRoleEnum
+  ) {
+    if (role === AccountRoleEnum.BRAND) {
+      const brandData = data as CreateBrandInfoDto;
+      return this.brandInfoRepository.updateOne({ where: { accountId } }, brandData);
+    } else if (role === AccountRoleEnum.PLAYER) {
+      const playerData = data as CreatePlayerInfoDto;
+      return this.playerInfoRepository.updateOne({ where: { accountId } }, playerData);
     }
   }
 

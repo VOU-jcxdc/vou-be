@@ -1,8 +1,8 @@
-import { Controller, Get, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Put, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { JwtAuthGuard } from "../../guard";
 import { CurrentUser } from "../../decorators";
-import { ICurrentUser } from "@types";
+import { ICurrentUser, UdpateAccountDto } from "@types";
 
 @UseGuards(JwtAuthGuard)
 @Controller("user")
@@ -11,7 +11,11 @@ export class UserController {
 
   @Get("/profile")
   async getUser(@CurrentUser() user: ICurrentUser) {
-    const id = user.userId;
-    return this.userService.getUser(id);
+    return this.userService.getUserInfoWithRole(user.userId, user.role);
+  }
+
+  @Put("/profile")
+  async updateUser(@CurrentUser() user: ICurrentUser, @Body() body: UdpateAccountDto) {
+    return this.userService.updateAccountByUser(user.userId, body);
   }
 }

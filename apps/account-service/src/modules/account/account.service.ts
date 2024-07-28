@@ -1,6 +1,6 @@
 import { Injectable, Logger, UnauthorizedException } from "@nestjs/common";
 import { AccountRepository } from "../repository/account.repository";
-import { CreateAccountDto } from "@types";
+import { AccountRoleEnum, CreateAccountDto, UdpateAccountDto, UpdateAccountByAdminDto } from "@types";
 import { AccountHelper } from "./account.helper";
 import { RpcException } from "@nestjs/microservices";
 @Injectable()
@@ -32,6 +32,46 @@ export class AccountService {
         throw new UnauthorizedException("Password is incorrect");
       }
       return this.accountHelper.buildVerifyAccountResponse(account);
+    } catch (error) {
+      this.logger.error(error);
+      throw new RpcException(error);
+    }
+  }
+
+  async getAllAccounts(offset: number, limit: number, role: AccountRoleEnum = undefined) {
+    try {
+      return this.accountRepository.getAllAccounts(offset, limit, role);
+    } catch (error) {
+      this.logger.error(error);
+      throw new RpcException(error);
+    }
+  }
+
+  async getAccountInfoWithRole(id: string, role: AccountRoleEnum) {
+    try {
+      return this.accountRepository.getAccountInfoWithRole(id, role);
+    } catch (error) {
+      this.logger.error(error);
+      throw new RpcException(error);
+    }
+  }
+
+  async getAccountInfo(id: string) {
+    try {
+      const account = await this.accountRepository.getAccountInfo(id);
+      return this.accountHelper.buildGetAccountInfoResponse(account);
+    } catch (error) {
+      this.logger.error(error);
+      throw new RpcException(error);
+    }
+  }
+
+  async updateAccount(id: string, body: UpdateAccountByAdminDto | UdpateAccountDto) {
+    try {
+      const { info, ...rest } = body;
+      const updatedAccount = await this.accountRepository.updateOne({ where: { id } }, rest);
+      const updatedInfo = await this.accountHelper.updateInfoData(info, id, updatedAccount.role);
+      return { ...updatedAccount, info: updatedInfo };
     } catch (error) {
       this.logger.error(error);
       throw new RpcException(error);
