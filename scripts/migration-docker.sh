@@ -2,7 +2,7 @@
 echo "Starting migration"
 
 # Find all typeorm.config.ts files matching the pattern and store them in an array
-configs=($(find . -type f -name "typeorm.config.ts" -path "*/apps/*/*"))
+configs=($(find . -type f -name "typeorm-docker.config.ts" -path "*/apps/*/*"))
 
 # Iterate over the array and run the migration command for each config
 for config in "${configs[@]}"; do
