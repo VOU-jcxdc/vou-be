@@ -1,7 +1,11 @@
-import { Body, Controller, Get, Param, ParseEnumPipe, ParseIntPipe, Put, Query } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseEnumPipe, ParseIntPipe, Put, Query, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { AccountRoleEnum, UpdateAccountByAdminDto } from "@types";
+import { JwtAuthGuard, RoleGuard } from "../../guard";
+import { Roles } from "../../decorators/roles.decorator";
 
+@UseGuards(JwtAuthGuard, RoleGuard)
+@Roles(AccountRoleEnum.ADMIN)
 @Controller("admin")
 export class AdminController {
   constructor(private readonly userService: UserService) {}

@@ -49,7 +49,8 @@ export class AccountService {
 
   async getAccountInfoWithRole(id: string, role: AccountRoleEnum) {
     try {
-      return this.accountRepository.getAccountInfoWithRole(id, role);
+      const account = await this.accountRepository.getAccountInfoWithRole(id, role);
+      return this.accountHelper.buildGetAccountInfoResponse(account);
     } catch (error) {
       this.logger.error(error);
       throw new RpcException(error);
