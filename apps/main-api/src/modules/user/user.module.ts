@@ -3,10 +3,11 @@ import { UserController } from "./user.controller";
 import { UserService } from "./user.service";
 import { ClientOptions, Transport } from "@nestjs/microservices";
 import { ConfigModule, ConfigService } from "@nestjs/config";
+import { AdminController } from "./admin.controller";
 
 @Module({
   imports: [ConfigModule],
-  controllers: [UserController],
+  controllers: [UserController, AdminController],
   providers: [
     {
       provide: "USER_SERVICE",

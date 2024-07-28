@@ -1,4 +1,4 @@
-import { GenderEnum } from "../enum";
+import { GenderEnum } from "../enums";
 import { IAccount } from "./account.interface";
 
 export interface IPlayerInfo {
