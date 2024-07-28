@@ -1,12 +1,21 @@
 import { Injectable } from "@nestjs/common";
-import { BaseEntity, Repository, FindOneOptions, DeepPartial, DeleteResult, ObjectId, FindOptionsWhere } from "typeorm";
+import {
+  BaseEntity,
+  Repository,
+  FindOneOptions,
+  FindManyOptions,
+  DeepPartial,
+  DeleteResult,
+  ObjectId,
+  FindOptionsWhere,
+} from "typeorm";
 
 @Injectable()
 export class BaseRepository<T extends BaseEntity> {
-  constructor(private repository: Repository<T>) {}
+  constructor(protected repository: Repository<T>) {}
 
-  findAll(): Promise<T[]> {
-    return this.repository.find();
+  findAll(option?: FindManyOptions<T>): Promise<T[]> {
+    return this.repository.find(option);
   }
 
   findOne(data: FindOneOptions<T>): Promise<T | null> {
@@ -21,5 +30,10 @@ export class BaseRepository<T extends BaseEntity> {
     data: string | number | Date | ObjectId | string[] | number[] | Date[] | ObjectId[] | FindOptionsWhere<T>
   ): Promise<DeleteResult> {
     return this.repository.delete(data);
+  }
+
+  async updateOne(data: FindOneOptions<T>, updateData: DeepPartial<T>): Promise<T> {
+    const existedData = await this.repository.findOne(data);
+    return this.repository.save({ ...existedData, ...updateData });
   }
 }

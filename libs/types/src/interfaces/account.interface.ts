@@ -1,4 +1,4 @@
-import { AccountRoleEnum, AccountStatusEnum } from "../enum";
+import { AccountRoleEnum, AccountStatusEnum } from "../enums";
 import { IBrandInfo } from "./brand_info.interface";
 import { IPlayerInfo } from "./player_info.interface";
 
@@ -7,6 +7,7 @@ export interface IAccount {
   username: string;
   email: string;
   phone: string;
+  password: string;
   status: AccountStatusEnum;
   role: AccountRoleEnum;
   createdOn: Date;
