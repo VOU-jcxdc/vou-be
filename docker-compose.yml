@@ -63,6 +63,8 @@ services:
         STAGE: dev
     ports:
       - "3000:3000"
+    env_file:
+      - ./apps/main-api/.env.build
     container_name: main-api
     depends_on:
       postgres:
