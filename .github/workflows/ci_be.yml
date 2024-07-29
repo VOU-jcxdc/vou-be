@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Executing remote ssh command
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.KEY }}
+        port: 22
+        script: |
+            cd vou-be
+            git reset --hard
+            git pull
+
+            # Write secrets.env in base64 to env.zip
+            base64 -d <<< "${{ secrets.ENV }}" > env.zip
+
+            # Unzip env.zip to vou-be
+            unzip -o env.zip
+
+            # Remove env.zip
+            rm env.zip
+
+            # Stop docker compose 
+            docker compose down && docker image prune -f
+
+            # Build docker compose
+            docker compose build
+
+            # Run docker compose
+            docker compose up -d
