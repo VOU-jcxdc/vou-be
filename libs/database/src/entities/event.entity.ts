@@ -18,10 +18,10 @@ export class Event extends BaseEntity implements IEvent {
   @Column({ name: "brand_id", type: "uuid", nullable: false })
   brandId: string;
 
-  @Column({ name: "begin_date", type: "date", nullable: false })
+  @Column({ name: "begin_date", type: "timestamp", nullable: false })
   beginDate: Date;
 
-  @Column({ name: "end_date", type: "date", nullable: false })
+  @Column({ name: "end_date", type: "timestamp", nullable: false })
   endDate: Date;
 
   @Column({ name: "description", type: "text", nullable: false })
