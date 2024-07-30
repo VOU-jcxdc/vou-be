@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { ClientOptions, ClientProxy, ClientProxyFactory } from "@nestjs/microservices";
-import { CreateAccountDto, ILoginResponse } from "@types";
+import { CreateAccountDto, ILoginResponse, USER_SERVICE_PROVIDER_NAME } from "@types";
 import { catchError, lastValueFrom } from "rxjs";
 import otpGenerator from "otp-generator";
 import { RedisService } from "@shared-modules";
@@ -12,7 +12,7 @@ export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   constructor(
-    @Inject("USER_SERVICE") options: ClientOptions,
+    @Inject(USER_SERVICE_PROVIDER_NAME) options: ClientOptions,
     private readonly jwtService: JwtService,
     private readonly redisService: RedisService
   ) {
