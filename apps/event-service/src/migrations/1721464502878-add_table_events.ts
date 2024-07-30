@@ -31,12 +31,12 @@ export class AddTableEvents1721464502878 implements MigrationInterface {
           },
           {
             name: "begin_date",
-            type: "date",
+            type: "timestamp",
             isNullable: false,
           },
           {
             name: "end_date",
-            type: "date",
+            type: "timestamp",
             isNullable: false,
           },
           {
