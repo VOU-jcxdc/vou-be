@@ -18,3 +18,5 @@ export * from "./favorite_event.interface";
 
 export * from "./current_user.interface";
 export * from "./login_response.interface";
+
+export * from "./service-provider.interface";

@@ -3,10 +3,9 @@ import { PassportModule } from "@nestjs/passport";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import { ClientOptions, Transport } from "@nestjs/microservices";
 import { JwtModule } from "@nestjs/jwt";
 import { JwtStrategy } from "../../strategies";
-import { RedisModule } from "@shared-modules";
+import { ClientProxyModule, RedisModule } from "@shared-modules";
 
 @Module({
   imports: [
@@ -22,22 +21,9 @@ import { RedisModule } from "@shared-modules";
       }),
     }),
     RedisModule,
+    ClientProxyModule,
   ],
   controllers: [AuthController],
-  providers: [
-    {
-      provide: "USER_SERVICE",
-      useFactory: (configService: ConfigService): ClientOptions => ({
-        transport: Transport.TCP,
-        options: {
-          host: configService.get("USER_SERVICE_HOST"),
-          port: configService.get("USER_SERVICE_PORT"),
-        },
-      }),
-      inject: [ConfigService],
-    },
-    AuthService,
-    JwtStrategy,
-  ],
+  providers: [AuthService, JwtStrategy],
 })
 export class AuthModule {}
