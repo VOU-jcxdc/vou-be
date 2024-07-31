@@ -7,3 +7,6 @@ export * from "./event_image.entity";
 export * from "./game.entity";
 export * from "./game_image.entity";
 export * from "./favorite_event.entity";
+export * from "./voucher.entity";
+export * from "./account_voucher.entity";
+export * from "./event_voucher.entity";
