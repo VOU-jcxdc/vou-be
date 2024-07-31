@@ -1,6 +1,5 @@
 import { ConfigService } from "@nestjs/config";
-import { USER_SERVICE_PROVIDER_NAME } from "../constants";
-import { IServiceProvider } from "../interfaces";
+import { USER_SERVICE_PROVIDER_NAME, IServiceProvider } from "@types";
 import { ClientOptions, Transport } from "@nestjs/microservices";
 
 export const userServiceProvider: IServiceProvider = {
