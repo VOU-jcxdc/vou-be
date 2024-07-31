@@ -2,7 +2,7 @@ import { IFavoriteEvent } from "@types";
 import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Event } from "./event.entity";
 
-@Entity({ name: "favorite_event" })
+@Entity({ name: "favorite_events" })
 export class FavoriteEvent extends BaseEntity implements IFavoriteEvent {
   @PrimaryGeneratedColumn("uuid")
   id: string;
@@ -13,7 +13,7 @@ export class FavoriteEvent extends BaseEntity implements IFavoriteEvent {
   @Column({ name: "event_id", type: "uuid", nullable: false })
   eventId: string;
 
-  @ManyToOne(() => Event, event => event.favoriteList)
+  @ManyToOne(() => Event, (event) => event.favoriteList)
   @JoinColumn({ name: "event_id", referencedColumnName: "id" })
   readonly event: Event;
 }
