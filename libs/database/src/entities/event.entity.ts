@@ -1,4 +1,4 @@
-import { IEvent } from "@types";
+import { IEvent, EventStatusEnum } from "@types";
 import { BaseEntity, Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { EventImage } from "./event_image.entity";
 import { Game } from "./game.entity";
@@ -26,6 +26,9 @@ export class Event extends BaseEntity implements IEvent {
 
   @Column({ name: "description", type: "text", nullable: false })
   description: string;
+
+  @Column({ name: "status", type: "enum", enum: EventStatusEnum, default: "planning", nullable: false })
+  status: EventStatusEnum;
 
   @OneToMany(() => EventImage, (eventImage) => eventImage.eventId)
   readonly images: EventImage[];

@@ -17,26 +17,24 @@ import { Roles } from "../../decorators/roles.decorator";
 import { JwtAuthGuard, RoleGuard } from "../../guard";
 import { CurrentUser } from "../../decorators";
 
+@UseGuards(JwtAuthGuard, RoleGuard)
 @Controller("events")
 export class EventController {
   constructor(private readonly eventService: EventService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(AccountRoleEnum.BRAND)
   async createEvent(@CurrentUser() user: ICurrentUser, @Body() dto: CreateEventDto) {
     return this.eventService.createEvent(user.userId, dto);
   }
 
   @Put()
-  @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(AccountRoleEnum.BRAND)
   async updateEvent(@CurrentUser() user: ICurrentUser, @Body() dto: UpdateEventDto) {
     return this.eventService.updateEvent(user.userId, dto);
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(AccountRoleEnum.BRAND, AccountRoleEnum.PLAYER)
   async getEvents(
     @CurrentUser() user: ICurrentUser,
@@ -47,7 +45,6 @@ export class EventController {
   }
 
   @Get(":id")
-  @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(AccountRoleEnum.BRAND, AccountRoleEnum.PLAYER)
   async getEventById(@CurrentUser() user: ICurrentUser, @Param("id") id: string) {
     return this.eventService.getEventById(user, id);

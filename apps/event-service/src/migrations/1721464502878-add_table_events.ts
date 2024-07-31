@@ -44,6 +44,13 @@ export class AddTableEvents1721464502878 implements MigrationInterface {
             type: "text",
             isNullable: false,
           },
+          {
+            name: "status",
+            type: "enum",
+            enum: ["planning", "ongoing", "finished"],
+            default: "'planning'",
+            isNullable: false,
+          },
         ],
         foreignKeys: [
           {

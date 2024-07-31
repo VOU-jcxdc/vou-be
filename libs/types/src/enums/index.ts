@@ -3,3 +3,4 @@ export * from "./account-status.enum";
 export * from "./gender.enum";
 export * from "./game-type.enum";
 export * from "./upload-status.enum";
+export * from "./event-status.enum";

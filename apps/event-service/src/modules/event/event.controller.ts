@@ -8,12 +8,12 @@ export class EventController {
   constructor(private readonly eventService: EventService) {}
 
   @MessagePattern({ method: "POST", path: "/events" })
-  async createEvent(@Payload() dto: CreateEventDto & { userId: string }) {
+  async createEvent(@Payload() dto: CreateEventDto & { brandId: string }) {
     return this.eventService.createEvent(dto);
   }
 
   @MessagePattern({ method: "PUT", path: "/events" })
-  async updateEvent(@Payload() dto: UpdateEventDto & { userId: string }) {
+  async updateEvent(@Payload() dto: UpdateEventDto & { brandId: string }) {
     return this.eventService.updateEvent(dto);
   }
 

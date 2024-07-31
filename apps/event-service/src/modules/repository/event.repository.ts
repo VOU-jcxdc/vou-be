@@ -2,7 +2,7 @@ import { BaseRepository, Event } from "@database";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { AccountRoleEnum, ICurrentUser } from "@types";
-import { Brackets, Repository } from "typeorm";
+import { Repository } from "typeorm";
 
 @Injectable()
 export class EventRepository extends BaseRepository<Event> {

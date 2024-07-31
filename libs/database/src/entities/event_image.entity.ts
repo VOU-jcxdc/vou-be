@@ -1,8 +1,8 @@
 import { IEventImage } from "@types";
-import { BaseEntity, Entity, Column, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Entity, Column, ManyToOne, PrimaryGeneratedColumn, JoinColumn } from "typeorm";
 import { Event } from "./event.entity";
 
-@Entity({ name: "event_image" })
+@Entity({ name: "event_images" })
 export class EventImage extends BaseEntity implements IEventImage {
   @PrimaryGeneratedColumn("uuid")
   id: string;
@@ -14,5 +14,6 @@ export class EventImage extends BaseEntity implements IEventImage {
   bucketId: string;
 
   @ManyToOne(() => Event, (event) => event.images)
+  @JoinColumn({ name: "event_id", referencedColumnName: "id" })
   event: Event;
 }
