@@ -1,26 +1,13 @@
 import { Module } from "@nestjs/common";
 import { UserController } from "./user.controller";
 import { UserService } from "./user.service";
-import { ClientOptions, Transport } from "@nestjs/microservices";
-import { ConfigModule, ConfigService } from "@nestjs/config";
+import { ConfigModule } from "@nestjs/config";
 import { AdminController } from "./admin.controller";
+import { ClientProxyModule } from "@shared-modules";
 
 @Module({
-  imports: [ConfigModule],
+  imports: [ConfigModule, ClientProxyModule],
   controllers: [UserController, AdminController],
-  providers: [
-    {
-      provide: "USER_SERVICE",
-      useFactory: (configService: ConfigService): ClientOptions => ({
-        transport: Transport.TCP,
-        options: {
-          host: configService.get("USER_SERVICE_HOST"),
-          port: configService.get("USER_SERVICE_PORT"),
-        },
-      }),
-      inject: [ConfigService],
-    },
-    UserService,
-  ],
+  providers: [UserService],
 })
 export class UserModule {}
