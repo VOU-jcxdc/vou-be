@@ -1,7 +1,7 @@
 {
-  "name": "voucher-service",
+  "name": "item-service",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/voucher-service/src",
+  "sourceRoot": "apps/item-service/src",
   "projectType": "application",
   "tags": [],
   "targets": {
@@ -9,15 +9,15 @@
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "voucher-service:build"
+        "buildTarget": "item-service:build",
+        "port": 9232
       },
       "configurations": {
         "development": {
-          "buildTarget": "voucher-service:build:development",
-          "port": 9931
+          "buildTarget": "item-service:build:development"
         },
         "production": {
-          "buildTarget": "voucher-service:build:production"
+          "buildTarget": "item-service:build:production"
         }
       }
     },
@@ -32,15 +32,7 @@
       "outputs": [],
       "options": {
         "command": "typeorm migration:create",
-        "cwd": "apps/voucher-service/src/migrations"
-      }
-    },
-    "typecheck": {
-      "executor": "nx:run-commands",
-      "options": {
-        "commands": ["tsc -p tsconfig.app.json --noEmit"],
-        "cwd": "apps/main-api",
-        "forwardAllArgs": false
+        "cwd": "apps/item-service/src/migrations"
       }
     }
   }
