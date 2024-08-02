@@ -19,7 +19,10 @@ export class Gift extends BaseEntity implements IGift {
   @Column({ name: "send_date", type: "timestamp", nullable: false, default: () => "CURRENT_TIMESTAMP" })
   sendDate: Date;
 
+  @Column({ name: "item_id", type: "uuid", nullable: false })
+  itemId: string;
+
   @OneToOne(() => Item)
   @JoinColumn({ name: "item_id", referencedColumnName: "id" })
-  readonly itemId: Item;
+  readonly item: Item;
 }

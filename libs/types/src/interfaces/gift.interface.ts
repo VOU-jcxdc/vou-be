@@ -5,7 +5,8 @@ export interface IGift {
   receiverId: string;
   gameId: string;
   sendDate: Date;
+  itemId: string;
 
   // Relations
-  readonly itemId: IItem;
+  readonly item: IItem;
 }

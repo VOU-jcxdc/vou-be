@@ -1,10 +1,10 @@
 import { MigrationInterface, QueryRunner, Table } from "typeorm";
 
-export class AddTableAccountItem1722522754637 implements MigrationInterface {
+export class AddTableGifts1722522550801 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: "account_items",
+        name: "gifts",
         columns: [
           {
             name: "id",
@@ -14,19 +14,22 @@ export class AddTableAccountItem1722522754637 implements MigrationInterface {
             generationStrategy: "uuid",
           },
           {
-            name: "account_id",
+            name: "sender_id",
             type: "uuid",
             isNullable: false,
           },
           {
-            name: "status",
-            type: "enum",
-            enum: ["available", "used", "transferred"],
+            name: "receiver_id",
+            type: "uuid",
             isNullable: false,
-            default: "'available'",
           },
           {
-            name: "assigned_date",
+            name: "game_id",
+            type: "uuid",
+            isNullable: false,
+          },
+          {
+            name: "send_date",
             type: "timestamp",
             isNullable: false,
             default: "CURRENT_TIMESTAMP",
@@ -39,7 +42,7 @@ export class AddTableAccountItem1722522754637 implements MigrationInterface {
         ],
         foreignKeys: [
           {
-            name: "FK_ACCOUNT_ITEMS_ITEM_ID",
+            name: "FK_GIFTS_ITEM_ID",
             columnNames: ["item_id"],
             referencedColumnNames: ["id"],
             referencedTableName: "items",

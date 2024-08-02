@@ -24,6 +24,12 @@ export class Item extends BaseEntity implements IItem {
   @Column({ name: "created_on", type: "timestamp", nullable: false, default: () => "CURRENT_TIMESTAMP" })
   createdOn: Date;
 
-  @Column({ name: "updated_on", type: "timestamp", nullable: false, default: () => "CURRENT_TIMESTAMP" })
+  @Column({
+    name: "updated_on",
+    type: "timestamp",
+    nullable: false,
+    default: () => "CURRENT_TIMESTAMP",
+    onUpdate: "CURRENT_TIMESTAMP",
+  })
   updatedOn: Date;
 }

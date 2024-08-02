@@ -22,8 +22,11 @@ export class AccountItem extends BaseEntity implements IAccountItem {
   @Column({ name: "assigned_date", type: "timestamp", nullable: false, default: () => "CURRENT_TIMESTAMP" })
   assignedDate: Date;
 
+  @Column({ name: "item_id", type: "uuid", nullable: false })
+  itemId: string;
+
   // Relations
   @OneToOne(() => Item)
   @JoinColumn({ name: "item_id", referencedColumnName: "id" })
-  readonly itemId: Item;
+  readonly item: Item;
 }

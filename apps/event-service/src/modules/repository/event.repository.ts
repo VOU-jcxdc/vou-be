@@ -1,8 +1,9 @@
 import { BaseRepository, Event } from "@database";
 import { Injectable } from "@nestjs/common";
+import { RpcException } from "@nestjs/microservices";
 import { InjectRepository } from "@nestjs/typeorm";
-import { AccountRoleEnum, ICurrentUser } from "@types";
-import { Repository } from "typeorm";
+import { AccountRoleEnum, EventStatusEnum, ICurrentUser } from "@types";
+import { In, Repository } from "typeorm";
 
 @Injectable()
 export class EventRepository extends BaseRepository<Event> {
@@ -30,5 +31,16 @@ export class EventRepository extends BaseRepository<Event> {
     });
 
     return { events, total, offset, limit };
+  }
+
+  async findNotExpiredEvent(id: string) {
+    const event = await this.repository.findOne({
+      where: { id, status: In([EventStatusEnum.PLANNING, EventStatusEnum.ONGOING]) },
+    });
+
+    if (!event) {
+      throw new RpcException("Event is not exist or it expired");
+    }
+    return event;
   }
 }

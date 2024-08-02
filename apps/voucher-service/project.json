@@ -14,7 +14,7 @@
       "configurations": {
         "development": {
           "buildTarget": "voucher-service:build:development",
-          "port": 9931
+          "port": 9932
         },
         "production": {
           "buildTarget": "voucher-service:build:production"

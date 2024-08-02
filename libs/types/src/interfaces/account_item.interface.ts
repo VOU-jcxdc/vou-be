@@ -6,7 +6,8 @@ export interface IAccountItem {
   accountId: string;
   status: AccountItemStatusEnum;
   assignedDate: Date;
+  itemId: string;
 
   // Relations
-  readonly itemId: IItem;
+  readonly item: IItem;
 }
