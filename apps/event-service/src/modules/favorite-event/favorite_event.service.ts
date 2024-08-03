@@ -1,13 +1,17 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { FavoriteEventRepository } from "../repository/favorite_event.repository.module";
+import { FavoriteEventRepository } from "../repository/favorite_event.repository";
 import { AddFavoriteEventDto } from "@types";
 import { RpcException } from "@nestjs/microservices";
+import { EventRepository } from "../repository/event.repository";
 
 @Injectable()
 export class FavoriteEventService {
   private readonly logger = new Logger(FavoriteEventService.name);
 
-  constructor(private readonly favoriteEventRepository: FavoriteEventRepository) {}
+  constructor(
+    private readonly favoriteEventRepository: FavoriteEventRepository,
+    private readonly eventRepository: EventRepository
+  ) {}
 
   async addFavoriteEvent(dto: AddFavoriteEventDto & { userId: string }) {
     try {
@@ -21,7 +25,13 @@ export class FavoriteEventService {
       });
 
       if (existedData) throw new RpcException("Event already in favorite lists");
-      await this.favoriteEventRepository.save(data);
+
+      const existedEvent = await this.eventRepository.findNotExpiredEvent(dto.eventId);
+
+      await this.favoriteEventRepository.save({
+        eventId: existedEvent.id,
+        accountId: dto.userId,
+      });
       return "OK";
     } catch (error) {
       this.logger.error(error);

@@ -10,3 +10,6 @@ export * from "./favorite_event.entity";
 export * from "./voucher.entity";
 export * from "./account_voucher.entity";
 export * from "./event_voucher.entity";
+export * from "./item.entity";
+export * from "./gift.entity";
+export * from "./account_item.entity";

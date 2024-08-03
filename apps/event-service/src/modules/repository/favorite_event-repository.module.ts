@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { FavoriteEvent } from "@database";
-import { FavoriteEventRepository } from "./favorite_event.repository.module";
+import { FavoriteEventRepository } from "./favorite_event.repository";
 
 @Module({
   imports: [TypeOrmModule.forFeature([FavoriteEvent])],

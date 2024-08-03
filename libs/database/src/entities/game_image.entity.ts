@@ -15,5 +15,5 @@ export class GameImage extends BaseEntity implements IGameImage {
 
   @ManyToOne(() => Game, (game) => game.images)
   @JoinColumn({ name: "game_id", referencedColumnName: "id" })
-  game: Game;
+  readonly game: Game;
 }

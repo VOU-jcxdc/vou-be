@@ -27,7 +27,7 @@ export class Event extends BaseEntity implements IEvent {
   @Column({ name: "description", type: "text", nullable: false })
   description: string;
 
-  @Column({ name: "status", type: "enum", enum: EventStatusEnum, default: "planning", nullable: false })
+  @Column({ name: "status", type: "enum", enum: EventStatusEnum, default: EventStatusEnum.PLANNING, nullable: false })
   status: EventStatusEnum;
 
   @OneToMany(() => EventImage, (eventImage) => eventImage.eventId)
