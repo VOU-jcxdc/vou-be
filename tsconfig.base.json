@@ -19,7 +19,8 @@
       "@database": ["libs/database/src/index.ts"],
       "@shared-modules": ["libs/shared-modules/src/index.ts"],
       "@types": ["libs/types/src/index.ts"],
-      "@utils": ["libs/utils/src/index.ts"]
+      "@utils": ["libs/utils/src/index.ts"],
+      "@utils/*": ["libs/utils/src/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]

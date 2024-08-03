@@ -1,3 +1,4 @@
+import { EventStatusEnum } from "../enums/event-status.enum";
 import { IEventImage } from "./event_image.interface";
 import { IFavoriteEvent } from "./favorite_event.interface";
 import { IGame } from "./game.interface";
@@ -10,6 +11,7 @@ export interface IEvent {
   beginDate: Date;
   endDate: Date;
   description: string;
+  status: EventStatusEnum;
 
   // Relations
   readonly images: IEventImage[];

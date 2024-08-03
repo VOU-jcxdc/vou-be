@@ -1,12 +1,12 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { ClientOptions, ClientProxy, ClientProxyFactory } from "@nestjs/microservices";
-import { AccountRoleEnum, UdpateAccountDto, UpdateAccountByAdminDto } from "@types";
+import { AccountRoleEnum, USER_SERVICE_PROVIDER_NAME, UdpateAccountDto, UpdateAccountByAdminDto } from "@types";
 
 @Injectable()
 export class UserService {
   private client: ClientProxy;
 
-  constructor(@Inject("USER_SERVICE") options: ClientOptions) {
+  constructor(@Inject(USER_SERVICE_PROVIDER_NAME) options: ClientOptions) {
     this.client = ClientProxyFactory.create(options);
   }
 

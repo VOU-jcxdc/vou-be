@@ -1,0 +1,39 @@
+{
+  "name": "item-service",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/item-service/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "item-service:build",
+        "port": 9232
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "item-service:build:development"
+        },
+        "production": {
+          "buildTarget": "item-service:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["apps/main-api/**/*.ts"]
+      }
+    },
+    "create-migration": {
+      "executor": "nx:run-commands",
+      "outputs": [],
+      "options": {
+        "command": "typeorm migration:create",
+        "cwd": "apps/item-service/src/migrations"
+      }
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "name": "voucher-service",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/voucher-service/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "voucher-service:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "voucher-service:build:development",
+          "port": 9932
+        },
+        "production": {
+          "buildTarget": "voucher-service:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["apps/main-api/**/*.ts"]
+      }
+    },
+    "create-migration": {
+      "executor": "nx:run-commands",
+      "outputs": [],
+      "options": {
+        "command": "typeorm migration:create",
+        "cwd": "apps/voucher-service/src/migrations"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": ["tsc -p tsconfig.app.json --noEmit"],
+        "cwd": "apps/main-api",
+        "forwardAllArgs": false
+      }
+    }
+  }
+}
