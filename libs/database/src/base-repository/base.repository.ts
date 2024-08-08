@@ -26,6 +26,10 @@ export class BaseRepository<T extends BaseEntity> {
     return this.repository.save(data);
   }
 
+  saveMany(data: DeepPartial<T>[]): Promise<T[]> {
+    return this.repository.save(data);
+  }
+
   delete(
     data: string | number | Date | ObjectId | string[] | number[] | Date[] | ObjectId[] | FindOptionsWhere<T>
   ): Promise<DeleteResult> {
