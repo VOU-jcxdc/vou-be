@@ -1,47 +1,56 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query } from "@nestjs/common";
+import { Body, Controller, Param } from "@nestjs/common";
 import { VoucherService } from "./voucher.service";
 import {
-  AssignVoucherDto,
+  AddVoucherToAccountDto,
   CreateVoucherDto,
   DeleteVoucherDto,
   UpdateAsssignVoucherDto,
   UpdateVoucherDto,
 } from "@types";
+import { MessagePattern, Payload } from "@nestjs/microservices";
 
 @Controller("vouchers")
 export class VoucherController {
   constructor(private readonly voucherService: VoucherService) {}
 
-  @Get(":eventId")
+  @MessagePattern({ method: "GET", path: "vouchers/account/:id/vouchers" })
+  getVouchersByAccountId(@Payload() data: { id: string }) {
+    return this.voucherService.getAccountVouchers(data.id);
+  }
+
+  @MessagePattern({ method: "GET", path: "vouchers/:eventId" })
   getVouchersByEventId(@Param("eventId") eventId: string) {
     return this.voucherService.getVouchersByEventId(eventId);
   }
 
-  @Post()
-  createVouchers(@Body() data: CreateVoucherDto) {
+  @MessagePattern({ method: "POST", path: "vouchers" })
+  createVouchers(@Payload() data: CreateVoucherDto) {
     return this.voucherService.createVouchers(data);
   }
 
-  @Post(":voucherId/assign")
-  assignVoucher(@Param("voucherId") voucherId: string, @Body() data: AssignVoucherDto) {
-    return this.voucherService.asignVoucherToAccount(voucherId, data);
+  @MessagePattern({ method: "POST", path: "vouchers/assigning" })
+  assignVoucher(@Payload() data: AddVoucherToAccountDto & { accountId: string }) {
+    const { accountId, ...rest } = data;
+    return this.voucherService.upsertAccountVoucher(accountId, rest);
   }
 
-  @Put(":voucherId")
-  updateVoucherDetail(@Param("voucherId") voucherId: string, @Body() data: UpdateVoucherDto) {
-    return this.voucherService.updateVoucherDetail(voucherId, data);
+  @MessagePattern({ method: "PUT", path: "vouchers/:voucherId" })
+  updateVoucherDetail(@Payload() data: UpdateVoucherDto & { voucherId: string }) {
+    const { voucherId, ...rest } = data;
+    return this.voucherService.updateVoucherDetail(voucherId, rest);
   }
 
-  @Put("account/:accountVoucherId")
+  @MessagePattern({ method: "PUT", path: "vouchers/account/:accountVoucherId" })
   updateAccountVoucherStatus(
-    @Param("accountVoucherId") accountVoucherId: string,
-    @Body() data: UpdateAsssignVoucherDto
+    @Payload() data: { accountVoucherId: string } & { accountId: string } & UpdateAsssignVoucherDto
   ) {
-    return this.voucherService.updateAccountVoucherStatus(accountVoucherId, data);
+    const { accountVoucherId, accountId, ...rest } = data;
+    return this.voucherService.updateAccountVoucherStatus(accountVoucherId, accountId, rest);
   }
 
-  @Delete()
-  deleteVouchersInEvent(@Query("eventId") eventId: string, @Body() data: DeleteVoucherDto) {
-    return this.voucherService.deleteVouchersInEvent(eventId, data.voucherIds);
+  @MessagePattern({ method: "DELETE", path: "vouchers" })
+  deleteVouchersInEvent(@Payload() data: { eventId: string } & DeleteVoucherDto) {
+    const { eventId, voucherIds } = data;
+    return this.voucherService.deleteVouchersInEvent(eventId, voucherIds);
   }
 }

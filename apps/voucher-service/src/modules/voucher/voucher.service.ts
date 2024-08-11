@@ -1,9 +1,16 @@
 import { Injectable } from "@nestjs/common";
 import { VoucherRepository } from "../repository/voucher.repository";
-import { AssignVoucherDto, CreateVoucherDto, UpdateAsssignVoucherDto, UpdateVoucherDto, VoucherStatus } from "@types";
+import {
+  AddVoucherToAccountDto,
+  CreateVoucherDto,
+  UpdateAsssignVoucherDto,
+  UpdateVoucherDto,
+  VoucherStatus,
+} from "@types";
 import { EventVoucherRepository } from "../repository/event-voucher.repository";
 import { AccountVoucherRepository } from "../repository/account-voucher.repository";
 import { isNil } from "lodash";
+import { RpcException } from "@nestjs/microservices";
 
 @Injectable()
 export class VoucherService {
@@ -70,21 +77,43 @@ export class VoucherService {
     }
   }
 
-  async asignVoucherToAccount(voucherId: string, data: AssignVoucherDto) {
+  async getAccountVouchers(accountId: string) {
+    try {
+      return this.accountVoucherRepo.findAll({
+        where: { accountId, status: VoucherStatus.ACTIVE },
+        relations: {
+          voucher: true,
+        },
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async upsertAccountVoucher(accountId: string, data: AddVoucherToAccountDto) {
     try {
       // check if the voucher is in the event and has enough quantity
-      const { eventId, quantity, accountId } = data;
+      const { eventVoucherId, quantity } = data;
       const voucherInEvent = await this.eventVoucherRepo.findOne({
-        where: { eventId, voucherId },
+        where: { id: eventVoucherId },
         relations: { voucher: true },
       });
       if (
         !voucherInEvent ||
         voucherInEvent.quantity < quantity ||
-        voucherInEvent.voucher.status !== VoucherStatus.EXPIRED
+        voucherInEvent.voucher.status === VoucherStatus.EXPIRED
       ) {
-        throw new Error("Voucher not found or not enough quantity");
+        throw new RpcException("Invalid voucher");
       }
+
+      // update the quantity of voucher in the event
+      console.log("quantity", quantity);
+      const res = await this.eventVoucherRepo.updateOne(
+        { where: { id: eventVoucherId } },
+        { quantity: voucherInEvent.quantity - quantity }
+      );
+
+      const { voucherId } = voucherInEvent;
       // check if the account has that voucher
       const existedAccountVoucher = await this.accountVoucherRepo.findOne({ where: { accountId, voucherId } });
 
@@ -96,23 +125,29 @@ export class VoucherService {
           )
         : this.accountVoucherRepo.save({ accountId, voucherId, quantity });
     } catch (error) {
-      throw error;
+      console.log("error", error);
+      throw new RpcException(error);
     }
   }
 
-  async updateAccountVoucherStatus(accountVoucherId: string, data: UpdateAsssignVoucherDto) {
+  async updateAccountVoucherStatus(accountVoucherId: string, accountId: string, data: UpdateAsssignVoucherDto) {
     try {
       // if this update the status of account voucher to EXPIRED, then update the status of voucher to EXPIRED
       const { quantity, status } = data;
       if (!isNil(status) && status === VoucherStatus.EXPIRED) {
-        return this.accountVoucherRepo.updateOne({ where: { id: accountVoucherId } }, { status });
+        return this.accountVoucherRepo.updateOne({ where: { id: accountVoucherId, accountId } }, { status });
       }
 
       // update the quantity of account voucher -> user use the voucher
-      const accountVoucher = await this.accountVoucherRepo.findOne({ where: { id: accountVoucherId } });
-      if (accountVoucher.quantity < quantity) {
-        throw new Error("Not enough quantity to update");
+      const accountVoucher = await this.accountVoucherRepo.findOne({
+        where: { id: accountVoucherId, accountId, status: VoucherStatus.ACTIVE },
+      });
+      if (!accountVoucher || accountVoucher.quantity < quantity) {
+        throw new Error("Voucher is unavailable");
       }
+
+      // if the quantity is equal to the quantity of account voucher, then update the status of account voucher to INACTIVE
+      // else, update the quantity of account voucher
       return accountVoucher.quantity === quantity
         ? this.accountVoucherRepo.updateOne(
             { where: { id: accountVoucherId } },
