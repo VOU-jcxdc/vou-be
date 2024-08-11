@@ -107,7 +107,6 @@ export class VoucherService {
       }
 
       // update the quantity of voucher in the event
-      console.log("quantity", quantity);
       const res = await this.eventVoucherRepo.updateOne(
         { where: { id: eventVoucherId } },
         { quantity: voucherInEvent.quantity - quantity }
