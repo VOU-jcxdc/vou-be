@@ -14,6 +14,12 @@ export class AddTableVouchers1722439112371 implements MigrationInterface {
             generationStrategy: "uuid",
           },
           {
+            name: "name",
+            type: "varchar",
+            length: "255",
+            isNullable: false,
+          },
+          {
             name: "description",
             type: "text",
             isNullable: false,

@@ -134,6 +134,26 @@ services:
     networks:
       - vou-network
 
+  voucher-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_NAME: voucher-service
+        STAGE: dev
+    ports:
+      - "3004:3004"
+    env_file:
+      - ./apps/voucher-service/.env.build
+    container_name: voucher-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migration:
+        condition: service_completed_successfully
+    networks:
+      - vou-network
+
 volumes:
   postgres-data:
   rabbitmq-data:

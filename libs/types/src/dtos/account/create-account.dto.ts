@@ -1,8 +1,8 @@
-import { AccountRoleEnum } from "../enums/account-role.enum";
+import { AccountRoleEnum } from "../../enums/account-role.enum";
 import { CreateBrandInfoDto } from "./create-brand-info.dto";
 import { CreatePlayerInfoDto } from "./create-player-info.dto";
 import { IsEnum, IsNotEmpty, Validate, ValidateNested } from "class-validator";
-import { InfoValidation } from "./custom";
+import { InfoValidation } from "../custom";
 
 export class CreateAccountDto {
   @IsNotEmpty({ message: "Phone is required" })

@@ -5,9 +5,10 @@ import { EventService } from "./event.service";
 import { ClientOptions, Transport } from "@nestjs/microservices";
 import { FavoriteEventController } from "./favorite_event.controller";
 import { FavoriteEventService } from "./favorite_event.service";
+import { ClientProxyModule } from "@shared-modules";
 
 @Module({
-  imports: [ConfigModule],
+  imports: [ConfigModule, ClientProxyModule],
   providers: [
     {
       provide: "EVENT_SERVICE",

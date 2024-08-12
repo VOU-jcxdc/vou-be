@@ -1,13 +1,25 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { ClientOptions, ClientProxy, ClientProxyFactory } from "@nestjs/microservices";
-import { AccountRoleEnum, USER_SERVICE_PROVIDER_NAME, UdpateAccountDto, UpdateAccountByAdminDto } from "@types";
+import {
+  AccountRoleEnum,
+  USER_SERVICE_PROVIDER_NAME,
+  UdpateAccountDto,
+  UpdateAccountByAdminDto,
+  UpdateAsssignVoucherDto,
+  VOUCHER_SERVICE_PROVIDER_NAME,
+} from "@types";
 
 @Injectable()
 export class UserService {
   private client: ClientProxy;
+  private clientVoucher: ClientProxy;
 
-  constructor(@Inject(USER_SERVICE_PROVIDER_NAME) options: ClientOptions) {
+  constructor(
+    @Inject(USER_SERVICE_PROVIDER_NAME) options: ClientOptions,
+    @Inject(VOUCHER_SERVICE_PROVIDER_NAME) optionsVoucher: ClientOptions
+  ) {
     this.client = ClientProxyFactory.create(options);
+    this.clientVoucher = ClientProxyFactory.create(optionsVoucher);
   }
 
   async getUserInfoWithRole(id: string, role: AccountRoleEnum) {
@@ -20,6 +32,18 @@ export class UserService {
 
   async getUserInfo(id: string) {
     return this.client.send({ method: "GET", path: "/account/:id" }, { id });
+  }
+
+  async getVouchers(id: string) {
+    return this.clientVoucher.send({ method: "GET", path: "vouchers/account/:id/vouchers" }, { id });
+  }
+
+  async updateAccountVoucherStatus(accountVoucherId: string, accountId: string, body: UpdateAsssignVoucherDto) {
+    const { quantity, status } = body;
+    return this.clientVoucher.send(
+      { method: "PUT", path: "vouchers/account/:accountVoucherId" },
+      { accountVoucherId, accountId, quantity, status }
+    );
   }
 
   async updateAccountByAdmin(id: string, body: UpdateAccountByAdminDto) {

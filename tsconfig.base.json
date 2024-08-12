@@ -14,6 +14,7 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "strictPropertyInitialization": false,
+    "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
       "@database": ["libs/database/src/index.ts"],
