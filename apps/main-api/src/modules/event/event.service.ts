@@ -28,6 +28,7 @@ export class EventService {
     const reqData = {
       ...dto,
       brandId: userId,
+      vouchers: undefined,
     };
 
     const rawData = this.client.send({ method: "POST", path: "/events" }, reqData).pipe(
@@ -38,7 +39,21 @@ export class EventService {
       })
     );
 
-    return lastValueFrom(rawData);
+    const event = await lastValueFrom(rawData);
+
+    const rawVouchers = this.clientVoucher
+      .send({ method: "POST", path: "/vouchers" }, { eventId: event.id, vouchers: dto.vouchers })
+      .pipe(
+        catchError((error) => {
+          const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
+          const message = error.message || "An error occurred";
+          throw new HttpException(message, statusCode);
+        })
+      );
+
+    await lastValueFrom(rawVouchers);
+
+    return event;
   }
 
   async updateEvent(userId: string, dto: UpdateEventDto, eventId: string) {

@@ -1,7 +1,7 @@
-import { Inject, Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { EventRepository } from "../repository/event.repository";
 import { AccountRoleEnum, CreateEventDto, ICurrentUser, UpdateEventDto, VOUCHER_SERVICE_PROVIDER_NAME } from "@types";
-import { ClientOptions, ClientProxy, ClientProxyFactory, RpcException } from "@nestjs/microservices";
+import { RpcException } from "@nestjs/microservices";
 import { EventImageRepository } from "../repository/event-image.repository";
 import { EventHelper } from "./event.helper";
 import { EventImage } from "@database";
@@ -10,16 +10,12 @@ import { catchError, lastValueFrom } from "rxjs";
 @Injectable()
 export class EventService {
   private readonly logger = new Logger(EventService.name);
-  private voucherClient: ClientProxy;
 
   constructor(
     private readonly eventRepository: EventRepository,
     private readonly eventImageRepository: EventImageRepository,
-    private readonly eventHelper: EventHelper,
-    @Inject(VOUCHER_SERVICE_PROVIDER_NAME) voucherOptions: ClientOptions
-  ) {
-    this.voucherClient = ClientProxyFactory.create(voucherOptions);
-  }
+    private readonly eventHelper: EventHelper
+  ) {}
 
   async createEvent(dto: CreateEventDto & { brandId: string }) {
     try {
@@ -36,22 +32,6 @@ export class EventService {
         ...rest,
         images,
       });
-
-      const rawVouchers = this.voucherClient
-        .send(
-          { method: "POST", path: "/vouchers" },
-          {
-            eventId: newEvent.id,
-            vouchers,
-          }
-        )
-        .pipe(
-          catchError((error) => {
-            throw new RpcException(error);
-          })
-        );
-
-      await lastValueFrom(rawVouchers);
 
       return this.eventHelper.buildResponseFromEvent(newEvent);
     } catch (error) {
