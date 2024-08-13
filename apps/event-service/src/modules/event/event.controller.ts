@@ -13,7 +13,7 @@ export class EventController {
   }
 
   @MessagePattern({ method: "PUT", path: "/events" })
-  async updateEvent(@Payload() dto: UpdateEventDto & { brandId: string }) {
+  async updateEvent(@Payload() dto: UpdateEventDto & { brandId: string; eventId: string }) {
     return this.eventService.updateEvent(dto);
   }
 

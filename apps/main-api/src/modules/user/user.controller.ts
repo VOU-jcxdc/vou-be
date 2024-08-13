@@ -5,7 +5,7 @@ import { CurrentUser } from "../../decorators";
 import { AccountRoleEnum, ICurrentUser, UdpateAccountDto, UpdateAsssignVoucherDto } from "@types";
 import { Roles } from "../../decorators/roles.decorator";
 
-@UseGuards(JwtAuthGuard, RoleGuard)
+@UseGuards(JwtAuthGuard)
 @Controller("users")
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -16,6 +16,7 @@ export class UserController {
   }
 
   @Get("vouchers")
+  @UseGuards(RoleGuard)
   @Roles(AccountRoleEnum.PLAYER)
   async getPlayerVouchers(@CurrentUser() user: ICurrentUser) {
     return this.userService.getVouchers(user.userId);
@@ -27,6 +28,7 @@ export class UserController {
   }
 
   @Put("voucher/:accountVoucherId/applying")
+  @UseGuards(RoleGuard)
   @Roles(AccountRoleEnum.PLAYER)
   async applyingVoucher(
     @Param("accountVoucherId") accountVoucherId: string,

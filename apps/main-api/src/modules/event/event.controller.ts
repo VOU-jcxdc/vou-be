@@ -29,10 +29,10 @@ export class EventController {
     return this.eventService.assignVoucherInEvent(user.userId, data);
   }
 
-  @Put()
+  @Put(":id")
   @Roles(AccountRoleEnum.BRAND)
-  async updateEvent(@CurrentUser() user: ICurrentUser, @Body() dto: UpdateEventDto) {
-    return this.eventService.updateEvent(user.userId, dto);
+  async updateEvent(@CurrentUser() user: ICurrentUser, @Body() dto: UpdateEventDto, @Param("id") eventId: string) {
+    return this.eventService.updateEvent(user.userId, dto, eventId);
   }
 
   @Get()
@@ -43,6 +43,12 @@ export class EventController {
     @Query("limit", ParseIntPipe) limit: number
   ) {
     return this.eventService.getEvents(user, offset, limit);
+  }
+
+  @Get(":id/vouchers")
+  @Roles(AccountRoleEnum.BRAND, AccountRoleEnum.PLAYER)
+  async getVouchersInEvent(@Param("id") id: string) {
+    return this.eventService.getVouchersInEvent(id);
   }
 
   @Get(":id")

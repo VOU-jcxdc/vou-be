@@ -1,30 +1,57 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { EventRepository } from "../repository/event.repository";
-import { AccountRoleEnum, CreateEventDto, ICurrentUser, UpdateEventDto } from "@types";
-import { RpcException } from "@nestjs/microservices";
+import { AccountRoleEnum, CreateEventDto, ICurrentUser, UpdateEventDto, VOUCHER_SERVICE_PROVIDER_NAME } from "@types";
+import { ClientOptions, ClientProxy, ClientProxyFactory, RpcException } from "@nestjs/microservices";
 import { EventImageRepository } from "../repository/event-image.repository";
 import { EventHelper } from "./event.helper";
+import { EventImage } from "@database";
+import { catchError, lastValueFrom } from "rxjs";
 
 @Injectable()
 export class EventService {
   private readonly logger = new Logger(EventService.name);
+  private voucherClient: ClientProxy;
 
   constructor(
     private readonly eventRepository: EventRepository,
     private readonly eventImageRepository: EventImageRepository,
-    private readonly eventHelper: EventHelper
-  ) {}
+    private readonly eventHelper: EventHelper,
+    @Inject(VOUCHER_SERVICE_PROVIDER_NAME) voucherOptions: ClientOptions
+  ) {
+    this.voucherClient = ClientProxyFactory.create(voucherOptions);
+  }
 
   async createEvent(dto: CreateEventDto & { brandId: string }) {
     try {
+      const { vouchers, ...rest } = dto;
+
+      const images =
+        dto.images.map((id) => {
+          const image = new EventImage();
+          image.bucketId = id;
+          return image;
+        }) || [];
+
       const newEvent = await this.eventRepository.save({
-        ...dto,
-        images: undefined,
+        ...rest,
+        images,
       });
 
-      for (const bucketId of dto.images) {
-        await this.eventImageRepository.save({ bucketId, eventId: newEvent.id });
-      }
+      const rawVouchers = this.voucherClient
+        .send(
+          { method: "POST", path: "/vouchers" },
+          {
+            eventId: newEvent.id,
+            vouchers,
+          }
+        )
+        .pipe(
+          catchError((error) => {
+            throw new RpcException(error);
+          })
+        );
+
+      await lastValueFrom(rawVouchers);
 
       return this.eventHelper.buildResponseFromEvent(newEvent);
     } catch (error) {
@@ -33,11 +60,11 @@ export class EventService {
     }
   }
 
-  async updateEvent(dto: UpdateEventDto & { brandId: string }) {
+  async updateEvent(dto: UpdateEventDto & { brandId: string; eventId: string }) {
     try {
       const event = await this.eventRepository.findOne({
         where: {
-          id: dto.id,
+          id: dto.eventId,
           brandId: dto.brandId,
         },
       });
@@ -46,16 +73,28 @@ export class EventService {
         throw new RpcException("Event related to this brand not found");
       }
 
+      const { images, ...rest } = dto;
+
       const updatedEvent = await this.eventRepository.save({
         ...event,
-        ...dto,
-        images: undefined,
+        ...rest,
       });
 
-      if (dto.images) {
-        await this.eventImageRepository.delete({ eventId: updatedEvent.id });
-        for (const bucketId of dto.images) {
-          await this.eventImageRepository.save({ bucketId, eventId: updatedEvent.id });
+      if (images) {
+        const oldImages = updatedEvent.images;
+        const updatedImages = images.map((id) => {
+          const image = new EventImage();
+          image.bucketId = id;
+          return image;
+        });
+
+        await this.eventRepository.save({
+          ...updatedEvent,
+          images: [...updatedImages],
+        });
+
+        for (const oldImage of oldImages) {
+          await this.eventImageRepository.delete({ id: oldImage.id });
         }
       }
 

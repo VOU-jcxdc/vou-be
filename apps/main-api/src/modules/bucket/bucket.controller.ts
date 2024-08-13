@@ -24,9 +24,9 @@ export class BucketController {
     return await this.bucketService.deleteFile(id);
   }
 
-  @Put("presigned-url")
-  async getPresignedUploadUrlForUpdate(@Body() dto: UpdateFileDto) {
-    return await this.bucketService.getPresignedUploadUrlForUpdate(dto);
+  @Put("presigned-url/:id")
+  async getPresignedUploadUrlForUpdate(@Body() dto: UpdateFileDto, @Param("id") id: string) {
+    return await this.bucketService.getPresignedUploadUrlForUpdate(id, dto);
   }
 
   @Post("upload-confirmation")
