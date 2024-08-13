@@ -1,7 +1,6 @@
-import { IsDate, IsEnum, IsNotEmpty, IsNumber, IsUUID, ValidateNested } from "class-validator";
+import { IsEnum, IsNotEmpty, IsNumber, IsUUID, ValidateNested } from "class-validator";
 import { VoucherType } from "../../enums";
-import { Transform, Type } from "class-transformer";
-import moment from "moment";
+import { Type } from "class-transformer";
 
 export class VoucherDetailDto {
   @IsNotEmpty({ message: "description is required" })
@@ -19,15 +18,8 @@ export class VoucherDetailDto {
   @IsNumber({ allowInfinity: false }, { message: "value must be a number" })
   value: number;
 
-  @Transform(({ value }) => {
-    const date = moment.utc(value, "YYYY-MM-DD", true);
-    if (!date.isValid()) {
-      throw new Error("exp must be a date");
-    }
-    return date.toDate();
-  })
-  @IsDate({ message: "exp must be a date" })
-  exp: Date;
+  @IsNumber({ allowInfinity: false }, { message: "duration must be a number" })
+  duration: number;
 
   @IsNumber({ allowInfinity: false }, { message: "quantity must be a number" })
   quantity: number;

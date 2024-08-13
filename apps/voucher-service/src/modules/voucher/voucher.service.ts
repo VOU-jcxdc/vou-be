@@ -11,7 +11,7 @@ import { EventVoucherRepository } from "../repository/event-voucher.repository";
 import { AccountVoucherRepository } from "../repository/account-voucher.repository";
 import { isNil } from "lodash";
 import { RpcException } from "@nestjs/microservices";
-
+import moment from "moment";
 @Injectable()
 export class VoucherService {
   constructor(
@@ -140,9 +140,17 @@ export class VoucherService {
       // update the quantity of account voucher -> user use the voucher
       const accountVoucher = await this.accountVoucherRepo.findOne({
         where: { id: accountVoucherId, accountId, status: VoucherStatus.ACTIVE },
+        relations: { voucher: true },
       });
       if (!accountVoucher || accountVoucher.quantity < quantity) {
         throw new Error("Voucher is unavailable");
+      }
+
+      const currentDate = moment();
+      const expiredDate = moment(accountVoucher.assigenedOn).add(accountVoucher.voucher.duration, "seconds");
+
+      if (currentDate.isAfter(expiredDate)) {
+        throw new Error("Voucher is expired");
       }
 
       // if the quantity is equal to the quantity of account voucher, then update the status of account voucher to INACTIVE
