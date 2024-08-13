@@ -1,9 +1,3 @@
-import { IsString, IsUUID } from "class-validator";
+import { UploadFileDto } from "./upload_file.dto";
 
-export class UpdateFileDto {
-  @IsUUID()
-  id: string;
-
-  @IsString()
-  filename: string;
-}
+export class UpdateFileDto extends UploadFileDto {}

@@ -73,7 +73,7 @@ export class AppService {
     }
   }
 
-  async getPresignedUploadUrlForUpdate(body: UpdateFileDto): Promise<{ id: string; url: string }> {
+  async getPresignedUploadUrlForUpdate(body: UpdateFileDto & { id: string }): Promise<{ id: string; url: string }> {
     try {
       const { id, filename } = body;
       const data = await this.bucketRepository.findOne({ where: { id } });

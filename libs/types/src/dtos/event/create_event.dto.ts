@@ -1,4 +1,6 @@
-import { IsDateString, IsString, IsUUID } from "class-validator";
+import { IsDateString, IsString, IsUUID, ValidateNested } from "class-validator";
+import { VoucherDetailDto } from "../voucher/create-voucher.dto";
+import { Type } from "class-transformer";
 
 export class CreateEventDto {
   @IsString()
@@ -15,4 +17,8 @@ export class CreateEventDto {
 
   @IsString()
   description: string;
+
+  @ValidateNested({ each: true })
+  @Type(() => VoucherDetailDto)
+  vouchers: VoucherDetailDto[];
 }

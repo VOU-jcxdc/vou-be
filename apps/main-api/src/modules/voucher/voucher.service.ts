@@ -1,6 +1,12 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { ClientOptions, ClientProxy, ClientProxyFactory } from "@nestjs/microservices";
-import { UpdateVoucherDto, VOUCHER_SERVICE_PROVIDER_NAME } from "@types";
+import {
+  CreateVoucherDto,
+  DeleteVoucherDto,
+  ICurrentUser,
+  UpdateVoucherDto,
+  VOUCHER_SERVICE_PROVIDER_NAME,
+} from "@types";
 
 @Injectable()
 export class VoucherService {
@@ -10,6 +16,14 @@ export class VoucherService {
   }
 
   async updateVoucherDetail(voucherId: string, data: UpdateVoucherDto) {
-    return this.voucherClient.send({ method: "PUT", path: "vouchers/:voucherId" }, { voucherId, ...data });
+    return this.voucherClient.send({ method: "PUT", path: "/vouchers/:voucherId" }, { voucherId, ...data });
+  }
+
+  async createVouchers(data: CreateVoucherDto) {
+    return this.voucherClient.send({ method: "POST", path: "/vouchers" }, data);
+  }
+
+  async deleteVouchers(data: DeleteVoucherDto & { eventId: string }) {
+    return this.voucherClient.send({ method: "DELETE", path: "/vouchers" }, data);
   }
 }

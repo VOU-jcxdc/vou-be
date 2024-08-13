@@ -23,8 +23,10 @@ export class AppController {
     return await this.appService.deleteFile(id);
   }
 
-  @MessagePattern({ method: "PUT", path: "/files/presigned-url" })
-  async updatePresignedUploadUrl(@Payload() body: UpdateFileDto): Promise<{ id: string; url: string }> {
+  @MessagePattern({ method: "PUT", path: "/files/presigned-url/:id" })
+  async updatePresignedUploadUrl(
+    @Payload() body: UpdateFileDto & { id: string }
+  ): Promise<{ id: string; url: string }> {
     return await this.appService.getPresignedUploadUrlForUpdate(body);
   }
 

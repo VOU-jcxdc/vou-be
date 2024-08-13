@@ -22,7 +22,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ExceptionHandlerInterceptor());
   app.useGlobalPipes(ThrowFirstErrorValidationPipe);
   await app.startAllMicroservices();
-  await app.listen(3014);
+  await app.init();
 
   Logger.log("🚀 Voucher application is running");
 }

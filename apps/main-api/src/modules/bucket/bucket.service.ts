@@ -1,13 +1,13 @@
 import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ClientOptions, ClientProxy, ClientProxyFactory } from "@nestjs/microservices";
 import { catchError, lastValueFrom } from "rxjs";
-import { ConfirmUploadDto, UpdateFileDto, UploadFileDto } from "@types";
+import { BUCKET_SERVICE_PROVIDER_NAME, ConfirmUploadDto, UpdateFileDto, UploadFileDto } from "@types";
 
 @Injectable()
 export class BucketService {
   private client: ClientProxy;
 
-  constructor(@Inject("BUCKET_SERVICE") private readonly options: ClientOptions) {
+  constructor(@Inject(BUCKET_SERVICE_PROVIDER_NAME) private readonly options: ClientOptions) {
     this.client = ClientProxyFactory.create(options);
   }
 
@@ -46,8 +46,8 @@ export class BucketService {
     return await lastValueFrom(data);
   }
 
-  async getPresignedUploadUrlForUpdate(body: UpdateFileDto): Promise<string> {
-    const rawData = this.client.send({ method: "PUT", path: "/files/presigned-url" }, body).pipe(
+  async getPresignedUploadUrlForUpdate(id: string, body: UpdateFileDto) {
+    const rawData = this.client.send({ method: "PUT", path: "/files/presigned-url/:id" }, { id, ...body }).pipe(
       catchError((error) => {
         const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
         const message = error.message || "An error occurred";

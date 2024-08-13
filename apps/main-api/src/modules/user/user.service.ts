@@ -35,13 +35,13 @@ export class UserService {
   }
 
   async getVouchers(id: string) {
-    return this.clientVoucher.send({ method: "GET", path: "vouchers/account/:id/vouchers" }, { id });
+    return this.clientVoucher.send({ method: "GET", path: "/vouchers/account/:id/vouchers" }, { id });
   }
 
   async updateAccountVoucherStatus(accountVoucherId: string, accountId: string, body: UpdateAsssignVoucherDto) {
     const { quantity, status } = body;
     return this.clientVoucher.send(
-      { method: "PUT", path: "vouchers/account/:accountVoucherId" },
+      { method: "PUT", path: "/vouchers/account/:accountVoucherId" },
       { accountVoucherId, accountId, quantity, status }
     );
   }

@@ -28,6 +28,7 @@ export class EventService {
     const reqData = {
       ...dto,
       brandId: userId,
+      vouchers: undefined,
     };
 
     const rawData = this.client.send({ method: "POST", path: "/events" }, reqData).pipe(
@@ -38,13 +39,28 @@ export class EventService {
       })
     );
 
-    return lastValueFrom(rawData);
+    const event = await lastValueFrom(rawData);
+
+    const rawVouchers = this.clientVoucher
+      .send({ method: "POST", path: "/vouchers" }, { eventId: event.id, vouchers: dto.vouchers })
+      .pipe(
+        catchError((error) => {
+          const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
+          const message = error.message || "An error occurred";
+          throw new HttpException(message, statusCode);
+        })
+      );
+
+    await lastValueFrom(rawVouchers);
+
+    return event;
   }
 
-  async updateEvent(userId: string, dto: UpdateEventDto) {
+  async updateEvent(userId: string, dto: UpdateEventDto, eventId: string) {
     const reqData = {
       ...dto,
       brandId: userId,
+      eventId,
     };
 
     const rawData = this.client.send({ method: "PUT", path: "/events" }, reqData).pipe(
@@ -89,7 +105,7 @@ export class EventService {
   async assignVoucherInEvent(accountId: string, data: AddVoucherToAccountDto) {
     const { eventVoucherId, quantity } = data;
     const rawData = this.clientVoucher
-      .send({ method: "POST", path: "vouchers/assigning" }, { accountId, eventVoucherId, quantity })
+      .send({ method: "POST", path: "/vouchers/assigning" }, { accountId, eventVoucherId, quantity })
       .pipe(
         catchError((error) => {
           const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
@@ -102,7 +118,19 @@ export class EventService {
   }
 
   async deleteVouchersInEvent(eventId: string, data: DeleteVoucherDto) {
-    const rawData = this.clientVoucher.send({ method: "DELETE", path: "vouchers" }, { eventId, ...data }).pipe(
+    const rawData = this.clientVoucher.send({ method: "DELETE", path: "/vouchers" }, { eventId, ...data }).pipe(
+      catchError((error) => {
+        const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
+        const message = error.message || "An error occurred";
+        throw new HttpException(message, statusCode);
+      })
+    );
+
+    return lastValueFrom(rawData);
+  }
+
+  async getVouchersInEvent(eventId: string) {
+    const rawData = this.clientVoucher.send({ method: "GET", path: "/vouchers/:eventId" }, { eventId }).pipe(
       catchError((error) => {
         const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
         const message = error.message || "An error occurred";
