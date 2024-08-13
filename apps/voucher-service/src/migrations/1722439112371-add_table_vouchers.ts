@@ -48,8 +48,8 @@ export class AddTableVouchers1722439112371 implements MigrationInterface {
             default: "'active'",
           },
           {
-            name: "exp",
-            type: "timestamp",
+            name: "duration",
+            type: "int",
             isNullable: true,
           },
           {

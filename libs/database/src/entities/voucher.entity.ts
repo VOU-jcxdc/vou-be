@@ -34,8 +34,8 @@ export class Voucher extends BaseEntity implements IVoucher {
   @Column({ name: "status", type: "enum", enum: VoucherStatus, default: VoucherStatus.ACTIVE })
   status: VoucherStatus;
 
-  @Column({ name: "exp", type: "timestamp", nullable: true })
-  exp: Date;
+  @Column({ name: "duration", type: "int", nullable: true })
+  duration: number;
 
   @CreateDateColumn({ name: "created_on", type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   createdOn: Date;

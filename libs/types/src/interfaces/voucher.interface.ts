@@ -8,7 +8,7 @@ export interface IVoucher {
   code: string;
   description: string;
   value: number;
-  exp: Date;
+  duration: number;
   status: VoucherStatus;
   type: VoucherType;
   createdOn: Date;

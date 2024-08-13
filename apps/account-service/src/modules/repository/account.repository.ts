@@ -1,7 +1,7 @@
 import { BaseRepository, Account } from "@database";
 import { Injectable, NotAcceptableException, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { AccountRoleEnum, CreateAccountDto, IAccount } from "@types";
+import { AccountRoleEnum, AccountStatusEnum, CreateAccountDto, IAccount } from "@types";
 import { isNil } from "lodash";
 import { Repository } from "typeorm";
 
@@ -18,7 +18,7 @@ export class AccountRepository extends BaseRepository<Account> {
       throw new NotAcceptableException("Account existed");
     }
 
-    return this.save(data);
+    return this.save(data.role === AccountRoleEnum.PLAYER ? { ...data, status: AccountStatusEnum.ACTIVE } : data);
   }
 
   async getExistedAccount(phone: string) {
