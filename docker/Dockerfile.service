@@ -1,4 +1,5 @@
-FROM node:18.20-alpine
+FROM vou-be-node_modules as node_modules
+FROM node:20-alpine
 
 ARG SERVICE_NAME
 
@@ -8,19 +9,15 @@ ENV BUILD_PATH='./src/dist'
 
 WORKDIR /src
 
+COPY --from=node_modules /src/node_modules ./node_modules
 COPY ./*.js /src/
-
 COPY ./*.json /src/
-
 COPY ./*.lock /src/
-
 COPY ./apps/${SERVICE_NAME} /src/apps/${SERVICE_NAME}
 
 COPY ./libs /src/libs
 
-RUN echo "building service: ${SERVICE_NAME} with stage: ${STAGE} "
-
-RUN yarn install --frozen-lockfile
+RUN echo "building service: ${SERVICE_NAME} with stage: ${STAGE}"
 
 RUN yarn build:${STAGE} ${SERVICE_NAME}
 
