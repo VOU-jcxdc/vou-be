@@ -9,4 +9,8 @@ export class UpdateEventDto extends PartialType(CreateEventDto) {
     message: `status must be one of the following values: ${Object.values(EventStatusEnum).join(", ")}`,
   })
   status: EventStatusEnum;
+
+  @IsOptional()
+  @IsUUID(4, { message: "gameId must be a valid UUID" })
+  gameId: string;
 }
