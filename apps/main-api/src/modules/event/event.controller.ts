@@ -1,18 +1,13 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseIntPipe,
-  ParseUUIDPipe,
-  Post,
-  Put,
-  Query,
-  Request,
-  UseGuards,
-} from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { EventService } from "./event.service";
-import { AccountRoleEnum, CreateEventDto, ICurrentUser, UpdateEventDto } from "@types";
+import {
+  AccountRoleEnum,
+  AddVoucherToAccountDto,
+  CreateEventDto,
+  DeleteVoucherDto,
+  ICurrentUser,
+  UpdateEventDto,
+} from "@types";
 import { Roles } from "../../decorators/roles.decorator";
 import { JwtAuthGuard, RoleGuard } from "../../guard";
 import { CurrentUser } from "../../decorators";
@@ -28,10 +23,16 @@ export class EventController {
     return this.eventService.createEvent(user.userId, dto);
   }
 
-  @Put()
+  @Post("vouchers/assigning")
+  @Roles(AccountRoleEnum.PLAYER)
+  async assignVoucher(@CurrentUser() user: ICurrentUser, @Body() data: AddVoucherToAccountDto) {
+    return this.eventService.assignVoucherInEvent(user.userId, data);
+  }
+
+  @Put(":id")
   @Roles(AccountRoleEnum.BRAND)
-  async updateEvent(@CurrentUser() user: ICurrentUser, @Body() dto: UpdateEventDto) {
-    return this.eventService.updateEvent(user.userId, dto);
+  async updateEvent(@CurrentUser() user: ICurrentUser, @Body() dto: UpdateEventDto, @Param("id") eventId: string) {
+    return this.eventService.updateEvent(user.userId, dto, eventId);
   }
 
   @Get()
@@ -44,9 +45,21 @@ export class EventController {
     return this.eventService.getEvents(user, offset, limit);
   }
 
+  @Get(":id/vouchers")
+  @Roles(AccountRoleEnum.BRAND, AccountRoleEnum.PLAYER)
+  async getVouchersInEvent(@Param("id") id: string) {
+    return this.eventService.getVouchersInEvent(id);
+  }
+
   @Get(":id")
   @Roles(AccountRoleEnum.BRAND, AccountRoleEnum.PLAYER)
   async getEventById(@CurrentUser() user: ICurrentUser, @Param("id") id: string) {
     return this.eventService.getEventById(user, id);
+  }
+
+  @Delete(":id/vouchers")
+  @Roles(AccountRoleEnum.BRAND)
+  async deleteVouchersInEvent(@Param("id") id: string, @Body() data: DeleteVoucherDto) {
+    return this.eventService.deleteVouchersInEvent(id, data);
   }
 }

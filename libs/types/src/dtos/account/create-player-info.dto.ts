@@ -1,4 +1,4 @@
-import { GenderEnum } from "../enums/gender.enum";
+import { GenderEnum } from "../../enums/gender.enum";
 import { Transform } from "class-transformer";
 import { IsDate, IsEnum, ValidateIf } from "class-validator";
 

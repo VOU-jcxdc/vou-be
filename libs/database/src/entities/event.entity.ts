@@ -30,7 +30,7 @@ export class Event extends BaseEntity implements IEvent {
   @Column({ name: "status", type: "enum", enum: EventStatusEnum, default: EventStatusEnum.PLANNING, nullable: false })
   status: EventStatusEnum;
 
-  @OneToMany(() => EventImage, (eventImage) => eventImage.eventId)
+  @OneToMany(() => EventImage, (eventImage) => eventImage.event, { cascade: true })
   readonly images: EventImage[];
 
   @OneToMany(() => FavoriteEvent, (favoriteEvent) => favoriteEvent.eventId)

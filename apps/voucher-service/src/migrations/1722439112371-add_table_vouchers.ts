@@ -14,6 +14,12 @@ export class AddTableVouchers1722439112371 implements MigrationInterface {
             generationStrategy: "uuid",
           },
           {
+            name: "name",
+            type: "varchar",
+            length: "255",
+            isNullable: false,
+          },
+          {
             name: "description",
             type: "text",
             isNullable: false,
@@ -42,8 +48,8 @@ export class AddTableVouchers1722439112371 implements MigrationInterface {
             default: "'active'",
           },
           {
-            name: "exp",
-            type: "timestamp",
+            name: "duration",
+            type: "int",
             isNullable: true,
           },
           {

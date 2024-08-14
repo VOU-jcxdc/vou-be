@@ -1,9 +1,11 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { EventRepository } from "../repository/event.repository";
-import { AccountRoleEnum, CreateEventDto, ICurrentUser, UpdateEventDto } from "@types";
+import { AccountRoleEnum, CreateEventDto, ICurrentUser, UpdateEventDto, VOUCHER_SERVICE_PROVIDER_NAME } from "@types";
 import { RpcException } from "@nestjs/microservices";
 import { EventImageRepository } from "../repository/event-image.repository";
 import { EventHelper } from "./event.helper";
+import { EventImage } from "@database";
+import { catchError, lastValueFrom } from "rxjs";
 
 @Injectable()
 export class EventService {
@@ -17,14 +19,19 @@ export class EventService {
 
   async createEvent(dto: CreateEventDto & { brandId: string }) {
     try {
-      const newEvent = await this.eventRepository.save({
-        ...dto,
-        images: undefined,
-      });
+      const { vouchers, ...rest } = dto;
 
-      for (const bucketId of dto.images) {
-        await this.eventImageRepository.save({ bucketId, eventId: newEvent.id });
-      }
+      const images =
+        dto.images.map((id) => {
+          const image = new EventImage();
+          image.bucketId = id;
+          return image;
+        }) || [];
+
+      const newEvent = await this.eventRepository.save({
+        ...rest,
+        images,
+      });
 
       return this.eventHelper.buildResponseFromEvent(newEvent);
     } catch (error) {
@@ -33,11 +40,11 @@ export class EventService {
     }
   }
 
-  async updateEvent(dto: UpdateEventDto & { brandId: string }) {
+  async updateEvent(dto: UpdateEventDto & { brandId: string; eventId: string }) {
     try {
       const event = await this.eventRepository.findOne({
         where: {
-          id: dto.id,
+          id: dto.eventId,
           brandId: dto.brandId,
         },
       });
@@ -46,16 +53,28 @@ export class EventService {
         throw new RpcException("Event related to this brand not found");
       }
 
+      const { images, ...rest } = dto;
+
       const updatedEvent = await this.eventRepository.save({
         ...event,
-        ...dto,
-        images: undefined,
+        ...rest,
       });
 
-      if (dto.images) {
-        await this.eventImageRepository.delete({ eventId: updatedEvent.id });
-        for (const bucketId of dto.images) {
-          await this.eventImageRepository.save({ bucketId, eventId: updatedEvent.id });
+      if (images) {
+        const oldImages = updatedEvent.images;
+        const updatedImages = images.map((id) => {
+          const image = new EventImage();
+          image.bucketId = id;
+          return image;
+        });
+
+        await this.eventRepository.save({
+          ...updatedEvent,
+          images: [...updatedImages],
+        });
+
+        for (const oldImage of oldImages) {
+          await this.eventImageRepository.delete({ id: oldImage.id });
         }
       }
 
