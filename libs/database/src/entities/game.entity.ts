@@ -10,9 +10,6 @@ export class Game extends BaseEntity implements IGame {
   @Column({ name: "name", type: "varchar", length: 255, nullable: false })
   name: string;
 
-  @OneToMany(() => GameImage, image => image.gameId)
-  readonly images: GameImage[];
-
   @Column({ name: "type", type: "enum", enum: GameTypeEnum, nullable: false })
   type: GameTypeEnum;
 
@@ -21,4 +18,8 @@ export class Game extends BaseEntity implements IGame {
 
   @Column({ name: "instruction", type: "text", nullable: false })
   instruction: string;
+
+  // Relations
+  @OneToMany(() => GameImage, (image) => image.game, { cascade: true, eager: true })
+  readonly images: GameImage[];
 }

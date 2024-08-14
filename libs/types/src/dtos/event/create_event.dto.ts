@@ -6,7 +6,7 @@ export class CreateEventDto {
   @IsString()
   name: string;
 
-  @IsUUID("4", { each: true })
+  @IsUUID("4", { each: true, message: "images must be a valid UUID" })
   images: string[];
 
   @IsDateString()
