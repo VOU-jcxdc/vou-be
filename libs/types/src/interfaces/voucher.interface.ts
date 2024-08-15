@@ -1,4 +1,4 @@
-import { VoucherStatus, VoucherType } from "../enums";
+import { VoucherUsageModeEnum, VoucherStatusEnum, VoucherTypeEnum } from "../enums";
 import { IAccountVoucher } from "./account_voucher.interface";
 import { IEventVoucher } from "./event_voucher.interface";
 
@@ -9,8 +9,10 @@ export interface IVoucher {
   description: string;
   value: number;
   duration: number;
-  status: VoucherStatus;
-  type: VoucherType;
+  status: VoucherStatusEnum;
+  type: VoucherTypeEnum;
+  brandId: string;
+  usageMode: VoucherUsageModeEnum;
   createdOn: Date;
   updatedOn: Date;
 

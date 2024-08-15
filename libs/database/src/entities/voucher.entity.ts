@@ -1,4 +1,4 @@
-import { IVoucher, VoucherStatus, VoucherType } from "@types";
+import { IVoucher, VoucherUsageModeEnum, VoucherStatusEnum, VoucherTypeEnum } from "@types";
 import {
   BaseEntity,
   Column,
@@ -25,17 +25,23 @@ export class Voucher extends BaseEntity implements IVoucher {
   @Column({ name: "code", type: "varchar", length: 50, nullable: false })
   code: string;
 
-  @Column({ name: "type", type: "enum", enum: VoucherType, default: VoucherType.AMOUNT })
-  type: VoucherType;
+  @Column({ name: "type", type: "enum", enum: VoucherTypeEnum, default: VoucherTypeEnum.AMOUNT })
+  type: VoucherTypeEnum;
 
   @Column({ name: "value", type: "int", default: 0 })
   value: number;
 
-  @Column({ name: "status", type: "enum", enum: VoucherStatus, default: VoucherStatus.ACTIVE })
-  status: VoucherStatus;
+  @Column({ name: "status", type: "enum", enum: VoucherStatusEnum, default: VoucherStatusEnum.ACTIVE })
+  status: VoucherStatusEnum;
 
   @Column({ name: "duration", type: "int", nullable: true })
   duration: number;
+
+  @Column({ name: "brand_id", type: "uuid", nullable: false })
+  brandId: string;
+
+  @Column({ name: "usage_mode", type: "enum", enum: VoucherUsageModeEnum, default: VoucherUsageModeEnum.OFFLINE })
+  usageMode: VoucherUsageModeEnum;
 
   @CreateDateColumn({ name: "created_on", type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   createdOn: Date;

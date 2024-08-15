@@ -5,7 +5,7 @@ import {
   CreateVoucherDto,
   UpdateAsssignVoucherDto,
   UpdateVoucherDto,
-  VoucherStatus,
+  VoucherStatusEnum,
 } from "@types";
 import { EventVoucherRepository } from "../repository/event-voucher.repository";
 import { AccountVoucherRepository } from "../repository/account-voucher.repository";
@@ -20,10 +20,10 @@ export class VoucherService {
     private readonly accountVoucherRepo: AccountVoucherRepository
   ) {}
 
-  async createVouchers(data: CreateVoucherDto) {
+  async createVouchers(brandId: string, data: CreateVoucherDto) {
     try {
       const { eventId, vouchers } = data;
-      const savedVouchers = await this.voucherRepo.saveManyVouchers(vouchers);
+      const savedVouchers = await this.voucherRepo.saveManyVouchers(vouchers, brandId);
       const eventVouchers = savedVouchers.map((voucher) => {
         return {
           eventId,
@@ -34,7 +34,7 @@ export class VoucherService {
       await this.eventVoucherRepo.saveMany(eventVouchers);
       return { eventId, vouchers: [...savedVouchers] };
     } catch (error) {
-      throw error;
+      throw new RpcException(error);
     }
   }
 
@@ -47,7 +47,7 @@ export class VoucherService {
         },
       });
     } catch (error) {
-      throw error;
+      throw new RpcException(error);
     }
   }
 
@@ -57,7 +57,7 @@ export class VoucherService {
         where: { id: voucherId },
       });
     } catch (error) {
-      throw error;
+      throw new RpcException(error);
     }
   }
 
@@ -65,7 +65,7 @@ export class VoucherService {
     try {
       return this.voucherRepo.updateOne({ where: { id: voucherId } }, data);
     } catch (error) {
-      throw error;
+      throw new RpcException(error);
     }
   }
 
@@ -73,20 +73,30 @@ export class VoucherService {
     try {
       return this.eventVoucherRepo.deleteVouchersInEvent(eventId, voucherIds);
     } catch (error) {
-      throw error;
+      throw new RpcException(error);
     }
   }
 
   async getAccountVouchers(accountId: string) {
     try {
       return this.accountVoucherRepo.findAll({
-        where: { accountId, status: VoucherStatus.ACTIVE },
+        where: { accountId, status: VoucherStatusEnum.ACTIVE },
         relations: {
           voucher: true,
         },
       });
     } catch (error) {
-      throw error;
+      throw new RpcException(error);
+    }
+  }
+
+  async getOwnerVouchers(brandId: string) {
+    try {
+      return this.voucherRepo.findAll({
+        where: { brandId },
+      });
+    } catch (error) {
+      throw new RpcException(error);
     }
   }
 
@@ -101,7 +111,7 @@ export class VoucherService {
       if (
         !voucherInEvent ||
         voucherInEvent.quantity < quantity ||
-        voucherInEvent.voucher.status === VoucherStatus.EXPIRED
+        voucherInEvent.voucher.status === VoucherStatusEnum.EXPIRED
       ) {
         throw new RpcException("Invalid voucher");
       }
@@ -120,7 +130,7 @@ export class VoucherService {
       return existedAccountVoucher
         ? this.accountVoucherRepo.updateOne(
             { where: { accountId, voucherId } },
-            { quantity: existedAccountVoucher.quantity + quantity, status: VoucherStatus.ACTIVE }
+            { quantity: existedAccountVoucher.quantity + quantity, status: VoucherStatusEnum.ACTIVE }
           )
         : this.accountVoucherRepo.save({ accountId, voucherId, quantity });
     } catch (error) {
@@ -133,13 +143,13 @@ export class VoucherService {
     try {
       // if this update the status of account voucher to EXPIRED, then update the status of voucher to EXPIRED
       const { quantity, status } = data;
-      if (!isNil(status) && status === VoucherStatus.EXPIRED) {
+      if (!isNil(status) && status === VoucherStatusEnum.EXPIRED) {
         return this.accountVoucherRepo.updateOne({ where: { id: accountVoucherId, accountId } }, { status });
       }
 
       // update the quantity of account voucher -> user use the voucher
       const accountVoucher = await this.accountVoucherRepo.findOne({
-        where: { id: accountVoucherId, accountId, status: VoucherStatus.ACTIVE },
+        where: { id: accountVoucherId, accountId, status: VoucherStatusEnum.ACTIVE },
         relations: { voucher: true },
       });
       if (!accountVoucher || accountVoucher.quantity < quantity) {
@@ -158,14 +168,14 @@ export class VoucherService {
       return accountVoucher.quantity === quantity
         ? this.accountVoucherRepo.updateOne(
             { where: { id: accountVoucherId } },
-            { quantity: 0, status: VoucherStatus.INACTIVE }
+            { quantity: 0, status: VoucherStatusEnum.INACTIVE }
           )
         : this.accountVoucherRepo.updateOne(
             { where: { id: accountVoucherId } },
             { quantity: accountVoucher.quantity - quantity }
           );
     } catch (error) {
-      throw error;
+      throw new RpcException(error);
     }
   }
 }

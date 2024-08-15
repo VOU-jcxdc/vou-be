@@ -1,4 +1,4 @@
-import { Controller, Param } from "@nestjs/common";
+import { Controller } from "@nestjs/common";
 import { VoucherService } from "./voucher.service";
 import {
   AddVoucherToAccountDto,
@@ -9,13 +9,18 @@ import {
 } from "@types";
 import { MessagePattern, Payload } from "@nestjs/microservices";
 
-@Controller("vouchers")
+@Controller()
 export class VoucherController {
   constructor(private readonly voucherService: VoucherService) {}
 
-  @MessagePattern({ method: "GET", path: "/vouchers/account/:id/vouchers" })
+  @MessagePattern({ method: "GET", path: "/vouchers/player/:id/vouchers" })
   getVouchersByAccountId(@Payload() data: { id: string }) {
     return this.voucherService.getAccountVouchers(data.id);
+  }
+
+  @MessagePattern({ method: "GET", path: "/vouchers/brand/:id/vouchers" })
+  getOwnerVouchers(@Payload() data: { id: string }) {
+    return this.voucherService.getOwnerVouchers(data.id);
   }
 
   @MessagePattern({ method: "GET", path: "/vouchers/:eventId" })
@@ -24,8 +29,9 @@ export class VoucherController {
   }
 
   @MessagePattern({ method: "POST", path: "/vouchers" })
-  createVouchers(@Payload() data: CreateVoucherDto) {
-    return this.voucherService.createVouchers(data);
+  createVouchers(@Payload() data: CreateVoucherDto & { brandId: string }) {
+    const { brandId, ...rest } = data;
+    return this.voucherService.createVouchers(brandId, rest);
   }
 
   @MessagePattern({ method: "POST", path: "/vouchers/assigning" })

@@ -6,10 +6,8 @@ import { CreateBrandInfoDto } from "@types";
 
 @Injectable()
 export class BrandInfoRepository extends BaseRepository<BrandInfo> {
-  private readonly _repository: Repository<BrandInfo> = null;
   constructor(@InjectRepository(BrandInfo) repository: Repository<BrandInfo>) {
     super(repository);
-    this._repository = repository;
   }
 
   async createBrandInfo(data: CreateBrandInfoDto, accountId: string) {

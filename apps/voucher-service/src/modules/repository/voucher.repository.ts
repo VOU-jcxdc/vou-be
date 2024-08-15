@@ -10,11 +10,11 @@ export class VoucherRepository extends BaseRepository<Voucher> {
     super(repository);
   }
 
-  async saveManyVouchers(vouchers: VoucherDetailDto[]) {
+  async saveManyVouchers(vouchers: VoucherDetailDto[], brandId: string) {
     try {
       const createdVouchers = vouchers.map(async (voucher) => {
         const { quantity, ...voucherData } = voucher;
-        const savedVoucher = await this.save(voucherData);
+        const savedVoucher = await this.save({ ...voucherData, brandId });
         return {
           ...savedVoucher,
           quantity,

@@ -1,5 +1,5 @@
 import { IsEnum, IsNumber, IsOptional, ValidateIf } from "class-validator";
-import { VoucherStatus } from "../../enums";
+import { VoucherStatusEnum } from "../../enums";
 import { isNil } from "lodash";
 
 export class UpdateAsssignVoucherDto {
@@ -10,6 +10,6 @@ export class UpdateAsssignVoucherDto {
 
   @IsOptional()
   @ValidateIf((data) => !isNil(data.status))
-  @IsEnum(VoucherStatus, { message: "status must be either 'active', 'inactive', or 'expired'" })
-  status: VoucherStatus;
+  @IsEnum(VoucherStatusEnum, { message: "status must be either 'active', 'inactive', or 'expired'" })
+  status: VoucherStatusEnum;
 }

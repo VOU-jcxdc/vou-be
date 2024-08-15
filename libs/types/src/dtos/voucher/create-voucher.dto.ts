@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsNumber, IsUUID, ValidateNested } from "class-validator";
-import { VoucherType } from "../../enums";
+import { VoucherUsageModeEnum, VoucherTypeEnum } from "../../enums";
 import { Type } from "class-transformer";
 
 export class VoucherDetailDto {
@@ -12,8 +12,8 @@ export class VoucherDetailDto {
   @IsNotEmpty({ message: "code is required" })
   code: string;
 
-  @IsEnum(VoucherType, { message: "type must be either 'amount' or 'percent'" })
-  type: VoucherType;
+  @IsEnum(VoucherTypeEnum, { message: "type must be either 'amount' or 'rate'" })
+  type: VoucherTypeEnum;
 
   @IsNumber({ allowInfinity: false }, { message: "value must be a number" })
   value: number;
@@ -23,6 +23,9 @@ export class VoucherDetailDto {
 
   @IsNumber({ allowInfinity: false }, { message: "quantity must be a number" })
   quantity: number;
+
+  @IsEnum(VoucherUsageModeEnum, { message: "usageMode must be either 'offline' or 'online'" })
+  usageMode: VoucherUsageModeEnum;
 }
 
 export class CreateVoucherDto {

@@ -17,9 +17,9 @@ export class UserController {
 
   @Get("vouchers")
   @UseGuards(RoleGuard)
-  @Roles(AccountRoleEnum.PLAYER)
+  @Roles(AccountRoleEnum.PLAYER, AccountRoleEnum.BRAND)
   async getPlayerVouchers(@CurrentUser() user: ICurrentUser) {
-    return this.userService.getVouchers(user.userId);
+    return this.userService.getVouchers(user);
   }
 
   @Put("profile")
