@@ -1,13 +1,17 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Inject, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { ClientOptions, ClientProxy, ClientProxyFactory } from "@nestjs/microservices";
 import {
   AccountRoleEnum,
+  IAccount,
+  IAccountVoucher,
+  ICurrentUser,
   USER_SERVICE_PROVIDER_NAME,
   UdpateAccountDto,
   UpdateAccountByAdminDto,
   UpdateAsssignVoucherDto,
   VOUCHER_SERVICE_PROVIDER_NAME,
 } from "@types";
+import { catchError, lastValueFrom } from "rxjs";
 
 @Injectable()
 export class UserService {
@@ -34,8 +38,35 @@ export class UserService {
     return this.client.send({ method: "GET", path: "/account/:id" }, { id });
   }
 
-  async getVouchers(id: string) {
-    return this.clientVoucher.send({ method: "GET", path: "/vouchers/account/:id/vouchers" }, { id });
+  async getVouchers(user: ICurrentUser) {
+    try {
+      if (user.role === AccountRoleEnum.PLAYER) {
+        const accountVouchers = await lastValueFrom(
+          this.clientVoucher.send({ method: "GET", path: "/vouchers/player/:id/vouchers" }, { id: user.userId }).pipe(
+            catchError((error) => {
+              const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
+              const message = error.message || "An error occurred";
+              throw new HttpException(message, statusCode);
+            })
+          )
+        );
+        return Promise.all(
+          accountVouchers.map(async (accountVoucher: IAccountVoucher) => {
+            const { voucher } = accountVoucher;
+            const brandUser = await lastValueFrom(await this.getUserInfo(voucher.brandId));
+            const { accountId, ...info } = brandUser.info;
+            return {
+              ...accountVoucher,
+              voucher: { ...voucher, brandInfo: { bucketId: brandUser.bucketId, ...info } },
+            };
+          })
+        );
+      } else {
+        return this.clientVoucher.send({ method: "GET", path: "/vouchers/brand/:id/vouchers" }, { id: user.userId });
+      }
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
   }
 
   async updateAccountVoucherStatus(accountVoucherId: string, accountId: string, body: UpdateAsssignVoucherDto) {

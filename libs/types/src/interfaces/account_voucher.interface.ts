@@ -1,4 +1,5 @@
-import { VoucherStatus } from "../enums";
+import { VoucherStatusEnum } from "../enums";
+import { IVoucher } from "./voucher.interface";
 
 export interface IAccountVoucher {
   id: string;
@@ -7,5 +8,7 @@ export interface IAccountVoucher {
   quantity: number;
   assigenedOn: Date;
   updatedOn: Date;
-  status: VoucherStatus;
+  status: VoucherStatusEnum;
+
+  readonly voucher: IVoucher;
 }

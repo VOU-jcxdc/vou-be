@@ -1,4 +1,4 @@
-import { VoucherStatus, IAccountVoucher } from "@types";
+import { VoucherStatusEnum, IAccountVoucher } from "@types";
 import {
   BaseEntity,
   Column,
@@ -36,8 +36,8 @@ export class AccountVoucher extends BaseEntity implements IAccountVoucher {
   })
   updatedOn: Date;
 
-  @Column({ name: "status", type: "enum", enum: VoucherStatus, default: VoucherStatus.ACTIVE })
-  status: VoucherStatus;
+  @Column({ name: "status", type: "enum", enum: VoucherStatusEnum, default: VoucherStatusEnum.ACTIVE })
+  status: VoucherStatusEnum;
 
   // Relations
   @ManyToOne(() => Voucher, (voucher) => voucher.accountVoucher)

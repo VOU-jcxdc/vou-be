@@ -1,4 +1,4 @@
-export enum VoucherStatus {
+export enum VoucherStatusEnum {
   ACTIVE = "active",
   INACTIVE = "inactive",
   EXPIRED = "expired",
