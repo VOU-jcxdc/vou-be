@@ -18,7 +18,7 @@ export class AccountRepository extends BaseRepository<Account> {
       throw new NotAcceptableException("Account existed");
     }
 
-    return this.save(data.role === AccountRoleEnum.PLAYER ? { ...data, status: AccountStatusEnum.ACTIVE } : data);
+    return this.save(data.role !== AccountRoleEnum.BRAND ? { ...data, status: AccountStatusEnum.ACTIVE } : data);
   }
 
   async getExistedAccount(phone: string) {

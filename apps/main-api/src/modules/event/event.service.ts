@@ -42,7 +42,7 @@ export class EventService {
     const event = await lastValueFrom(rawData);
 
     const rawVouchers = this.clientVoucher
-      .send({ method: "POST", path: "/vouchers" }, { eventId: event.id, vouchers: dto.vouchers })
+      .send({ method: "POST", path: "/vouchers" }, { eventId: event.id, brandId: userId, vouchers: dto.vouchers })
       .pipe(
         catchError((error) => {
           const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;

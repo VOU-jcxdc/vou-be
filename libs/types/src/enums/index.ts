@@ -9,3 +9,4 @@ export * from "./voucher-type.enum";
 export * from "./item-status.enum";
 export * from "./item-type.enum";
 export * from "./account-item-status.enum";
+export * from "./voucher-usage-mode.enum";

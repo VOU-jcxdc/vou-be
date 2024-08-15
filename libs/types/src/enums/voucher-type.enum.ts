@@ -1,4 +1,4 @@
-export enum VoucherType {
+export enum VoucherTypeEnum {
   RATE = "rate",
   AMOUNT = "amount",
 }

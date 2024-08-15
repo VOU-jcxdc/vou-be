@@ -1,8 +1,9 @@
 import { Body, Controller, Delete, Param, Post, Put, UseGuards } from "@nestjs/common";
 import { VoucherService } from "./voucher.service";
 import { JwtAuthGuard, RoleGuard } from "../../guard";
-import { AccountRoleEnum, CreateVoucherDto, DeleteVoucherDto, UpdateVoucherDto } from "@types";
+import { AccountRoleEnum, CreateVoucherDto, DeleteVoucherDto, ICurrentUser, UpdateVoucherDto } from "@types";
 import { Roles } from "../../decorators/roles.decorator";
+import { CurrentUser } from "../../decorators";
 
 @UseGuards(JwtAuthGuard, RoleGuard)
 @Controller("vouchers")
@@ -17,8 +18,8 @@ export class VoucherController {
 
   @Post()
   @Roles(AccountRoleEnum.BRAND)
-  async createVouchers(@Body() data: CreateVoucherDto) {
-    return this.voucherService.createVouchers(data);
+  async createVouchers(@Body() data: CreateVoucherDto, @CurrentUser() user: ICurrentUser) {
+    return this.voucherService.createVouchers(data, user.userId);
   }
 
   @Delete()
