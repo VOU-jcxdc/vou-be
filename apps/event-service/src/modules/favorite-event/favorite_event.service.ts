@@ -3,6 +3,7 @@ import { FavoriteEventRepository } from "../repository/favorite_event.repository
 import { AddFavoriteEventDto } from "@types";
 import { RpcException } from "@nestjs/microservices";
 import { EventRepository } from "../repository/event.repository";
+import { EventHelper } from "../event/event.helper";
 
 @Injectable()
 export class FavoriteEventService {
@@ -10,7 +11,8 @@ export class FavoriteEventService {
 
   constructor(
     private readonly favoriteEventRepository: FavoriteEventRepository,
-    private readonly eventRepository: EventRepository
+    private readonly eventRepository: EventRepository,
+    private readonly eventHelper: EventHelper
   ) {}
 
   async addFavoriteEvent(dto: AddFavoriteEventDto & { userId: string }) {
@@ -32,7 +34,8 @@ export class FavoriteEventService {
         eventId: existedEvent.id,
         accountId: dto.userId,
       });
-      return "OK";
+
+      return await this.eventHelper.buildResponseFromEvent(existedEvent);
     } catch (error) {
       this.logger.error(error);
       throw new RpcException(error);
@@ -52,7 +55,15 @@ export class FavoriteEventService {
 
   async getFavoriteEvents(offset: number, limit: number, userId: string) {
     try {
-      return await this.favoriteEventRepository.getFavoriteEvents(offset, limit, userId);
+      const data = await this.favoriteEventRepository.getFavoriteEvents(offset, limit, userId);
+      return {
+        total: data.total,
+        limit: data.limit,
+        offset: data.offset,
+        favoriteEvents: await Promise.all(
+          data.favoriteEvents.map((event) => this.eventHelper.buildResponseFromEvent(event))
+        ),
+      };
     } catch (error) {
       this.logger.error(error);
       throw new RpcException(error);

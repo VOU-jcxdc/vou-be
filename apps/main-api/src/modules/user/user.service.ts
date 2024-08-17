@@ -2,7 +2,6 @@ import { HttpException, HttpStatus, Inject, Injectable, InternalServerErrorExcep
 import { ClientOptions, ClientProxy, ClientProxyFactory } from "@nestjs/microservices";
 import {
   AccountRoleEnum,
-  IAccount,
   IAccountVoucher,
   ICurrentUser,
   USER_SERVICE_PROVIDER_NAME,
@@ -54,7 +53,9 @@ export class UserService {
           accountVouchers.map(async (accountVoucher: IAccountVoucher) => {
             const { voucher } = accountVoucher;
             const brandUser = await lastValueFrom(await this.getUserInfo(voucher.brandId));
+            /* eslint-disable @typescript-eslint/no-unused-vars */
             const { accountId, ...info } = brandUser.info;
+            /* eslint-enable @typescript-eslint/no-unused-vars */
             return {
               ...accountVoucher,
               voucher: { ...voucher, brandInfo: { bucketId: brandUser.bucketId, ...info } },

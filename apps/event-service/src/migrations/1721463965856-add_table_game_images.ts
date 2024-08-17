@@ -37,7 +37,7 @@ export class AddTableGameImages1721463965856 implements MigrationInterface {
     );
   }
 
-  public async down(_: QueryRunner): Promise<void> {
+  public async down(): Promise<void> {
     throw new Error("Method not implemented.");
   }
 }

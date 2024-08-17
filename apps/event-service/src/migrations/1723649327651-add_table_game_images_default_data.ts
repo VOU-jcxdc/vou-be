@@ -18,7 +18,7 @@ export class AddTableGameImagesDefaultData1723649327651 implements MigrationInte
     `);
   }
 
-  public async down(_: QueryRunner): Promise<void> {
+  public async down(): Promise<void> {
     throw new Error("Method not implemented.");
   }
 }

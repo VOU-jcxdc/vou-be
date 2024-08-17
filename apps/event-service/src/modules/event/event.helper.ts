@@ -1,12 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { EventImageRepository } from "../repository/event-image.repository";
-import { EventRepository } from "../repository/event.repository";
 import { Event } from "@database";
+import { FavoriteEventRepository } from "../repository/favorite_event.repository";
 
 @Injectable()
 export class EventHelper {
   constructor(
-    private readonly eventRepository: EventRepository,
+    private readonly favoriteEventRepository: FavoriteEventRepository,
     private readonly eventImageRepository: EventImageRepository
   ) {}
 
@@ -15,18 +15,26 @@ export class EventHelper {
     return images.map((image) => image.bucketId);
   }
 
-  async buildResponseFromId(eventId: string) {
-    const event = await this.eventRepository.findOne({ where: { id: eventId } });
-    return {
-      ...event,
-      images: await this.findImagesByEventId(eventId),
-    };
-  }
-
-  async buildResponseFromEvent(event: Event) {
+  /* eslint-disable @typescript-eslint/no-inferrable-types */
+  async buildResponseFromEvent(event: Event, userId: string = "") {
     return {
       ...event,
       images: await this.findImagesByEventId(event.id),
+      favorite: await this.isFavoriteEvent(event.id, userId),
     };
+  }
+  /* eslint-enable @typescript-eslint/no-inferrable-types */
+
+  async isFavoriteEvent(eventId: string, userId: string) {
+    if (!userId) return undefined;
+
+    return this.favoriteEventRepository.findOne({
+      where: {
+        accountId: userId,
+        eventId,
+      },
+    })
+      ? true
+      : undefined;
   }
 }
