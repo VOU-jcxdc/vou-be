@@ -1,19 +1,24 @@
 import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ClientOptions, ClientProxy, ClientProxyFactory } from "@nestjs/microservices";
-import { AddFavoriteEventDto } from "@types";
+import { AddFavoriteEventDto, EVENT_SERVICE_PROVIDER_NAME } from "@types";
 import { catchError, lastValueFrom } from "rxjs";
+import { EventHelper } from "./event.helper";
+import { Event } from "@database";
 
 @Injectable()
 export class FavoriteEventService {
-  private client: ClientProxy;
+  private eventClient: ClientProxy;
 
-  constructor(@Inject("EVENT_SERVICE") private readonly options: ClientOptions) {
-    this.client = ClientProxyFactory.create(options);
+  constructor(
+    @Inject(EVENT_SERVICE_PROVIDER_NAME) eventOptions: ClientOptions,
+    private readonly eventHelper: EventHelper
+  ) {
+    this.eventClient = ClientProxyFactory.create(eventOptions);
   }
 
   async addFavoriteEvent(dto: AddFavoriteEventDto, userId: string) {
     const reqData = { ...dto, userId };
-    const rawData = this.client.send({ method: "POST", path: "events/favorite-events" }, reqData).pipe(
+    const rawData = this.eventClient.send({ method: "POST", path: "events/favorite-events" }, reqData).pipe(
       catchError((error) => {
         const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
         const message = error.message || "An error occurred";
@@ -21,12 +26,13 @@ export class FavoriteEventService {
       })
     );
 
-    return lastValueFrom(rawData);
+    const event = await lastValueFrom(rawData);
+    return this.eventHelper.buildEventResponse(event);
   }
 
   async deleteFavoriteEvent(eventId: string, userId: string) {
     const reqData = { eventId, userId };
-    const rawData = this.client.send({ method: "DELETE", path: "events/favorite-events/:id" }, reqData).pipe(
+    const rawData = this.eventClient.send({ method: "DELETE", path: "events/favorite-events/:id" }, reqData).pipe(
       catchError((error) => {
         const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
         const message = error.message || "An error occurred";
@@ -39,7 +45,7 @@ export class FavoriteEventService {
 
   async getFavoriteEvents(offset: number, limit: number, userId: string) {
     const reqData = { offset, limit, userId };
-    const rawData = this.client.send({ method: "GET", path: "events/favorite-events" }, reqData).pipe(
+    const rawData = this.eventClient.send({ method: "GET", path: "events/favorite-events" }, reqData).pipe(
       catchError((error) => {
         const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
         const message = error.message || "An error occurred";
@@ -47,6 +53,14 @@ export class FavoriteEventService {
       })
     );
 
-    return lastValueFrom(rawData);
+    const data = await lastValueFrom(rawData);
+    return {
+      total: data.total,
+      offset: data.offset,
+      limit: data.limit,
+      favoriteEvents: await Promise.all(
+        data.favoriteEvents.map((event: Event & { images: string[] }) => this.eventHelper.buildEventResponse(event))
+      ),
+    };
   }
 }

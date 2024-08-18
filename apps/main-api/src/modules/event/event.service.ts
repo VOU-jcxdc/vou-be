@@ -10,18 +10,21 @@ import {
   VOUCHER_SERVICE_PROVIDER_NAME,
 } from "@types";
 import { catchError, lastValueFrom } from "rxjs";
+import { EventHelper } from "./event.helper";
+import { Event } from "@database";
 
 @Injectable()
 export class EventService {
-  private client: ClientProxy;
-  private clientVoucher: ClientProxy;
+  private eventClient: ClientProxy;
+  private voucherClient: ClientProxy;
 
   constructor(
     @Inject(EVENT_SERVICE_PROVIDER_NAME) eventOptions: ClientOptions,
-    @Inject(VOUCHER_SERVICE_PROVIDER_NAME) voucherOptions: ClientOptions
+    @Inject(VOUCHER_SERVICE_PROVIDER_NAME) voucherOptions: ClientOptions,
+    private readonly eventHelper: EventHelper
   ) {
-    this.client = ClientProxyFactory.create(eventOptions);
-    this.clientVoucher = ClientProxyFactory.create(voucherOptions);
+    this.eventClient = ClientProxyFactory.create(eventOptions);
+    this.voucherClient = ClientProxyFactory.create(voucherOptions);
   }
 
   async createEvent(userId: string, dto: CreateEventDto) {
@@ -31,7 +34,7 @@ export class EventService {
       vouchers: undefined,
     };
 
-    const rawData = this.client.send({ method: "POST", path: "/events" }, reqData).pipe(
+    const rawData = this.eventClient.send({ method: "POST", path: "/events" }, reqData).pipe(
       catchError((error) => {
         const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
         const message = error.message || "An error occurred";
@@ -41,7 +44,7 @@ export class EventService {
 
     const event = await lastValueFrom(rawData);
 
-    const rawVouchers = this.clientVoucher
+    const rawVouchers = this.voucherClient
       .send({ method: "POST", path: "/vouchers" }, { eventId: event.id, brandId: userId, vouchers: dto.vouchers })
       .pipe(
         catchError((error) => {
@@ -53,7 +56,7 @@ export class EventService {
 
     await lastValueFrom(rawVouchers);
 
-    return event;
+    return this.eventHelper.buildEventResponse(event);
   }
 
   async updateEvent(userId: string, dto: UpdateEventDto, eventId: string) {
@@ -63,7 +66,7 @@ export class EventService {
       eventId,
     };
 
-    const rawData = this.client.send({ method: "PUT", path: "/events" }, reqData).pipe(
+    const rawData = this.eventClient.send({ method: "PUT", path: "/events" }, reqData).pipe(
       catchError((error) => {
         const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
         const message = error.message || "An error occurred";
@@ -71,13 +74,14 @@ export class EventService {
       })
     );
 
-    return lastValueFrom(rawData);
+    const event = await lastValueFrom(rawData);
+    return this.eventHelper.buildEventResponse(event);
   }
 
   async getEvents(user: ICurrentUser, offset: number, limit: number) {
     const reqData = { user, offset, limit };
 
-    const rawData = this.client.send({ method: "GET", path: "/events" }, reqData).pipe(
+    const rawData = this.eventClient.send({ method: "GET", path: "/events" }, reqData).pipe(
       catchError((error) => {
         const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
         const message = error.message || "An error occurred";
@@ -85,13 +89,21 @@ export class EventService {
       })
     );
 
-    return lastValueFrom(rawData);
+    const data = await lastValueFrom(rawData);
+    return {
+      total: data.total,
+      offset: data.offset,
+      limit: data.limit,
+      events: await Promise.all(
+        data.events.map((event: Event & { images: string[] }) => this.eventHelper.buildEventResponse(event))
+      ),
+    };
   }
 
   async getEventById(user: ICurrentUser, id: string) {
     const reqData = { user, id };
 
-    const rawData = this.client.send({ method: "GET", path: "/events/:id" }, reqData).pipe(
+    const rawData = this.eventClient.send({ method: "GET", path: "/events/:id" }, reqData).pipe(
       catchError((error) => {
         const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
         const message = error.message || "An error occurred";
@@ -99,12 +111,13 @@ export class EventService {
       })
     );
 
-    return lastValueFrom(rawData);
+    const event = await lastValueFrom(rawData);
+    return this.eventHelper.buildEventResponse(event);
   }
 
   async assignVoucherInEvent(accountId: string, data: AddVoucherToAccountDto) {
     const { eventVoucherId, quantity } = data;
-    const rawData = this.clientVoucher
+    const rawData = this.voucherClient
       .send({ method: "POST", path: "/vouchers/assigning" }, { accountId, eventVoucherId, quantity })
       .pipe(
         catchError((error) => {
@@ -118,7 +131,7 @@ export class EventService {
   }
 
   async deleteVouchersInEvent(eventId: string, data: DeleteVoucherDto) {
-    const rawData = this.clientVoucher.send({ method: "DELETE", path: "/vouchers" }, { eventId, ...data }).pipe(
+    const rawData = this.voucherClient.send({ method: "DELETE", path: "/vouchers" }, { eventId, ...data }).pipe(
       catchError((error) => {
         const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
         const message = error.message || "An error occurred";
@@ -130,7 +143,7 @@ export class EventService {
   }
 
   async getVouchersInEvent(eventId: string) {
-    const rawData = this.clientVoucher.send({ method: "GET", path: "/vouchers/:eventId" }, { eventId }).pipe(
+    const rawData = this.voucherClient.send({ method: "GET", path: "/vouchers/:eventId" }, { eventId }).pipe(
       catchError((error) => {
         const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
         const message = error.message || "An error occurred";

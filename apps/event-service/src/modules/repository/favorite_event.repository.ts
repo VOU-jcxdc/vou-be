@@ -1,4 +1,4 @@
-import { BaseRepository, Event, FavoriteEvent } from "@database";
+import { BaseRepository, FavoriteEvent } from "@database";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -16,11 +16,11 @@ export class FavoriteEventRepository extends BaseRepository<FavoriteEvent> {
       take: limit,
       relations: ["event"],
     });
-    const favoriteLists = lists.map((item) => {
+    const favoriteEvents = lists.map((item) => {
       return item.event;
     });
     const total = await this.repository.count({ where: { accountId: userId } });
 
-    return { favoriteLists, total, offset, limit };
+    return { favoriteEvents, total, offset, limit };
   }
 }

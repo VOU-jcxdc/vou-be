@@ -1,11 +1,10 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { EventRepository } from "../repository/event.repository";
-import { AccountRoleEnum, CreateEventDto, ICurrentUser, UpdateEventDto, VOUCHER_SERVICE_PROVIDER_NAME } from "@types";
+import { AccountRoleEnum, CreateEventDto, ICurrentUser, UpdateEventDto } from "@types";
 import { RpcException } from "@nestjs/microservices";
 import { EventImageRepository } from "../repository/event-image.repository";
 import { EventHelper } from "./event.helper";
 import { EventImage } from "@database";
-import { catchError, lastValueFrom } from "rxjs";
 
 @Injectable()
 export class EventService {
@@ -90,7 +89,9 @@ export class EventService {
       const events = await this.eventRepository.findAllByRole(user, offset, limit);
       return {
         ...events,
-        events: await Promise.all(events.events.map((event) => this.eventHelper.buildResponseFromEvent(event))),
+        events: await Promise.all(
+          events.events.map((event) => this.eventHelper.buildResponseFromEvent(event, user.userId))
+        ),
       };
     } catch (error) {
       this.logger.error(error);
@@ -111,7 +112,7 @@ export class EventService {
         throw new RpcException("Event not found");
       }
 
-      return this.eventHelper.buildResponseFromEvent(event);
+      return this.eventHelper.buildResponseFromEvent(event, user.userId);
     } catch (error) {
       this.logger.error(error);
       throw new RpcException(error);
