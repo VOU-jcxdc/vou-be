@@ -28,12 +28,12 @@ export class EventHelper {
   async isFavoriteEvent(eventId: string, userId: string) {
     if (!userId) return undefined;
 
-    return this.favoriteEventRepository.findOne({
+    return (await this.favoriteEventRepository.findOne({
       where: {
         accountId: userId,
         eventId,
       },
-    })
+    }))
       ? true
       : undefined;
   }
