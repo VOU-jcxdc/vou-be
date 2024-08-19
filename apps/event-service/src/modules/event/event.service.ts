@@ -18,7 +18,9 @@ export class EventService {
 
   async createEvent(dto: CreateEventDto & { brandId: string }) {
     try {
+      /* eslint-disable @typescript-eslint/no-unused-vars */
       const { vouchers, ...rest } = dto;
+      /* eslint-enable @typescript-eslint/no-unused-vars */
 
       const images =
         dto.images.map((id) => {
