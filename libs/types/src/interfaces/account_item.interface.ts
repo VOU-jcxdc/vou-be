@@ -7,6 +7,8 @@ export interface IAccountItem {
   status: AccountItemStatusEnum;
   assignedDate: Date;
   itemId: string;
+  quantity: number;
+  updatedOn: Date;
 
   // Relations
   readonly item: IItem;

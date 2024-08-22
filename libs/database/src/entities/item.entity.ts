@@ -12,8 +12,8 @@ export class Item extends BaseEntity implements IItem {
   @Column({ name: "image_id", type: "uuid", nullable: false })
   imageId: string;
 
-  @Column({ name: "game_id", type: "uuid", nullable: false })
-  gameId: string;
+  @Column({ name: "event_id", type: "uuid", nullable: false })
+  eventId: string;
 
   @Column({ name: "type", type: "enum", enum: ItemTypeEnum, default: ItemTypeEnum.CRAFTING_MATERIAL, nullable: false })
   type: ItemTypeEnum;
@@ -32,4 +32,7 @@ export class Item extends BaseEntity implements IItem {
     onUpdate: "CURRENT_TIMESTAMP",
   })
   updatedOn: Date;
+
+  @Column({ name: "quantity", type: "int", nullable: false })
+  quantity: number;
 }
