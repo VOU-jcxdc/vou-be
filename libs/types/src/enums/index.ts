@@ -10,3 +10,4 @@ export * from "./item-status.enum";
 export * from "./item-type.enum";
 export * from "./account-item-status.enum";
 export * from "./voucher-usage-mode.enum";
+export * from "./gift-status.enum";
