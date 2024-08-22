@@ -1,5 +1,14 @@
-import { IGift } from "@types";
-import { BaseEntity, Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { GiftStatusEnum, IGift } from "@types";
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from "typeorm";
 import { Item } from "./item.entity";
 
 @Entity({ name: "gifts" })
@@ -16,8 +25,23 @@ export class Gift extends BaseEntity implements IGift {
   @Column({ name: "game_id", type: "uuid", nullable: false })
   gameId: string;
 
-  @Column({ name: "send_date", type: "timestamp", nullable: false, default: () => "CURRENT_TIMESTAMP" })
+  @CreateDateColumn({ name: "send_date", type: "timestamp", nullable: false, default: () => "CURRENT_TIMESTAMP" })
   sendDate: Date;
+
+  @UpdateDateColumn({
+    name: "updated_on",
+    type: "timestamp",
+    nullable: false,
+    default: () => "CURRENT_TIMESTAMP",
+    onUpdate: "CURRENT_TIMESTAMP",
+  })
+  updatedOn: Date;
+
+  @Column({ name: "quantity", type: "int", nullable: false })
+  quantity: number;
+
+  @Column({ name: "status", type: "enum", enum: GiftStatusEnum })
+  status: GiftStatusEnum;
 
   @Column({ name: "item_id", type: "uuid", nullable: false })
   itemId: string;
