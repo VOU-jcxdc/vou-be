@@ -24,7 +24,13 @@ export class EventHelper {
 
     return {
       ...event,
-      brandInfo: returnData.info,
+      brandId: undefined,
+      brandInfo: {
+        ...returnData.info,
+        bucketId: returnData.bucketId,
+        id: undefined,
+        accountId: undefined,
+      },
     };
   }
 }
