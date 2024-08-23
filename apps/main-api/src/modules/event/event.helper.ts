@@ -1,4 +1,4 @@
-import { Event } from "@database";
+import { BrandInfo, Event } from "@database";
 import { HttpException, HttpStatus, Inject } from "@nestjs/common";
 import { ClientOptions, ClientProxy, ClientProxyFactory } from "@nestjs/microservices";
 import { USER_SERVICE_PROVIDER_NAME } from "@types";
@@ -22,9 +22,15 @@ export class EventHelper {
 
     const returnData = await lastValueFrom(rawData);
 
+    const { id, accountId, ...brandInfo } = returnData.info;
+    const { brandId, ...restEvent } = event;
+
     return {
-      ...event,
-      brandInfo: returnData.info,
+      ...restEvent,
+      brandInfo: {
+        ...brandInfo,
+        bucketId: returnData.bucketId,
+      },
     };
   }
 }
