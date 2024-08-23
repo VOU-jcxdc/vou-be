@@ -28,3 +28,4 @@ export * from "./login_response.interface";
 export * from "./service-provider.interface";
 
 export * from "./notification_token.interface";
+export * from "./notification.interface";
