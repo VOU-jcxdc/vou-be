@@ -1,4 +1,12 @@
-import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from "typeorm";
 import { GameTypeEnum, IGame } from "@types";
 import { GameImage } from "./game_image.entity";
 
@@ -18,6 +26,17 @@ export class Game extends BaseEntity implements IGame {
 
   @Column({ name: "instruction", type: "text", nullable: false })
   instruction: string;
+
+  @CreateDateColumn({ name: "created_on", type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+  createdOn: Date;
+
+  @UpdateDateColumn({
+    name: "updated_on",
+    type: "timestamp",
+    default: () => "CURRENT_TIMESTAMP",
+    onUpdate: "CURRENT_TIMESTAMP",
+  })
+  updatedOn: Date;
 
   // Relations
   @OneToMany(() => GameImage, (image) => image.game, { cascade: true, eager: true })

@@ -8,6 +8,8 @@ export interface IBrandInfo {
   field: string;
   address: string;
   gps: Geometry;
+  createdOn: Date;
+  updatedOn: Date;
 
   //Relations;
   readonly account: IAccount;
