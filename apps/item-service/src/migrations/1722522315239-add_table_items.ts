@@ -25,7 +25,7 @@ export class AddTableItems1722522315239 implements MigrationInterface {
             isNullable: false,
           },
           {
-            name: "game_id",
+            name: "event_id",
             type: "uuid",
             isNullable: false,
           },

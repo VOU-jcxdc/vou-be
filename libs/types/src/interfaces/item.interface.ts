@@ -3,9 +3,10 @@ import { ItemStatusEnum, ItemTypeEnum } from "../enums";
 export interface IItem {
   name: string;
   imageId: string;
-  gameId: string;
+  eventId: string;
   type: ItemTypeEnum;
   status: ItemStatusEnum;
   createdOn: Date;
   updatedOn: Date;
+  quantity: number;
 }

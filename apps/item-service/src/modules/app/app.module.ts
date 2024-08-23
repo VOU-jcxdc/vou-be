@@ -1,9 +1,9 @@
-import { PostgreDatabaseModule } from "@database";
+import { MongoDatabaseModule, PostgreDatabaseModule } from "@database";
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), PostgreDatabaseModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), PostgreDatabaseModule, MongoDatabaseModule],
   controllers: [],
   providers: [],
 })
