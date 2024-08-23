@@ -1,5 +1,15 @@
 import { IBrandInfo } from "@types";
-import { BaseEntity, Column, Entity, Geometry, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  Geometry,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from "typeorm";
 import { Account } from "./account.entity";
 
 @Entity({ name: "brands_info" })
@@ -21,6 +31,17 @@ export class BrandInfo extends BaseEntity implements IBrandInfo {
 
   @Column({ name: "account_id", type: "uuid", nullable: false })
   accountId: string;
+
+  @CreateDateColumn({ name: "created_on", type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+  createdOn: Date;
+
+  @UpdateDateColumn({
+    name: "updated_on",
+    type: "timestamp",
+    default: () => "CURRENT_TIMESTAMP",
+    onUpdate: "CURRENT_TIMESTAMP",
+  })
+  updatedOn: Date;
 
   @OneToOne(() => Account, (account) => account.brandInfo)
   @JoinColumn({ name: "account_id", referencedColumnName: "id" })
