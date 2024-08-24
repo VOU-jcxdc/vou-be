@@ -12,6 +12,8 @@ export interface IEvent {
   endDate: Date;
   description: string;
   status: EventStatusEnum;
+  createdOn: Date;
+  updatedOn: Date;
 
   // Relations
   readonly images: IEventImage[];

@@ -7,6 +7,8 @@ export interface IGame {
   type: GameTypeEnum;
   exchangeStatus: boolean;
   instruction: string;
+  createdOn: Date;
+  updatedOn: Date;
 
   // Relations
   readonly images: IGameImage[];
