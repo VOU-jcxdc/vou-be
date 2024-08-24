@@ -58,8 +58,8 @@ export class FavoriteEventService {
       total: data.total,
       offset: data.offset,
       limit: data.limit,
-      favoriteEvents: await Promise.all(
-        data.favoriteEvents.map((event: Event & { images: string[] }) => this.eventHelper.buildEventResponse(event))
+      events: await Promise.all(
+        data.events.map((event: Event & { images: string[] }) => this.eventHelper.buildEventResponse(event))
       ),
     };
   }
