@@ -9,7 +9,8 @@
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "notification-service:build"
+        "buildTarget": "notification-service:build",
+        "port": 9933
       },
       "configurations": {
         "development": {
