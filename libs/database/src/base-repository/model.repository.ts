@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { Document, Model } from "mongoose";
+import { Document, FilterQuery, Model } from "mongoose";
 
 @Injectable()
 export class ModelRepository<T extends Document> {
@@ -9,7 +9,15 @@ export class ModelRepository<T extends Document> {
     return this.model.find().exec();
   }
 
+  async findOne(query: FilterQuery<T>): Promise<T | null> {
+    return this.model.findOne(query).exec();
+  }
+
   async create(data: Partial<T>): Promise<T> {
     return this.model.create(data);
+  }
+
+  async update(query: FilterQuery<T>, data: Partial<T>): Promise<T | null> {
+    return this.model.findOneAndUpdate(query, data, { new: true }).exec();
   }
 }
