@@ -66,7 +66,6 @@ export class EventController {
   @Get(":id/recipes")
   @Roles(AccountRoleEnum.BRAND, AccountRoleEnum.PLAYER)
   async getRecipesInEvent(@Param("id") id: string) {
-    console.log("eventId", id);
     return this.eventService.getRecipesInEvent(id);
   }
 }

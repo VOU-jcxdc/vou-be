@@ -24,7 +24,6 @@ export class ItemController {
 
   @MessagePattern({ method: "GET", path: "/events/:eventId/recipes" })
   getRecipesInEvent(@Payload() { eventId }: { eventId: string }) {
-    console.log("received event id", eventId);
     return this.itemService.getRecipesInEvent(eventId);
   }
 
