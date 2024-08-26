@@ -4,6 +4,7 @@ import { EventModule } from "../event/event.module";
 import { PostgreDatabaseModule } from "@database";
 import { FavoriteEventModule } from "../favorite-event/favorite_event.module";
 import { GameInSystemModule } from "../games-in-system/game-in-system.module";
+import { EventConsumerModule } from "../consumer/event-consumer.module";
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { GameInSystemModule } from "../games-in-system/game-in-system.module";
     EventModule,
     FavoriteEventModule,
     GameInSystemModule,
+    EventConsumerModule,
   ],
   controllers: [],
   providers: [],

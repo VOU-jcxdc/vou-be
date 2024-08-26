@@ -5,6 +5,7 @@ import { AppOptions, cert } from "firebase-admin/app";
 import { FirebaseMessagingService } from "./firebase-messaging.service";
 
 @Module({
+  imports: [ConfigModule],
   providers: [
     {
       provide: "FIREBASE_ADMIN_OPTIONS_TOKEN",

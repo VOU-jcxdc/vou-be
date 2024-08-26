@@ -55,7 +55,9 @@ services:
         condition: service_completed_successfully
 
   rabbitmq:
-    image: rabbitmq:3-management
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.rabbitmq
     container_name: rabbitmq-vou
     networks:
       - vou-network

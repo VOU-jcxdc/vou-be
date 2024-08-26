@@ -5,8 +5,8 @@ import { Document, FilterQuery, Model } from "mongoose";
 export class ModelRepository<T extends Document> {
   constructor(private model: Model<T>) {}
 
-  async findAll(): Promise<T[]> {
-    return this.model.find().exec();
+  async find(filter: FilterQuery<T>) {
+    return this.model.find(filter);
   }
 
   async findOne(query: FilterQuery<T>): Promise<T | null> {
