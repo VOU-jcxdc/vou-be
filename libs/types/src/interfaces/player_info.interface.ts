@@ -6,6 +6,8 @@ export interface IPlayerInfo {
   accountId: string;
   gender: GenderEnum;
   dob: Date;
+  createdOn: Date;
+  updatedOn: Date;
 
   // Relations;
   readonly account: IAccount;

@@ -1,4 +1,4 @@
-import { MongoDatabaseModule, PostgreDatabaseModule } from "@database";
+import { PostgreDatabaseModule } from "@database";
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { ItemModule } from "../item/item.module";

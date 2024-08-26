@@ -6,6 +6,7 @@ import { AuthModule } from "../auth/auth.module";
 import { EventModule } from "../event/event.module";
 import { VoucherModule } from "../voucher/voucher.module";
 import { ItemModule } from "../item/item.module";
+import { NotificationModule } from "../notification/notification.module";
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ItemModule } from "../item/item.module";
     EventModule,
     VoucherModule,
     ItemModule,
+    NotificationModule,
   ],
   controllers: [],
   providers: [],

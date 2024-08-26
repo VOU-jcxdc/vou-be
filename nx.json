@@ -40,7 +40,8 @@
         "apps/bucket-service-e2e/**/*",
         "apps/event-service-e2e/**/*",
         "apps/voucher-service-e2e/**/*",
-        "apps/item-service-e2e/**/*"
+        "apps/item-service-e2e/**/*",
+        "apps/notification-service-e2e/**/*"
       ]
     }
   ],

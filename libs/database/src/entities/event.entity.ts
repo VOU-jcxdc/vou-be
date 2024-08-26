@@ -1,5 +1,15 @@
 import { IEvent, EventStatusEnum } from "@types";
-import { BaseEntity, Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from "typeorm";
 import { EventImage } from "./event_image.entity";
 import { Game } from "./game.entity";
 import { FavoriteEvent } from "./favorite_event.entity";
@@ -29,6 +39,17 @@ export class Event extends BaseEntity implements IEvent {
 
   @Column({ name: "status", type: "enum", enum: EventStatusEnum, default: EventStatusEnum.PLANNING, nullable: false })
   status: EventStatusEnum;
+
+  @CreateDateColumn({ name: "created_on", type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+  createdOn: Date;
+
+  @UpdateDateColumn({
+    name: "updated_on",
+    type: "timestamp",
+    default: () => "CURRENT_TIMESTAMP",
+    onUpdate: "CURRENT_TIMESTAMP",
+  })
+  updatedOn: Date;
 
   @OneToMany(() => EventImage, (eventImage) => eventImage.event, { cascade: true })
   readonly images: EventImage[];

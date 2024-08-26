@@ -18,9 +18,7 @@ export class EventService {
 
   async createEvent(dto: CreateEventDto & { brandId: string }) {
     try {
-      /* eslint-disable @typescript-eslint/no-unused-vars */
       const { vouchers, ...rest } = dto;
-      /* eslint-enable @typescript-eslint/no-unused-vars */
 
       const images =
         dto.images.map((id) => {
@@ -62,21 +60,18 @@ export class EventService {
       });
 
       if (images) {
-        const oldImages = updatedEvent.images;
-        const updatedImages = images.map((id) => {
-          const image = new EventImage();
-          image.bucketId = id;
-          return image;
+        await this.eventImageRepository.delete({
+          eventId: updatedEvent.id,
         });
 
-        await this.eventRepository.save({
-          ...updatedEvent,
-          images: [...updatedImages],
+        const newEventImages = images.map((i) => {
+          return {
+            eventId: updatedEvent.id,
+            bucketId: i,
+          };
         });
 
-        for (const oldImage of oldImages) {
-          await this.eventImageRepository.delete({ id: oldImage.id });
-        }
+        await this.eventImageRepository.saveMany(newEventImages);
       }
 
       return this.eventHelper.buildResponseFromEvent(updatedEvent);
