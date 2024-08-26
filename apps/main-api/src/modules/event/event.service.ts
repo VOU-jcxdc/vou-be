@@ -6,6 +6,7 @@ import {
   DeleteVoucherDto,
   EVENT_SERVICE_PROVIDER_NAME,
   ICurrentUser,
+  ITEM_SERVICE_PROVIDER_NAME,
   UpdateEventDto,
   VOUCHER_SERVICE_PROVIDER_NAME,
 } from "@types";
@@ -17,14 +18,17 @@ import { Event } from "@database";
 export class EventService {
   private eventClient: ClientProxy;
   private voucherClient: ClientProxy;
+  private itemClient: ClientProxy;
 
   constructor(
     @Inject(EVENT_SERVICE_PROVIDER_NAME) eventOptions: ClientOptions,
     @Inject(VOUCHER_SERVICE_PROVIDER_NAME) voucherOptions: ClientOptions,
+    @Inject(ITEM_SERVICE_PROVIDER_NAME) itemOptions: ClientOptions,
     private readonly eventHelper: EventHelper
   ) {
     this.eventClient = ClientProxyFactory.create(eventOptions);
     this.voucherClient = ClientProxyFactory.create(voucherOptions);
+    this.itemClient = ClientProxyFactory.create(itemOptions);
   }
 
   async createEvent(userId: string, dto: CreateEventDto) {
@@ -152,5 +156,9 @@ export class EventService {
     );
 
     return lastValueFrom(rawData);
+  }
+
+  async getRecipesInEvent(eventId: string) {
+    return this.itemClient.send({ method: "GET", path: "/events/:eventId/recipes" }, { eventId });
   }
 }

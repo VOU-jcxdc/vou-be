@@ -1,6 +1,7 @@
 export * from "./bucket";
 export * from "./event";
 export * from "./favorite-event";
+export * from "./item";
 export * from "./account/create-account.dto";
 export * from "./account/create-brand-info.dto";
 export * from "./account/create-player-info.dto";

@@ -15,6 +15,21 @@ services:
       retries: 5
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    
+  mongo:
+    image: mongo
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    env_file:
+      - docker/.env
+    networks:
+      - vou-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh mongo:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   node_modules:
     build:
@@ -72,7 +87,7 @@ services:
         SERVICE_NAME: main-api
         STAGE: dev
     ports:
-      - "3000:3000"
+      - "${MAIN_API_PORT}:${MAIN_API_PORT}"
     env_file:
       - ./apps/main-api/.env.build
     container_name: main-api
@@ -92,7 +107,7 @@ services:
         SERVICE_NAME: account-service
         STAGE: dev
     ports:
-      - "3001:3001"
+      - "${ACCOUNT_SERVICE_PORT}:${ACCOUNT_SERVICE_PORT}"
     env_file:
       - ./apps/account-service/.env.build
     container_name: account-service
@@ -112,7 +127,7 @@ services:
         SERVICE_NAME: event-service
         STAGE: dev
     ports:
-      - "3002:3002"
+      - "${EVENT_SERVICE_PORT}:${EVENT_SERVICE_PORT}"
     env_file:
       - ./apps/event-service/.env.build
     container_name: event-service
@@ -132,7 +147,7 @@ services:
         SERVICE_NAME: bucket-service
         STAGE: dev
     ports:
-      - "3003:3003"
+      - "${BUCKET_SERVICE_PORT}:${BUCKET_SERVICE_PORT}"
     env_file:
       - ./apps/bucket-service/.env.build
     container_name: bucket-service
@@ -152,12 +167,34 @@ services:
         SERVICE_NAME: voucher-service
         STAGE: dev
     ports:
-      - "3004:3004"
+      - "${VOUCHER_SERVICE_PORT}:${VOUCHER_SERVICE_PORT}"
     env_file:
       - ./apps/voucher-service/.env.build
     container_name: voucher-service
     depends_on:
       postgres:
+        condition: service_healthy
+      migration:
+        condition: service_completed_successfully
+    networks:
+      - vou-network
+
+  item-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_NAME: item-service
+        STAGE: dev
+    ports:
+      - "${ITEM_SERVICE_PORT}:${ITEM_SERVICE_PORT}"
+    env_file:
+      - ./apps/item-service/.env.build
+    container_name: item-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
         condition: service_healthy
       migration:
         condition: service_completed_successfully
