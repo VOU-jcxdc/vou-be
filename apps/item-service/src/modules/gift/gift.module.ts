@@ -2,12 +2,12 @@ import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { GiftService } from "./gift.service";
 import { GiftRepositoryModule } from "../repository/gift-repository.module";
-import { AccountItemService } from "../account-item/account-item.service";
-// import { ItemController } from "./item.controller";
+import { ItemModule } from "../item/item.module";
+import { GiftController } from "./gift.controller";
 
 @Module({
-  imports: [GiftRepositoryModule, AccountItemService, ConfigModule],
-  //   controllers: [ItemController],
+  imports: [GiftRepositoryModule, ItemModule, ConfigModule],
+  controllers: [GiftController],
   providers: [GiftService],
 })
 export class GiftModule {}

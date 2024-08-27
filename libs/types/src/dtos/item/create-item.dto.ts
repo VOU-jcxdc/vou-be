@@ -1,7 +1,8 @@
-import { IsEnum, IsNumber, IsNotEmpty, IsUUID } from "class-validator";
+import { IsEnum, IsNumber, IsNotEmpty, IsUUID, ValidateNested } from "class-validator";
 import { ItemTypeEnum } from "../../enums";
+import { Type } from "class-transformer";
 
-export class CreateItemDto {
+export class ItemDetailDto {
   @IsNotEmpty({ message: "Name is required" })
   name: string;
 
@@ -16,4 +17,10 @@ export class CreateItemDto {
 
   @IsNumber({ allowInfinity: false }, { message: "Quantity must be an integer" })
   quantity: number;
+}
+
+export class CreateItemDto {
+  @ValidateNested({ each: true })
+  @Type(() => ItemDetailDto)
+  items: ItemDetailDto[];
 }

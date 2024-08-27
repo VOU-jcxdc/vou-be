@@ -5,10 +5,14 @@ import { CombineItemModelModule } from "../model/combine_item-model.module";
 import { CombineItemHelper } from "../combine-item/combine_item.helper";
 import { ConfigModule } from "@nestjs/config";
 import { ItemRepositoryModule } from "../repository/item-repository.module";
+import { ConfigModule } from "@nestjs/config";
+import { ItemController } from "./item.controller";
+import { AccountItemRepositoryModule } from "../repository/account-item-repository.module";
 
 @Module({
-  imports: [ItemRepositoryModule, CombineItemModelModule, ConfigModule],
+  imports: [ItemRepositoryModule, CombineItemModelModule, AccountItemRepositoryModule, ConfigModule],
   controllers: [ItemController],
   providers: [ItemService, CombineItemHelper],
+  exports: [ItemService],
 })
 export class ItemModule {}
