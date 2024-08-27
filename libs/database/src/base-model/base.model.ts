@@ -1,18 +1,13 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { Document, FilterQuery, Model, Types, UpdateQuery } from "mongoose";
 
 @Injectable()
 export class BaseModel<T extends Document> {
   constructor(protected model: Model<T>) {}
 
-  save(data: T) {
-    try {
-      const newData = new this.model(data);
-      return newData.save();
-    } catch (error) {
-      Logger.error(error);
-      throw error;
-    }
+  save(data: Partial<T>) {
+    const newData = new this.model(data);
+    return newData.save();
   }
 
   async findByIdAndUpdate(id: Types.ObjectId, update: UpdateQuery<T>) {

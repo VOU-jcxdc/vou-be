@@ -1,15 +1,9 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { ClientOptions, ClientProxy, ClientProxyFactory } from "@nestjs/microservices";
-import {
-  CreateRecipeDto,
-  GetAvaibleRecipesForItemsDto,
-  ICurrentUser,
-  ITEM_SERVICE_PROVIDER_NAME,
-  UpdateRecipeDto,
-} from "@types";
+import { CreateRecipeDto, GetAvaibleRecipesForItemsDto, ITEM_SERVICE_PROVIDER_NAME, UpdateRecipeDto } from "@types";
 
 @Injectable()
-export class ItemService {
+export class CombineItemService {
   private itemClient: ClientProxy;
 
   constructor(@Inject(ITEM_SERVICE_PROVIDER_NAME) itemOptions: ClientOptions) {

@@ -3,10 +3,12 @@ import { CombineItemTypeEnum, ICombineItems, IItemRecipe } from "@types";
 import { Document, HydratedDocument } from "mongoose";
 
 @Schema({
+  collection: "combine_items",
   timestamps: {
     createdAt: "createdOn",
     updatedAt: "updatedOn",
   },
+  versionKey: false,
 })
 export class CombineItems extends Document implements ICombineItems {
   @Prop({ type: String, required: true })

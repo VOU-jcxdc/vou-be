@@ -1,41 +1,41 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard, RoleGuard } from "../../guard";
-import { ItemService } from "./item.service";
+import { CombineItemService } from "./combine_item.service";
 import { AccountRoleEnum, CreateRecipeDto, GetAvaibleRecipesForItemsDto, UpdateRecipeDto } from "@types";
 import { Roles } from "../../decorators/roles.decorator";
 
 @UseGuards(JwtAuthGuard, RoleGuard)
 @Controller("items")
-export class ItemController {
-  constructor(private readonly itemService: ItemService) {}
+export class CombineItemController {
+  constructor(private readonly combineItemService: CombineItemService) {}
 
   @Roles(AccountRoleEnum.BRAND)
   @Post("recipes")
   createRecipe(@Body() dto: CreateRecipeDto) {
-    return this.itemService.createRecipe(dto);
+    return this.combineItemService.createRecipe(dto);
   }
 
   @Roles(AccountRoleEnum.BRAND)
   @Put("recipes/:id")
   updateRecipe(@Param("id") id: string, @Body() dto: UpdateRecipeDto) {
-    return this.itemService.updateRecipe(id, dto);
+    return this.combineItemService.updateRecipe(id, dto);
   }
 
   @Roles(AccountRoleEnum.BRAND, AccountRoleEnum.PLAYER)
   @Get("recipes/:id")
   getRecipe(@Param("id") id: string) {
-    return this.itemService.getRecipe(id);
+    return this.combineItemService.getRecipe(id);
   }
 
   @Roles(AccountRoleEnum.PLAYER)
   @Post("recipes/available-for-items")
   getAvaibleRecipesForItems(@Body() dto: GetAvaibleRecipesForItemsDto) {
-    return this.itemService.getAvaibleRecipesForItems(dto);
+    return this.combineItemService.getAvaibleRecipesForItems(dto);
   }
 
   @Roles(AccountRoleEnum.BRAND)
   @Delete("recipes/:id")
   deleteRecipe(@Param("id") id: string) {
-    return this.itemService.deleteRecipe(id);
+    return this.combineItemService.deleteRecipe(id);
   }
 }

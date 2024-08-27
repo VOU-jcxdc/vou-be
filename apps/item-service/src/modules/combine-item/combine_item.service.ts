@@ -3,20 +3,23 @@ import { RpcException } from "@nestjs/microservices";
 import { CreateRecipeDto, GetAvaibleRecipesForItemsDto, ICurrentUser, UpdateRecipeDto } from "@types";
 import { CombineItemModel } from "../model/combine_item.model";
 import { Types } from "mongoose";
-import { ItemHelper } from "./item.helper";
+import { CombineItemHelper } from "./combine_item.helper";
 import { CombineItems } from "@database";
 
 @Injectable()
-export class ItemService {
-  private readonly logger = new Logger(ItemService.name);
+export class CombineItemService {
+  private readonly logger = new Logger(CombineItemService.name);
 
-  constructor(private readonly combineItemsModel: CombineItemModel, private readonly itemHelper: ItemHelper) {}
+  constructor(
+    private readonly combineItemsModel: CombineItemModel,
+    private readonly combineItemHelper: CombineItemHelper
+  ) {}
 
   async createRecipe(dto: CreateRecipeDto) {
     try {
       const mappedDto = dto as CombineItems;
       const data = await this.combineItemsModel.save(mappedDto);
-      return this.itemHelper.buildResponseData(data);
+      return this.combineItemHelper.buildResponseData(data);
     } catch (error) {
       this.logger.error(error);
       throw new RpcException(error);
@@ -27,7 +30,7 @@ export class ItemService {
     try {
       const { id, ...dto } = req;
       const data = await this.combineItemsModel.findByIdAndUpdate(Types.ObjectId.createFromHexString(id), dto);
-      return this.itemHelper.buildResponseData(data);
+      return this.combineItemHelper.buildResponseData(data);
     } catch (error) {
       this.logger.error(error);
       throw new RpcException(error);
@@ -37,7 +40,7 @@ export class ItemService {
   async getRecipe(id: string) {
     try {
       const data = await this.combineItemsModel.findById(Types.ObjectId.createFromHexString(id));
-      return this.itemHelper.buildResponseData(data);
+      return this.combineItemHelper.buildResponseData(data);
     } catch (error) {
       this.logger.error(error);
       throw new RpcException(error);
@@ -49,7 +52,7 @@ export class ItemService {
       const data = await this.combineItemsModel.find({
         eventId: eventId,
       });
-      return data.map((it) => this.itemHelper.buildResponseData(it));
+      return data.map((it) => this.combineItemHelper.buildResponseData(it));
     } catch (error) {
       this.logger.error(error);
       throw new RpcException(error);
@@ -61,7 +64,7 @@ export class ItemService {
       const data = await this.combineItemsModel.find({
         itemRecipe: { $elemMatch: { itemId: { $in: dto.items } } },
       });
-      return data.map((it) => this.itemHelper.buildResponseData(it));
+      return data.map((it) => this.combineItemHelper.buildResponseData(it));
     } catch (error) {
       this.logger.error(error);
       throw new RpcException(error);

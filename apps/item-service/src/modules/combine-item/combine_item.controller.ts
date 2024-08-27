@@ -1,11 +1,11 @@
 import { Controller } from "@nestjs/common";
 import { MessagePattern, Payload } from "@nestjs/microservices";
 import { CreateRecipeDto, GetAvaibleRecipesForItemsDto, ICurrentUser, UpdateRecipeDto } from "@types";
-import { ItemService } from "./item.service";
+import { CombineItemService } from "./combine_item.service";
 
 @Controller()
-export class ItemController {
-  constructor(private readonly itemService: ItemService) {}
+export class CombineItemController {
+  constructor(private readonly itemService: CombineItemService) {}
 
   @MessagePattern({ method: "POST", path: "/recipes" })
   createRecipe(@Payload() dto: CreateRecipeDto) {

@@ -1,10 +1,18 @@
-import { MongoDatabaseModule } from "@database";
+import { CombineItems, CombineItemsSchema, MongoDatabaseModule } from "@database";
 import { Module } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
 import { CombineItemModel } from "./combine_item.model";
+import { MongooseModule } from "@nestjs/mongoose";
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), MongoDatabaseModule],
+  imports: [
+    MongooseModule.forFeature([
+      {
+        name: CombineItems.name,
+        schema: CombineItemsSchema,
+      },
+    ]),
+    MongoDatabaseModule,
+  ],
   providers: [CombineItemModel],
   exports: [CombineItemModel],
 })
