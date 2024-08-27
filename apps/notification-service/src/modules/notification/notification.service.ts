@@ -14,10 +14,10 @@ export class NotificationService {
 
   async upsertAccountToken(accountId: string, token: string) {
     try {
-      const existingToken = await this.notificationTokenModel.findOne({ accountId });
+      const existingToken = await this.notificationTokenModel.find({ accountId });
       existingToken
-        ? await this.notificationTokenModel.update({ accountId }, { token })
-        : await this.notificationTokenModel.create({ accountId, token });
+        ? await this.notificationTokenModel.updateOne({ accountId }, { token })
+        : await this.notificationTokenModel.save({ accountId, token });
       return "OK";
     } catch (error) {
       console.error(error);
@@ -31,7 +31,7 @@ export class NotificationService {
       const deviceTokens = tokens.map((token) => ({ token: token.token, _id: token._id, accountId: token.accountId }));
       for (const token of deviceTokens) {
         await this.firebaseMessagingService.pushNotification(token.token, null, { title, body }, data);
-        this.notificationModel.create({
+        this.notificationModel.save({
           title,
           content: body,
           accountId: token.accountId,
@@ -40,6 +40,24 @@ export class NotificationService {
           isRead: false,
         });
       }
+    } catch (error) {
+      console.error(error);
+      throw new RpcException(error);
+    }
+  }
+
+  async getAccountNotifications(accountId: string) {
+    try {
+      return await this.notificationModel.findAllAccountNotifications(accountId);
+    } catch (error) {
+      console.error(error);
+      throw new RpcException(error);
+    }
+  }
+
+  async markNotificationsAsRead(notificationId: string[]) {
+    try {
+      return await this.notificationModel.updateMany({ _id: notificationId }, { isRead: true });
     } catch (error) {
       console.error(error);
       throw new RpcException(error);
