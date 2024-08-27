@@ -8,12 +8,18 @@ export class FirebaseMessagingService {
   constructor(@Inject("FIREBASE_ADMIN_OPTIONS_TOKEN") readonly options: AppOptions) {
     this.app = initializeApp(options);
   }
-  pushNotification(token: string, message: { title: string; body: string }, data?: { [key: string]: string }) {
+  pushNotification(
+    token: string,
+    topic?: string,
+    message?: { title: string; body: string },
+    data?: { [key: string]: string }
+  ) {
     try {
       return messaging().send({
         notification: message,
         token,
         data,
+        topic,
       });
     } catch (error) {
       console.log(error);

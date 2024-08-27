@@ -46,7 +46,7 @@ export class EventService {
       await this.rabbitMqService.publishWithDelay(
         DELAY_MESSAGE_EXCHANGE_NAME,
         EVENT_NOTIFICATION_ROUTING_KEY,
-        newEvent.id,
+        { eventId: newEvent.id, beginDate: newEvent.beginDate },
         120000
       );
 
@@ -76,6 +76,16 @@ export class EventService {
         ...event,
         ...rest,
       });
+
+      if (!moment(updatedEvent.beginDate).isSame(moment(event.beginDate))) {
+        const timeSchedule = moment(updatedEvent.beginDate).valueOf();
+        await this.rabbitMqService.publishWithDelay(
+          DELAY_MESSAGE_EXCHANGE_NAME,
+          EVENT_NOTIFICATION_ROUTING_KEY,
+          { eventId: updatedEvent.id, beginDate: updatedEvent.beginDate },
+          120000
+        );
+      }
 
       if (images) {
         await this.eventImageRepository.delete({

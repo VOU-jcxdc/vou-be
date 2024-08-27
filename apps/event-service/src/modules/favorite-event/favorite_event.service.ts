@@ -67,23 +67,4 @@ export class FavoriteEventService {
       throw new RpcException(error);
     }
   }
-
-  async getFavoriteAccountIds(eventId: string) {
-    try {
-      const favEvents = await this.favoriteEventRepository.findAll({ where: { eventId } });
-      const event = await this.eventRepository.findOne({ where: { id: eventId } });
-      const accountIds = favEvents.map((favEvent) => favEvent.accountId);
-      return {
-        accountIds,
-        event: {
-          name: event.name,
-          description: event.description,
-          beginDate: event.beginDate,
-        },
-      };
-    } catch (error) {
-      this.logger.error(error);
-      throw new RpcException(error);
-    }
-  }
 }

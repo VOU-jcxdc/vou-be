@@ -12,6 +12,9 @@ import { Document } from "mongoose";
 })
 export class Notification extends Document implements INotification {
   @Prop({ type: String, required: true })
+  title: string;
+
+  @Prop({ type: String, required: true })
   content: string;
 
   @Prop({ type: String, required: true })

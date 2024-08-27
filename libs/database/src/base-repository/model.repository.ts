@@ -17,6 +17,10 @@ export class ModelRepository<T extends Document> {
     return this.model.create(data);
   }
 
+  async createMany(data: Partial<T>[]) {
+    return this.model.insertMany(data);
+  }
+
   async update(query: FilterQuery<T>, data: Partial<T>): Promise<T | null> {
     return this.model.findOneAndUpdate(query, data, { new: true }).exec();
   }

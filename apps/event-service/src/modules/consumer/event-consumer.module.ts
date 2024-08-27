@@ -1,10 +1,11 @@
 import { Module } from "@nestjs/common";
 import { EventConsumerService } from "./event-consumer.service";
 import { RabbitmqModule } from "@shared-modules";
-import { FavoriteEventModule } from "../favorite-event/favorite_event.module";
+import { EventRepositoryModule } from "../repository/event-repository.module";
+import { FavoriteEventRepositoryModule } from "../repository/favorite_event-repository.module";
 
 @Module({
-  imports: [RabbitmqModule, FavoriteEventModule],
+  imports: [RabbitmqModule, EventRepositoryModule, FavoriteEventRepositoryModule],
   providers: [EventConsumerService],
 })
 export class EventConsumerModule {}

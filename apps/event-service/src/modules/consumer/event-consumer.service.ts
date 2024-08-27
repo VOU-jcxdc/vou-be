@@ -1,8 +1,11 @@
 import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import amqp, { ChannelWrapper } from "amqp-connection-manager";
-import { FavoriteEventService } from "../favorite-event/favorite_event.service";
 import { ConfirmChannel } from "amqplib";
 import { RabbitMqService } from "@shared-modules";
+import { EventRepository } from "../repository/event.repository";
+import moment from "moment";
+import { FavoriteEventRepository } from "../repository/favorite_event.repository";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class EventConsumerService implements OnModuleInit {
@@ -10,10 +13,12 @@ export class EventConsumerService implements OnModuleInit {
   private readonly logger = new Logger(EventConsumerService.name);
 
   constructor(
-    private readonly favoriteEventService: FavoriteEventService,
-    private readonly rabbitMqService: RabbitMqService
+    private readonly favoriteEventRepository: FavoriteEventRepository,
+    private readonly eventRepository: EventRepository,
+    private readonly rabbitMqService: RabbitMqService,
+    configService: ConfigService
   ) {
-    const connection = amqp.connect(["amqp://localhost:5672"]);
+    const connection = amqp.connect([configService.get("RMQ_URLS")]);
     this.channelWrapper = connection.createChannel();
   }
 
@@ -23,11 +28,24 @@ export class EventConsumerService implements OnModuleInit {
         await channel.assertQueue("eventNotificationQueue", { durable: true });
         await channel.consume("eventNotificationQueue", async (message) => {
           if (message) {
-            const eventId = JSON.parse(message.content.toString());
-            const data = await this.favoriteEventService.getFavoriteAccountIds(eventId);
-            console.log("Event notification sent to accounts:", data);
-            this.rabbitMqService.publishToQueue("notificationQueue", data);
-            channel.ack(message);
+            const { eventId, beginDate } = JSON.parse(message.content.toString());
+            const currentEvent = await this.eventRepository.findOne({ where: { id: eventId } });
+            if (currentEvent && moment(currentEvent.beginDate).isSame(moment(beginDate))) {
+              const favEvents = await this.favoriteEventRepository.findAll({ where: { eventId } });
+              const event = await this.eventRepository.findOne({ where: { id: eventId } });
+              const accountIds = favEvents.map((favEvent) => favEvent.accountId);
+              const data = {
+                accountIds,
+                event: {
+                  id: event.id,
+                  name: event.name,
+                  description: event.description,
+                  beginDate: event.beginDate,
+                },
+              };
+              this.rabbitMqService.publishToQueue("notificationQueue", { ...data, topic: "event" });
+              channel.ack(message);
+            }
           }
         });
       });
