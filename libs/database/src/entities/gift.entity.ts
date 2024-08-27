@@ -22,8 +22,8 @@ export class Gift extends BaseEntity implements IGift {
   @Column({ name: "receiver_id", type: "uuid", nullable: false })
   receiverId: string;
 
-  @Column({ name: "game_id", type: "uuid", nullable: false })
-  gameId: string;
+  @Column({ name: "event_id", type: "uuid", nullable: false })
+  eventId: string;
 
   @CreateDateColumn({ name: "send_date", type: "timestamp", nullable: false, default: () => "CURRENT_TIMESTAMP" })
   sendDate: Date;

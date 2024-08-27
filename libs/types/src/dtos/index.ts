@@ -13,5 +13,6 @@ export * from "./voucher/update-voucher.dto";
 export * from "./voucher/delete-voucher.dto";
 export * from "./voucher/add-voucher-to-account.dto";
 export * from "./voucher/update-assign-voucher.dto";
+export * from "./item";
 export * from "./notification";
 export * from "./game-in-system";

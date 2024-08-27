@@ -1,10 +1,10 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Item, AccountItem, Gift } from "@database";
-import { ItemRepository } from "./item.repository";
+import { AccountItemRepository } from "./account-item.repository";
 @Module({
   imports: [TypeOrmModule.forFeature([Item, AccountItem, Gift])],
-  providers: [ItemRepository],
-  exports: [ItemRepository],
+  providers: [AccountItemRepository],
+  exports: [AccountItemRepository],
 })
-export class ItemRepositoryModule {}
+export class AccountItemRepositoryModule {}
