@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { ClientOptions, ClientProxy, ClientProxyFactory } from "@nestjs/microservices";
-import { CreateRecipeDto, GetAvaibleRecipesForItemsDto, ITEM_SERVICE_PROVIDER_NAME, UpdateRecipeDto } from "@types";
+import { CreateRecipeDto, ITEM_SERVICE_PROVIDER_NAME, UpdateRecipeDto } from "@types";
 
 @Injectable()
 export class CombineItemService {
@@ -20,10 +20,6 @@ export class CombineItemService {
 
   getRecipe(id: string) {
     return this.itemClient.send({ method: "GET", path: "/recipes/:id" }, { id });
-  }
-
-  getAvaibleRecipesForItems(dto: GetAvaibleRecipesForItemsDto) {
-    return this.itemClient.send({ method: "POST", path: "/recipes/available-for-items" }, dto);
   }
 
   deleteRecipe(id: string) {

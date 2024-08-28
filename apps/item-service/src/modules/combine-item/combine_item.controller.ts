@@ -1,6 +1,6 @@
 import { Controller } from "@nestjs/common";
 import { MessagePattern, Payload } from "@nestjs/microservices";
-import { CreateRecipeDto, GetAvaibleRecipesForItemsDto, ICurrentUser, UpdateRecipeDto } from "@types";
+import { CreateRecipeDto, UpdateRecipeDto } from "@types";
 import { CombineItemService } from "./combine_item.service";
 
 @Controller()
@@ -25,11 +25,6 @@ export class CombineItemController {
   @MessagePattern({ method: "GET", path: "/events/:eventId/recipes" })
   getRecipesInEvent(@Payload() { eventId }: { eventId: string }) {
     return this.itemService.getRecipesInEvent(eventId);
-  }
-
-  @MessagePattern({ method: "POST", path: "/recipes/available-for-items" })
-  getAvaibleRecipesForItems(@Payload() dto: GetAvaibleRecipesForItemsDto) {
-    return this.itemService.getAvaibleRecipesForItems(dto);
   }
 
   @MessagePattern({ method: "DELETE", path: "/recipes/:id" })

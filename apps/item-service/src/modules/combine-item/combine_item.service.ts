@@ -1,10 +1,11 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { RpcException } from "@nestjs/microservices";
-import { CreateRecipeDto, GetAvaibleRecipesForItemsDto, ICurrentUser, UpdateRecipeDto } from "@types";
+import { CreateRecipeDto, ItemStatusEnum, UpdateRecipeDto } from "@types";
 import { CombineItemModel } from "../model/combine_item.model";
 import { Types } from "mongoose";
 import { CombineItemHelper } from "./combine_item.helper";
 import { CombineItems } from "@database";
+import { ItemRepository } from "../repository/item.repository";
 
 @Injectable()
 export class CombineItemService {
@@ -12,12 +13,37 @@ export class CombineItemService {
 
   constructor(
     private readonly combineItemsModel: CombineItemModel,
-    private readonly combineItemHelper: CombineItemHelper
+    private readonly combineItemHelper: CombineItemHelper,
+    private readonly itemRepository: ItemRepository
   ) {}
+
+  async isCraftable(itemId: string, quantity: number) {
+    try {
+      const data = await this.itemRepository.findOne({ where: { id: itemId } });
+      if (!data) throw new RpcException("Item not found");
+      if (data.status === ItemStatusEnum.ACTIVE && data.quantity < quantity) return false;
+      return true;
+    } catch (error) {
+      this.logger.error(error);
+      throw new RpcException(error);
+    }
+  }
 
   async createRecipe(dto: CreateRecipeDto) {
     try {
       const mappedDto = dto as CombineItems;
+
+      const isCraftableConstraint = mappedDto.itemRecipe.map(async (it) => {
+        return this.isCraftable(it.itemId, it.quantity);
+      });
+
+      isCraftableConstraint.push(this.isCraftable(mappedDto.targetId, 1));
+
+      const resolvedConstraints = await Promise.all(isCraftableConstraint);
+      if (resolvedConstraints.some((it) => it === false)) {
+        throw new RpcException("Item not craftable");
+      }
+
       const data = await this.combineItemsModel.save(mappedDto);
       return this.combineItemHelper.buildResponseData(data);
     } catch (error) {
@@ -51,18 +77,6 @@ export class CombineItemService {
     try {
       const data = await this.combineItemsModel.find({
         eventId: eventId,
-      });
-      return data.map((it) => this.combineItemHelper.buildResponseData(it));
-    } catch (error) {
-      this.logger.error(error);
-      throw new RpcException(error);
-    }
-  }
-
-  async getAvaibleRecipesForItems(dto: GetAvaibleRecipesForItemsDto) {
-    try {
-      const data = await this.combineItemsModel.find({
-        itemRecipe: { $elemMatch: { itemId: { $in: dto.items } } },
       });
       return data.map((it) => this.combineItemHelper.buildResponseData(it));
     } catch (error) {
