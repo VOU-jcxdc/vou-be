@@ -32,6 +32,7 @@ export class NotificationConsumerService implements OnModuleInit {
                   null,
                   {
                     eventId: event.id,
+                    tag: "begin_fav_event",
                   }
                 );
                 break;
