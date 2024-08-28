@@ -78,7 +78,8 @@ export class CombineItemService {
       const data = await this.combineItemsModel.find({
         eventId: eventId,
       });
-      return data.map((it) => this.combineItemHelper.buildResponseData(it));
+      const result = data.map((it) => this.combineItemHelper.buildResponseData(it));
+      return Promise.all(result);
     } catch (error) {
       this.logger.error(error);
       throw new RpcException(error);
