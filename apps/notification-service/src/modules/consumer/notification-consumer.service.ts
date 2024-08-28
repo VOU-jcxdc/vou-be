@@ -7,15 +7,17 @@ import { ConfigService } from "@nestjs/config";
 @Injectable()
 export class NotificationConsumerService implements OnModuleInit {
   private channelWrapper: ChannelWrapper;
+  private configService: ConfigService;
   private readonly logger = new Logger(NotificationConsumerService.name);
 
   constructor(private readonly notificationService: NotificationService, configService: ConfigService) {
-    const connection = amqp.connect([configService.get("RMQ_URLS")]);
-    this.channelWrapper = connection.createChannel();
+    this.configService = configService;
   }
 
   public async onModuleInit() {
     try {
+      const connection = amqp.connect([this.configService.get("RMQ_URLS")]);
+      this.channelWrapper = connection.createChannel();
       await this.channelWrapper.addSetup(async (channel: ConfirmChannel) => {
         await channel.assertQueue("notificationQueue", { durable: true });
         await channel.consume("notificationQueue", async (message) => {

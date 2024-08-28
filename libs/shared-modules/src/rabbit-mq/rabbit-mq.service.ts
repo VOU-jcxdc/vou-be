@@ -1,19 +1,20 @@
-import { Inject, Injectable, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
+import { Injectable, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { ClientProxy } from "@nestjs/microservices";
-import { DELAY_MESSAGE_EXCHANGE_NAME, EVENT_NOTIFICATION_ROUTING_KEY, RMQ_PROVIDER } from "@types";
+import { DELAY_MESSAGE_EXCHANGE_NAME, EVENT_NOTIFICATION_ROUTING_KEY } from "@types";
 import { Channel } from "amqplib";
 import amqp, { ChannelWrapper } from "amqp-connection-manager";
 
 @Injectable()
 export class RabbitMqService implements OnModuleInit, OnModuleDestroy {
   private channel: ChannelWrapper;
-  constructor(@Inject(RMQ_PROVIDER) private client: ClientProxy, private readonly configService: ConfigService) {}
+  private configService: ConfigService;
+  constructor(configService: ConfigService) {
+    this.configService = configService;
+  }
 
   async onModuleInit() {
     try {
-      await this.client.connect();
-      const connection = amqp.connect(["amqp://localhost:5672"]);
+      const connection = amqp.connect([this.configService.get("RMQ_URLS") as string]);
       this.channel = connection.createChannel({
         json: true,
         setup: async (channel: Channel) => {
@@ -36,7 +37,6 @@ export class RabbitMqService implements OnModuleInit, OnModuleDestroy {
 
   async onModuleDestroy() {
     try {
-      await this.client.close();
       await this.channel.close();
     } catch (error) {
       console.error(error);

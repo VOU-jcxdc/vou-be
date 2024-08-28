@@ -10,6 +10,7 @@ import { ConfigService } from "@nestjs/config";
 @Injectable()
 export class EventConsumerService implements OnModuleInit {
   private channelWrapper: ChannelWrapper;
+  private configService: ConfigService;
   private readonly logger = new Logger(EventConsumerService.name);
 
   constructor(
@@ -18,12 +19,13 @@ export class EventConsumerService implements OnModuleInit {
     private readonly rabbitMqService: RabbitMqService,
     configService: ConfigService
   ) {
-    const connection = amqp.connect([configService.get("RMQ_URLS")]);
-    this.channelWrapper = connection.createChannel();
+    this.configService = configService;
   }
 
   public async onModuleInit() {
     try {
+      const connection = amqp.connect([this.configService.get("RMQ_URLS")]);
+      this.channelWrapper = connection.createChannel();
       await this.channelWrapper.addSetup(async (channel: ConfirmChannel) => {
         await channel.assertQueue("eventNotificationQueue", { durable: true });
         await channel.consume("eventNotificationQueue", async (message) => {
