@@ -21,14 +21,11 @@ jobs:
             git reset --hard
             git pull
 
-            # Write secrets.env in base64 to env.zip
-            base64 -d <<< "${{ secrets.ENV }}" > env.zip
+            # Write secrets.env file to .env
+            echo "${{ secrets.ENV }}" > .env
 
-            # Unzip env.zip to vou-be
-            unzip -o env.zip
-
-            # Remove env.zip
-            rm env.zip
+            # Run copy-env.sh scripts
+            bash scripts/copy-env.sh
 
             # Stop docker compose 
             docker compose down && docker image prune -f
