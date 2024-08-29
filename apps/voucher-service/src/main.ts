@@ -7,8 +7,8 @@ import { ExceptionHandlerInterceptor, ThrowFirstErrorValidationPipe, TransformRe
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const microserviceHost = process.env.MICROSERVICE_HOST || "localhost";
-  const microservicePort = Number(process.env.MICROSERVICE_PORT as string) || 3004;
+  const microserviceHost = process.env.VOUCHER_SERVICE_HOST || "localhost";
+  const microservicePort = Number(process.env.VOUCHER_SERVICE_PORT as string) || 3004;
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.TCP,

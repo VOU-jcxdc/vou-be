@@ -62,4 +62,10 @@ export class EventController {
   async deleteVouchersInEvent(@Param("id") id: string, @Body() data: DeleteVoucherDto) {
     return this.eventService.deleteVouchersInEvent(id, data);
   }
+
+  @Get(":id/recipes")
+  @Roles(AccountRoleEnum.BRAND, AccountRoleEnum.PLAYER)
+  async getRecipesInEvent(@Param("id") id: string) {
+    return this.eventService.getRecipesInEvent(id);
+  }
 }
