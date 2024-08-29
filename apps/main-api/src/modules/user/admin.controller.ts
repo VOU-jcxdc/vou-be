@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Param, ParseEnumPipe, ParseIntPipe, Put, Query, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseEnumPipe, ParseIntPipe, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
-import { AccountRoleEnum, UpdateAccountByAdminDto } from "@types";
+import { AccountRoleEnum, CreateAdminDto, UpdateAccountByAdminDto } from "@types";
 import { JwtAuthGuard, RoleGuard } from "../../guard";
 import { Roles } from "../../decorators/roles.decorator";
 
@@ -27,5 +27,10 @@ export class AdminController {
   @Put("user/:id")
   async updateAccount(@Param("id") id: string, @Body() body: UpdateAccountByAdminDto) {
     return this.userService.updateAccountByAdmin(id, body);
+  }
+
+  @Post("user")
+  async createUser(@Body() data: CreateAdminDto) {
+    return this.userService.createUser(data);
   }
 }
