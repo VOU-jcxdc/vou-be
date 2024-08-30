@@ -21,4 +21,14 @@ export class ItemRepository extends BaseRepository<Item> {
     if (item.quantity < expectedQuantity) throw new BadRequestException("Not enough quantity of the requested item");
     return item;
   }
+
+  async getRandomItemByEventId(eventId: string) {
+    return this.repository
+      .createQueryBuilder("items")
+      .where("items.event_id = :eventId", { eventId })
+      .andWhere("items.quantity > :quantity", { quantity: 0 })
+      .orderBy("RANDOM()") // Orders by a random value
+      .limit(1) // Limits the result to one item
+      .getOne(); // Gets a single random item
+  }
 }

@@ -212,6 +212,18 @@ export class EventService {
     return lastValueFrom(rawData);
   }
 
+  async assignItemInEvent(accountId: string, eventId: string) {
+    const rawData = this.itemClient.send({ method: "POST", path: "/items/system" }, { accountId, eventId }).pipe(
+      catchError((error) => {
+        const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
+        const message = error.message || "An error occurred";
+        throw new HttpException(message, statusCode);
+      })
+    );
+
+    return lastValueFrom(rawData);
+  }
+
   async getRecipesInEvent(eventId: string) {
     return this.itemClient.send({ method: "GET", path: "/events/:eventId/recipes" }, { eventId });
   }

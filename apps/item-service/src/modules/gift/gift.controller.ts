@@ -1,33 +1,34 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
 import { GiftService } from "./gift.service";
 import { CreateGiftRequestDto } from "@types";
+import { MessagePattern, Payload } from "@nestjs/microservices";
 
-@Controller("gifts")
+@Controller()
 export class GiftController {
   constructor(private readonly giftService: GiftService) {}
 
-  @Get("/received-requests/:receiverId")
-  getReceivedRequests(@Param("receiverId") receiverId: string) {
+  @MessagePattern({ method: "GET", path: "gifts/received-requests/:receiverId" })
+  getReceivedRequests(@Payload("receiverId") receiverId: string) {
     return this.giftService.getGiftRequestsByReceiverId(receiverId);
   }
 
-  @Get("/sent-requests/:senderId")
-  getSentRequests(@Param("senderId") senderId: string) {
+  @MessagePattern({ method: "GET", path: "gifts/sent-requests/:senderId" })
+  getSentRequests(@Payload("senderId") senderId: string) {
     return this.giftService.getGiftRequestsBySenderId(senderId);
   }
 
-  @Post()
+  @MessagePattern({ method: "POST", path: "gifts" })
   createGiftRequest(@Body() data: CreateGiftRequestDto) {
     return this.giftService.createGiftRequest(data);
   }
 
-  @Put(":giftId")
-  acceptGiftRequest(@Param() { giftId }: { giftId: string }) {
-    return this.giftService.acceptGiftRequest(giftId);
+  @MessagePattern({ method: "PUT", path: "gifts/:giftId" })
+  acceptGiftRequest(@Payload() { accountId, giftId }: { accountId: string; giftId: string }) {
+    return this.giftService.acceptGiftRequest(giftId, accountId);
   }
 
-  @Delete(":giftId")
-  rejectGiftRequest(@Param() { giftId }: { giftId: string }) {
-    return this.giftService.rejectGiftRequest(giftId);
+  @MessagePattern({ method: "DELETE", path: "gifts/:giftId" })
+  rejectGiftRequest(@Payload() { accountId, giftId }: { accountId: string; giftId: string }) {
+    return this.giftService.rejectGiftRequest(giftId, accountId);
   }
 }

@@ -31,6 +31,12 @@ export class EventController {
     return this.eventService.assignVoucherInEvent(user.userId, data);
   }
 
+  @Post("/:id/items/assigning")
+  @Roles(AccountRoleEnum.PLAYER)
+  async assignItem(@CurrentUser() user: ICurrentUser, @Param("id") eventId: string) {
+    return this.eventService.assignItemInEvent(user.userId, eventId);
+  }
+
   @Post(":id/items")
   @Roles(AccountRoleEnum.BRAND)
   async createItems(@Param("id") eventId: string, @Body() dto: CreateItemDto) {

@@ -1,17 +1,13 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ClientOptions, ClientProxy, ClientProxyFactory } from "@nestjs/microservices";
-import { CreateItemDto, EVENT_SERVICE_PROVIDER_NAME, ITEM_SERVICE_PROVIDER_NAME } from "@types";
+import { ITEM_SERVICE_PROVIDER_NAME } from "@types";
+import { catchError, lastValueFrom } from "rxjs";
 
 @Injectable()
 export class ItemService {
-  private eventClient: ClientProxy;
   private itemClient: ClientProxy;
 
-  constructor(
-    @Inject(ITEM_SERVICE_PROVIDER_NAME) itemOptions: ClientOptions,
-    @Inject(EVENT_SERVICE_PROVIDER_NAME) eventOptions: ClientOptions
-  ) {
-    this.eventClient = ClientProxyFactory.create(eventOptions);
+  constructor(@Inject(ITEM_SERVICE_PROVIDER_NAME) itemOptions: ClientOptions) {
     this.itemClient = ClientProxyFactory.create(itemOptions);
   }
 
@@ -19,11 +15,15 @@ export class ItemService {
     return this.itemClient.send({ method: "GET", path: "/items/:id/recipes" }, { id });
   }
 
-  async getItemsByEventId(eventId: string) {
-    return this.itemClient.send({ method: "GET", path: "/items/:eventId" }, { eventId });
-  }
-  async createItems(data: CreateItemDto) {
-    // const event = this.eventClient.send({ method: "GET", path: "/events/:id"}, {})
-    return this.itemClient.send({ method: "POST", path: "/items" }, data);
+  async getPlayerItems(accountId: string) {
+    const rawData = this.itemClient.send({ method: "GET", path: "/items/my-items" }, { accountId }).pipe(
+      catchError((error) => {
+        const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
+        const message = error.message || "An error occurred";
+        throw new HttpException(message, statusCode);
+      })
+    );
+
+    return lastValueFrom(rawData);
   }
 }

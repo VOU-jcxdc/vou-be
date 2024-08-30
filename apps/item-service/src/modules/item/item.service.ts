@@ -6,12 +6,14 @@ import { AccountItemRepository } from "../repository/account-item.repository";
 import { CombineItemModel } from "../model/combine_item.model";
 import { CombineItemHelper } from "../combine-item/combine_item.helper";
 
+import { AccountItemHelper } from "./account-item.helper";
 @Injectable()
 export class ItemService {
   private readonly logger: Logger = new Logger(ItemService.name);
   constructor(
     private readonly itemRepository: ItemRepository,
     private readonly accountItemRepository: AccountItemRepository,
+    private readonly accountItemHelper: AccountItemHelper,
     private readonly combineItemModel: CombineItemModel,
     private readonly combineItemHelper: CombineItemHelper
   ) {}
@@ -39,7 +41,7 @@ export class ItemService {
       });
     } catch (error) {
       this.logger.error(error);
-      throw new BadRequestException(error);
+      throw new RpcException(error);
     }
   }
 
@@ -48,7 +50,7 @@ export class ItemService {
       return this.itemRepository.findOne({ where: { id: itemId } });
     } catch (error) {
       this.logger.error(error);
-      throw new BadRequestException(error);
+      throw new RpcException(error);
     }
   }
 
@@ -57,7 +59,7 @@ export class ItemService {
       return this.itemRepository.updateOne({ where: { id: itemId } }, data);
     } catch (error) {
       this.logger.error(error);
-      throw new BadRequestException(error);
+      throw new RpcException(error);
     }
   }
 
@@ -66,7 +68,7 @@ export class ItemService {
       return this.itemRepository.delete({ id: itemId });
     } catch (error) {
       this.logger.error(error);
-      throw new BadRequestException(error);
+      throw new RpcException(error);
     }
   }
 
@@ -80,7 +82,7 @@ export class ItemService {
       return await this.accountItemRepository.save(newAccountItem);
     } catch (error) {
       this.logger.error(error);
-      throw new BadRequestException(error);
+      throw new RpcException(error);
     }
   }
 
@@ -97,7 +99,7 @@ export class ItemService {
       );
     } catch (error) {
       this.logger.error(error);
-      throw new BadRequestException(error);
+      throw new RpcException(error);
     }
   }
 
@@ -111,21 +113,22 @@ export class ItemService {
       });
     } catch (error) {
       this.logger.error(error);
-      throw new BadRequestException(error);
+      throw new RpcException(error);
     }
   }
 
-  async getAccountItemByItemId(accountId: string, itemId: string) {
+  async getAccountItemByAccountId(accountId: string) {
     try {
-      return this.accountItemRepository.findOne({
-        where: { accountId, itemId },
+      return this.accountItemRepository.findAll({
+        where: { accountId },
         relations: {
           item: true,
         },
+        select: ["id", "status", "assignedDate", "quantity"],
       });
     } catch (error) {
       this.logger.error(error);
-      throw new BadRequestException(error);
+      throw new RpcException(error);
     }
   }
 
@@ -133,11 +136,11 @@ export class ItemService {
     try {
       await this.itemRepository.checkExisted({ id: itemId });
       const accountItem = await this.accountItemRepository.findOne({ where: { accountId, itemId } });
-      if (accountItem) return this.updateAccountItem(accountId, itemId, quantity);
+      if (accountItem) return this.updateAccountItem(accountId, itemId, accountItem.quantity + quantity);
       else return this.createAccountItem(accountId, itemId, quantity);
     } catch (error) {
       this.logger.error(error);
-      throw new BadRequestException(error);
+      throw new RpcException(error);
     }
   }
 
@@ -145,23 +148,24 @@ export class ItemService {
     try {
       const accountItem = await this.accountItemRepository.checkAvailableStock({ accountId, itemId }, quantity);
       return this.accountItemRepository.updateOne(
-        { where: { ...accountItem } },
+        { where: { accountId, itemId } },
         { quantity: accountItem.quantity - quantity }
       );
     } catch (error) {
       this.logger.error(error);
-      throw new BadRequestException(error);
+      throw new RpcException(error);
     }
   }
 
-  async receiveItemFromSystem(accountId: string, itemId: string, quantity: number) {
+  async receiveItemFromSystem(accountId: string, eventId: string) {
     try {
-      const stockItem = await this.itemRepository.checkAvailableStock({ id: itemId }, quantity);
-      await this.updateItemDetail(itemId, { quantity: stockItem.quantity - quantity });
-      return this.receiveItem(accountId, itemId, quantity);
+      const stockItem = await this.itemRepository.getRandomItemByEventId(eventId);
+      const receivedItem = await this.receiveItem(accountId, stockItem.id, 1);
+      await this.updateItemDetail(stockItem.id, { quantity: stockItem.quantity - 1 });
+      return this.accountItemHelper.buildResponse(receivedItem);
     } catch (error) {
       this.logger.error(error);
-      throw new BadRequestException(error);
+      throw new RpcException(error);
     }
   }
 

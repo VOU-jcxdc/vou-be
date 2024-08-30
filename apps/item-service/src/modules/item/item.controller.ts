@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
+import { Controller } from "@nestjs/common";
 import { ItemService } from "./item.service";
 import { MessagePattern, Payload } from "@nestjs/microservices";
 import { CreateItemDto, ReceiveItemDto, UpdateItemDto } from "@types";
@@ -35,7 +35,12 @@ export class ItemController {
 
   @MessagePattern({ method: "POST", path: "/items/system" })
   receiveItem(@Payload() data: ReceiveItemDto) {
-    const { accountId, itemId, quantity } = data;
-    return this.itemService.receiveItemFromSystem(accountId, itemId, quantity);
+    const { accountId, eventId } = data;
+    return this.itemService.receiveItemFromSystem(accountId, eventId);
+  }
+
+  @MessagePattern({ method: "GET", path: "/items/my-items" })
+  getPlayerItems(@Payload("accountId") accountId: string) {
+    return this.itemService.getAccountItemByAccountId(accountId);
   }
 }

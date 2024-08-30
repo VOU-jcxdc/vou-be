@@ -1,7 +1,9 @@
-import { BadRequestException, Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { GiftRepository } from "../repository/gift.repository";
 import { CreateGiftRequestDto, GiftStatusEnum } from "@types";
 import { ItemService } from "../item/item.service";
+import { In } from "typeorm";
+import { RpcException } from "@nestjs/microservices";
 
 @Injectable()
 export class GiftService {
@@ -13,14 +15,16 @@ export class GiftService {
       return this.giftRepository.findAll({
         where: {
           senderId,
+          status: In([GiftStatusEnum.REQUESTED, GiftStatusEnum.REJECTED]),
         },
         relations: {
           item: true,
         },
+        select: ["id", "senderId", "receiverId", "sendDate", "status", "quantity", "item"],
       });
     } catch (error) {
       this.logger.error(error);
-      throw new BadRequestException(error);
+      throw new RpcException(error);
     }
   }
 
@@ -29,14 +33,16 @@ export class GiftService {
       return this.giftRepository.findAll({
         where: {
           receiverId,
+          status: GiftStatusEnum.REQUESTED,
         },
         relations: {
           item: true,
         },
+        select: ["id", "senderId", "receiverId", "sendDate", "status", "quantity", "item"],
       });
     } catch (error) {
       this.logger.error(error);
-      throw new BadRequestException(error);
+      throw new RpcException(error);
     }
   }
 
@@ -48,13 +54,14 @@ export class GiftService {
       });
     } catch (error) {
       this.logger.error(error);
-      throw new BadRequestException(error);
+      throw new RpcException(error);
     }
   }
 
-  async acceptGiftRequest(giftId: string) {
+  async acceptGiftRequest(giftId: string, accountId: string) {
     try {
       const request = await this.giftRepository.checkExisted(giftId);
+      this.giftRepository.checkPermissionUpdate(request, accountId);
       const { senderId, receiverId, itemId } = request;
       await this.itemService.receiveItem(senderId, itemId, request.quantity);
       await this.giftRepository.updateOne(
@@ -66,12 +73,14 @@ export class GiftService {
       return await this.itemService.loseItem(receiverId, itemId, request.quantity);
     } catch (error) {
       this.logger.error(error);
-      throw new BadRequestException(error);
+      throw new RpcException(error);
     }
   }
 
-  async rejectGiftRequest(giftId: string) {
+  async rejectGiftRequest(giftId: string, accountId: string) {
     try {
+      const request = await this.giftRepository.checkExisted(giftId);
+      this.giftRepository.checkPermissionUpdate(request, accountId);
       return this.giftRepository.updateOne(
         {
           where: { id: giftId },
@@ -82,7 +91,7 @@ export class GiftService {
       );
     } catch (error) {
       this.logger.error(error);
-      throw new BadRequestException(error);
+      throw new RpcException(error);
     }
   }
 }
