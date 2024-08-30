@@ -29,7 +29,7 @@ export class NotificationConsumerService implements OnModuleInit {
                 const { event } = data;
                 await this.notificationService.sendNotificationToAccounts(
                   accountIds,
-                  event.name,
+                  event.name + " will begin after 1 hour!!!",
                   event.description,
                   null,
                   {

@@ -42,12 +42,12 @@ export class EventService {
         images,
       });
 
-      const timeSchedule = moment(newEvent.beginDate).valueOf();
-      await this.rabbitMqService.publishWithDelay(
+      const timeSchedule = moment(newEvent.beginDate).subtract(1, "hour").diff(moment());
+      this.rabbitMqService.publishWithDelay(
         DELAY_MESSAGE_EXCHANGE_NAME,
         EVENT_NOTIFICATION_ROUTING_KEY,
         { eventId: newEvent.id, beginDate: newEvent.beginDate },
-        120000
+        timeSchedule
       );
 
       return this.eventHelper.buildResponseFromEvent(newEvent);
@@ -78,12 +78,12 @@ export class EventService {
       });
 
       if (!moment(updatedEvent.beginDate).isSame(moment(event.beginDate))) {
-        const timeSchedule = moment(updatedEvent.beginDate).valueOf();
-        await this.rabbitMqService.publishWithDelay(
+        const timeSchedule = moment(updatedEvent.beginDate).subtract(1, "hour").diff(moment());
+        this.rabbitMqService.publishWithDelay(
           DELAY_MESSAGE_EXCHANGE_NAME,
           EVENT_NOTIFICATION_ROUTING_KEY,
           { eventId: updatedEvent.id, beginDate: updatedEvent.beginDate },
-          120000
+          timeSchedule
         );
       }
 

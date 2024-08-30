@@ -43,7 +43,7 @@ export class RabbitMqService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  async publishWithDelay(exchange: string, routingKey: string, message: any, timeSchedule: number) {
+  publishWithDelay(exchange: string, routingKey: string, message: any, timeSchedule: number) {
     try {
       this.channel.publish(exchange, routingKey, message, {
         headers: { "x-delay": timeSchedule },
@@ -55,7 +55,7 @@ export class RabbitMqService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  async publishToQueue(queue: string, message: any) {
+  publishToQueue(queue: string, message: any) {
     try {
       this.channel.sendToQueue(queue, message, { persistent: true });
     } catch (error) {
