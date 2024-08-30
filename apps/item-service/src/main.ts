@@ -23,7 +23,7 @@ async function bootstrap() {
   });
 
   await app.startAllMicroservices();
-  await app.listen(1234);
+  await app.init();
 
   Logger.log(`🚀 Item application is running`);
 }

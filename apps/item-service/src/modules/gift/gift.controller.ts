@@ -7,12 +7,12 @@ export class GiftController {
   constructor(private readonly giftService: GiftService) {}
 
   @Get("/received-requests/:receiverId")
-  getReceivedRequests(@Param() { receiverId }: { receiverId: string }) {
+  getReceivedRequests(@Param("receiverId") receiverId: string) {
     return this.giftService.getGiftRequestsByReceiverId(receiverId);
   }
 
   @Get("/sent-requests/:senderId")
-  getSentRequests(@Param() { senderId }: { senderId: string }) {
+  getSentRequests(@Param("senderId") senderId: string) {
     return this.giftService.getGiftRequestsBySenderId(senderId);
   }
 

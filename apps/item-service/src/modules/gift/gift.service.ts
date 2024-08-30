@@ -54,21 +54,16 @@ export class GiftService {
 
   async acceptGiftRequest(giftId: string) {
     try {
-      const request = await this.giftRepository.findOne({ where: { id: giftId } });
-      if (!request) throw new NotFoundException("The gift request does not existed");
-      const { receiverId, itemId } = request;
-      const receiverItem = await this.itemService.getAccountItemByItemId(receiverId, itemId);
-      if (!receiverItem || receiverItem.quantity < request.quantity) {
-        throw new BadRequestException("Does not have enough items");
-      }
+      const request = await this.giftRepository.checkExisted(giftId);
+      const { senderId, receiverId, itemId } = request;
+      await this.itemService.receiveItem(senderId, itemId, request.quantity);
       await this.giftRepository.updateOne(
         { where: { id: giftId } },
         {
           status: GiftStatusEnum.ACCEPTED,
         }
       );
-      const newQuantity = receiverItem.quantity - request.quantity;
-      return this.itemService.receiveItem(receiverId, itemId, newQuantity);
+      return await this.itemService.loseItem(receiverId, itemId, request.quantity);
     } catch (error) {
       this.logger.error(error);
       throw new BadRequestException(error);

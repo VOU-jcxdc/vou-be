@@ -2,8 +2,9 @@ import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common"
 import { ItemService } from "./item.service";
 import { MessagePattern, Payload } from "@nestjs/microservices";
 import { CreateItemDto, ReceiveItemDto, UpdateItemDto } from "@types";
+import { MessagePattern, Payload } from "@nestjs/microservices";
 
-@Controller("items")
+@Controller()
 export class ItemController {
   constructor(private readonly itemService: ItemService) {}
 
@@ -12,28 +13,28 @@ export class ItemController {
     return this.itemService.getCraftableRecipesForItem(id);
   }
 
-  @Get(":eventId")
-  getItemsByEventId(@Param() { eventId }: { eventId: string }) {
+  @MessagePattern({ method: "GET", path: "/items/:eventId" })
+  getItemsByEventId(@Payload() { eventId }: { eventId: string }) {
     return this.itemService.getItemsByEventId(eventId);
   }
 
-  @Post()
-  createItems(@Body() data: CreateItemDto) {
+  @MessagePattern({ method: "POST", path: "/items" })
+  createItems(@Payload() data: CreateItemDto & { eventId: string }) {
     return this.itemService.createItems(data);
   }
 
-  @Put(":itemId")
-  updateItemDetail(@Param() { itemId }: { itemId: string }, @Body() data: UpdateItemDto) {
+  @MessagePattern({ method: "PUT", path: "/items/:itemId" })
+  updateItemDetail(@Payload() { itemId, ...data }: { itemId: string } & UpdateItemDto) {
     return this.itemService.updateItemDetail(itemId, data);
   }
 
-  @Delete(":itemId")
-  deleteItemsInEvent(@Param() { itemId }: { itemId: string }) {
+  @MessagePattern({ method: "DELETE", path: "/items/:itemId" })
+  deleteItemInEvent(@Payload() { itemId }: { itemId: string }) {
     return this.itemService.deleteItemInEvent(itemId);
   }
 
-  @Post("system")
-  receiveItem(@Body() data: ReceiveItemDto) {
+  @MessagePattern({ method: "POST", path: "/items/system" })
+  receiveItem(@Payload() data: ReceiveItemDto) {
     const { accountId, itemId, quantity } = data;
     return this.itemService.receiveItemFromSystem(accountId, itemId, quantity);
   }

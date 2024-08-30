@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, Logger } from "@nestjs/common";
 import { ItemRepository } from "../repository/item.repository";
 import { CreateItemDto, UpdateItemDto } from "@types";
 import { RpcException } from "@nestjs/microservices";
@@ -16,9 +16,15 @@ export class ItemService {
     private readonly combineItemHelper: CombineItemHelper
   ) {}
 
-  async createItems({ items }: CreateItemDto) {
+  async createItems({ items, eventId }: CreateItemDto & { eventId: string }) {
     try {
-      const savedItems = await this.itemRepository.saveMany(items);
+      const populatedItems = items.map((item) => {
+        return {
+          ...item,
+          eventId,
+        };
+      });
+      const savedItems = await this.itemRepository.saveMany(populatedItems);
       return savedItems;
     } catch (error) {
       this.logger.error(error);
@@ -66,8 +72,6 @@ export class ItemService {
 
   private async createAccountItem(accountId: string, itemId: string, quantity: number) {
     try {
-      const item = await this.itemRepository.findOne({ where: { id: itemId } });
-      if (!item) throw new NotFoundException("Item not existed");
       const newAccountItem = {
         accountId,
         itemId,
@@ -82,13 +86,6 @@ export class ItemService {
 
   private async updateAccountItem(accountId: string, itemId: string, quantity: number) {
     try {
-      const item = await this.itemRepository.findOne({ where: { id: itemId } });
-      if (!item) throw new NotFoundException("Item not existed");
-      const newAccountItem = {
-        accountId,
-        itemId,
-        quantity,
-      };
       return await this.accountItemRepository.updateOne(
         {
           where: {
@@ -96,7 +93,7 @@ export class ItemService {
             itemId,
           },
         },
-        newAccountItem
+        { quantity }
       );
     } catch (error) {
       this.logger.error(error);
@@ -134,6 +131,7 @@ export class ItemService {
 
   async receiveItem(accountId: string, itemId: string, quantity: number) {
     try {
+      await this.itemRepository.checkExisted({ id: itemId });
       const accountItem = await this.accountItemRepository.findOne({ where: { accountId, itemId } });
       if (accountItem) return this.updateAccountItem(accountId, itemId, quantity);
       else return this.createAccountItem(accountId, itemId, quantity);
@@ -145,13 +143,11 @@ export class ItemService {
 
   async loseItem(accountId: string, itemId: string, quantity: number) {
     try {
-      const accountItem = await this.accountItemRepository.findOne({ where: { accountId, itemId } });
-      if (!accountItem) throw new NotFoundException("This account doesn't have the item");
-      if (accountItem.quantity < quantity) throw new BadRequestException("Not enough quantity of the requested item");
-      return this.accountItemRepository.save({
-        ...accountItem,
-        quantity: accountItem.quantity - quantity,
-      });
+      const accountItem = await this.accountItemRepository.checkAvailableStock({ accountId, itemId }, quantity);
+      return this.accountItemRepository.updateOne(
+        { where: { ...accountItem } },
+        { quantity: accountItem.quantity - quantity }
+      );
     } catch (error) {
       this.logger.error(error);
       throw new BadRequestException(error);
@@ -160,8 +156,7 @@ export class ItemService {
 
   async receiveItemFromSystem(accountId: string, itemId: string, quantity: number) {
     try {
-      const stockItem = await this.itemRepository.findOne({ where: { id: itemId } });
-      if (!stockItem || stockItem.quantity - quantity < 0) throw new BadRequestException("No item left");
+      const stockItem = await this.itemRepository.checkAvailableStock({ id: itemId }, quantity);
       await this.updateItemDetail(itemId, { quantity: stockItem.quantity - quantity });
       return this.receiveItem(accountId, itemId, quantity);
     } catch (error) {

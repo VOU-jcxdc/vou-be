@@ -6,11 +6,8 @@ export class ItemDetailDto {
   @IsNotEmpty({ message: "Name is required" })
   name: string;
 
-  @IsUUID("4", { message: "image must be a valid UUID" })
+  @IsUUID("4", { message: "Image must be a valid UUID" })
   imageId: string;
-
-  @IsUUID("4", { message: "Event must be a valid UUID" })
-  eventId: string;
 
   @IsEnum(ItemTypeEnum)
   type: ItemTypeEnum;

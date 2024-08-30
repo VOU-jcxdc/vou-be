@@ -3,11 +3,13 @@ import { ClientOptions, ClientProxy, ClientProxyFactory } from "@nestjs/microser
 import {
   AddVoucherToAccountDto,
   CreateEventDto,
+  CreateItemDto,
   DeleteVoucherDto,
   EVENT_SERVICE_PROVIDER_NAME,
   ICurrentUser,
   ITEM_SERVICE_PROVIDER_NAME,
   UpdateEventDto,
+  UpdateItemDto,
   VOUCHER_SERVICE_PROVIDER_NAME,
 } from "@types";
 import { catchError, lastValueFrom } from "rxjs";
@@ -148,6 +150,58 @@ export class EventService {
 
   async getVouchersInEvent(eventId: string) {
     const rawData = this.voucherClient.send({ method: "GET", path: "/vouchers/:eventId" }, { eventId }).pipe(
+      catchError((error) => {
+        const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
+        const message = error.message || "An error occurred";
+        throw new HttpException(message, statusCode);
+      })
+    );
+    return lastValueFrom(rawData);
+  }
+
+  async getItemsInEvent(eventId: string) {
+    const rawData = this.itemClient.send({ method: "GET", path: "/items/:eventId" }, { eventId }).pipe(
+      catchError((error) => {
+        const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
+        const message = error.message || "An error occurred";
+        throw new HttpException(message, statusCode);
+      })
+    );
+    return lastValueFrom(rawData);
+  }
+
+  async createItemsInEvent(eventId: string, data: CreateItemDto) {
+    const reqData = {
+      eventId,
+      ...data,
+    };
+    const rawData = this.itemClient.send({ method: "POST", path: "/items" }, reqData).pipe(
+      catchError((error) => {
+        const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
+        const message = error.message || "An error occurred";
+        throw new HttpException(message, statusCode);
+      })
+    );
+    return lastValueFrom(rawData);
+  }
+
+  async updateItemDetail(itemId: string, data: UpdateItemDto) {
+    const reqData = {
+      ...data,
+      itemId,
+    };
+    const rawData = this.itemClient.send({ method: "PUT", path: "/items/:itemId" }, reqData).pipe(
+      catchError((error) => {
+        const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
+        const message = error.message || "An error occurred";
+        throw new HttpException(message, statusCode);
+      })
+    );
+    return lastValueFrom(rawData);
+  }
+
+  async deleteItemInEvent(itemId: string) {
+    const rawData = this.itemClient.send({ method: "DELETE", path: "/items/:itemId" }, { itemId }).pipe(
       catchError((error) => {
         const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
         const message = error.message || "An error occurred";
