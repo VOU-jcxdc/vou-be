@@ -22,6 +22,11 @@ for service in "${services[@]}"; do
     fi
 done
 
+# Copy env to ./apps/main-api
+if ! cp -f "$env_path" "./apps/main-api/.env.build"; then
+    env_validation=false
+fi
+
 # Copy env to ./docker
 if ! cp -f "$env_path" "./docker"; then
     env_validation=false

@@ -17,7 +17,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
     
   mongo:
-    image: mongo
+    image: mongodb/mongodb-community-server
     container_name: mongo
     ports:
       - "27017:27017"
@@ -26,7 +26,7 @@ services:
     networks:
       - vou-network
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh mongo:27017/test --quiet
+      test: echo 'db.runCommand("ping").ok' | mongosh admin -u $MONGODB_INITDB_ROOT_USERNAME -p $MONGODB_INITDB_ROOT_PASSWORD --quiet | grep 1
       interval: 10s
       timeout: 5s
       retries: 5
