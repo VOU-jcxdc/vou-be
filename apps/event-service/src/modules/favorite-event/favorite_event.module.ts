@@ -10,5 +10,6 @@ import { EventImageRepositoryModule } from "../repository/event-image-repository
   imports: [FavoriteEventRepositoryModule, EventRepositoryModule, EventImageRepositoryModule],
   controllers: [FavoriteEventController],
   providers: [FavoriteEventService, EventHelper],
+  exports: [FavoriteEventService],
 })
 export class FavoriteEventModule {}

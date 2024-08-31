@@ -25,4 +25,12 @@ export class BaseModel<T extends Document> {
   async findByIdAndDelete(id: Types.ObjectId) {
     return this.model.findByIdAndDelete(id);
   }
+
+  async updateOne(filter: FilterQuery<T>, update: UpdateQuery<T>) {
+    return this.model.updateOne(filter, update);
+  }
+
+  async updateMany(filter: FilterQuery<T>, update: UpdateQuery<T>) {
+    return this.model.updateMany(filter, update);
+  }
 }

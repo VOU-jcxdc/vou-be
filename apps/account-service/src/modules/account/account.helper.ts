@@ -30,7 +30,9 @@ export class AccountHelper {
 
   buildGetAccountInfoResponse(data: IAccount) {
     const { brandInfo, playerInfo, ...rest } = data;
-    return data.role === AccountRoleEnum.PLAYER ? { ...rest, info: playerInfo } : { ...rest, info: brandInfo };
+    return data.role === AccountRoleEnum.PLAYER
+      ? { ...rest, info: playerInfo || {} }
+      : { ...rest, info: brandInfo || {} };
   }
 
   async createInfoData(role: AccountRoleEnum, data: CreateBrandInfoDto | CreatePlayerInfoDto, accountId: string) {

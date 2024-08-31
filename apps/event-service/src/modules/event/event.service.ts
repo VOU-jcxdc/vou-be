@@ -1,10 +1,19 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { EventRepository } from "../repository/event.repository";
-import { AccountRoleEnum, CreateEventDto, ICurrentUser, UpdateEventDto } from "@types";
+import {
+  AccountRoleEnum,
+  CreateEventDto,
+  DELAY_MESSAGE_EXCHANGE_NAME,
+  EVENT_NOTIFICATION_ROUTING_KEY,
+  ICurrentUser,
+  UpdateEventDto,
+} from "@types";
 import { RpcException } from "@nestjs/microservices";
 import { EventImageRepository } from "../repository/event-image.repository";
 import { EventHelper } from "./event.helper";
 import { EventImage } from "@database";
+import { RabbitMqService } from "@shared-modules";
+import moment from "moment";
 
 @Injectable()
 export class EventService {
@@ -13,7 +22,8 @@ export class EventService {
   constructor(
     private readonly eventRepository: EventRepository,
     private readonly eventImageRepository: EventImageRepository,
-    private readonly eventHelper: EventHelper
+    private readonly eventHelper: EventHelper,
+    private readonly rabbitMqService: RabbitMqService
   ) {}
 
   async createEvent(dto: CreateEventDto & { brandId: string }) {
@@ -31,6 +41,16 @@ export class EventService {
         ...rest,
         images,
       });
+
+      const oneHourBefore = moment(moment(newEvent.beginDate)).subtract(1, "hour");
+      const delay = oneHourBefore.diff(moment());
+
+      this.rabbitMqService.publishWithDelay(
+        DELAY_MESSAGE_EXCHANGE_NAME,
+        EVENT_NOTIFICATION_ROUTING_KEY,
+        { eventId: newEvent.id, beginDate: newEvent.beginDate },
+        delay
+      );
 
       return this.eventHelper.buildResponseFromEvent(newEvent);
     } catch (error) {
@@ -58,6 +78,17 @@ export class EventService {
         ...event,
         ...rest,
       });
+
+      if (!moment(updatedEvent.beginDate).isSame(moment(event.beginDate))) {
+        const oneHourBefore = moment(moment(updatedEvent.beginDate)).subtract(1, "hour");
+        const delay = oneHourBefore.diff(moment());
+        this.rabbitMqService.publishWithDelay(
+          DELAY_MESSAGE_EXCHANGE_NAME,
+          EVENT_NOTIFICATION_ROUTING_KEY,
+          { eventId: updatedEvent.id, beginDate: updatedEvent.beginDate },
+          delay
+        );
+      }
 
       if (images) {
         await this.eventImageRepository.delete({
