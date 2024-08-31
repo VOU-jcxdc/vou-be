@@ -30,6 +30,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    command: mongod --quiet --logpath /dev/null 
 
   node_modules:
     build:
