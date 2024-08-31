@@ -4,8 +4,7 @@ services:
     container_name: postgres
     ports:
       - "5433:5432"
-    env_file:
-      - docker/.env
+    env_file: .env
     networks:
       - vou-network
     healthcheck:
@@ -22,8 +21,7 @@ services:
     ports:
       - "27017:27017"
     command: mongod --quiet --logpath /dev/null
-    env_file:
-      - docker/.env
+    env_file: .env
     networks:
       - vou-network
     healthcheck:
@@ -45,8 +43,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile.migration
     container_name: migration
-    env_file:
-      - docker/.env
+    env_file: .env
     networks:
       - vou-network
     depends_on:
@@ -62,8 +59,7 @@ services:
     container_name: rabbitmq-vou
     networks:
       - vou-network
-    env_file:
-      - docker/.env
+    env_file: .env
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -75,8 +71,7 @@ services:
     container_name: redis
     networks:
       - vou-network
-    env_file:
-      - docker/.env
+    env_file: .env
     ports:
       - "6379:6379"
     volumes:
@@ -91,8 +86,7 @@ services:
         STAGE: dev
     ports:
       - "${MAIN_API_PORT}:${MAIN_API_PORT}"
-    env_file:
-      - ./apps/main-api/.env.build
+    env_file: .env
     container_name: main-api
     depends_on:
       postgres:
@@ -111,8 +105,7 @@ services:
         STAGE: dev
     ports:
       - "${ACCOUNT_SERVICE_PORT}:${ACCOUNT_SERVICE_PORT}"
-    env_file:
-      - ./apps/account-service/.env.build
+    env_file: .env
     container_name: account-service
     depends_on:
       postgres:
@@ -131,8 +124,7 @@ services:
         STAGE: dev
     ports:
       - "${EVENT_SERVICE_PORT}:${EVENT_SERVICE_PORT}"
-    env_file:
-      - ./apps/event-service/.env.build
+    env_file: .env
     container_name: event-service
     depends_on:
       postgres:
@@ -151,8 +143,7 @@ services:
         STAGE: dev
     ports:
       - "${BUCKET_SERVICE_PORT}:${BUCKET_SERVICE_PORT}"
-    env_file:
-      - ./apps/bucket-service/.env.build
+    env_file: .env
     container_name: bucket-service
     depends_on:
       postgres:
@@ -171,8 +162,7 @@ services:
         STAGE: dev
     ports:
       - "${VOUCHER_SERVICE_PORT}:${VOUCHER_SERVICE_PORT}"
-    env_file:
-      - ./apps/voucher-service/.env.build
+    env_file: .env
     container_name: voucher-service
     depends_on:
       postgres:
@@ -191,8 +181,7 @@ services:
         STAGE: dev
     ports:
       - "${ITEM_SERVICE_PORT}:${ITEM_SERVICE_PORT}"
-    env_file:
-      - ./apps/item-service/.env.build
+    env_file: .env
     container_name: item-service
     depends_on:
       postgres:
@@ -213,8 +202,7 @@ services:
         STAGE: dev
     ports:
       - "${NOTIFICATION_SERVICE_PORT}:${NOTIFICATION_SERVICE_PORT}"
-    env_file:
-      - ./apps/notification-service/.env.build
+    env_file: .env
     container_name: notification-service
     depends_on:
       postgres:

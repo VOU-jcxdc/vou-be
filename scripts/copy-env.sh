@@ -17,18 +17,13 @@ env_validation=true
 
 # Iterate over the array and copy the .env file to each service (force overwrite)
 for service in "${services[@]}"; do
-    if ! cp -f "$env_path" "$service/.env.build"; then
+    if ! cp -f "$env_path" "$service/.env"; then
         env_validation=false
     fi
 done
 
 # Copy env to ./apps/main-api
-if ! cp -f "$env_path" "./apps/main-api/.env.build"; then
-    env_validation=false
-fi
-
-# Copy env to ./docker
-if ! cp -f "$env_path" "./docker"; then
+if ! cp -f "$env_path" "./apps/main-api/.env"; then
     env_validation=false
 fi
 
