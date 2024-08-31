@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { ItemRepository } from "../repository/item.repository";
 import { CreateItemDto, UpdateItemDto } from "@types";
 import { RpcException } from "@nestjs/microservices";
@@ -174,7 +174,8 @@ export class ItemService {
       const data = await this.combineItemModel.find({
         itemRecipe: { $elemMatch: { itemId: id } },
       });
-      return data.map((it) => this.combineItemHelper.buildResponseData(it));
+      const responseData = data.map((it) => this.combineItemHelper.buildResponseData(it));
+      return Promise.all(responseData);
     } catch (error) {
       this.logger.error(error);
       throw new RpcException(error);

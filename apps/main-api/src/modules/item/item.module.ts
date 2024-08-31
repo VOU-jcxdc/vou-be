@@ -9,7 +9,7 @@ import { ItemService } from "./item.service";
 
 @Module({
   imports: [ClientProxyModule],
-  controllers: [CombineItemController, ItemController, GiftService],
-  providers: [CombineItemService, ItemService, GiftController],
+  controllers: [CombineItemController, ItemController, GiftController],
+  providers: [CombineItemService, ItemService, GiftService],
 })
 export class ItemModule {}

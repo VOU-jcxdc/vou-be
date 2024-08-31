@@ -1,9 +1,9 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { Item, AccountItem, Gift } from "@database";
+import { AccountItem } from "@database";
 import { AccountItemRepository } from "./account-item.repository";
 @Module({
-  imports: [TypeOrmModule.forFeature([Item, AccountItem, Gift])],
+  imports: [TypeOrmModule.forFeature([AccountItem])],
   providers: [AccountItemRepository],
   exports: [AccountItemRepository],
 })

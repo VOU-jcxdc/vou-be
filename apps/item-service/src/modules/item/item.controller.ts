@@ -2,7 +2,6 @@ import { Controller } from "@nestjs/common";
 import { ItemService } from "./item.service";
 import { MessagePattern, Payload } from "@nestjs/microservices";
 import { CreateItemDto, ReceiveItemDto, UpdateItemDto } from "@types";
-import { MessagePattern, Payload } from "@nestjs/microservices";
 
 @Controller()
 export class ItemController {
