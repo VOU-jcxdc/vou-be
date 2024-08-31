@@ -21,6 +21,7 @@ export * from "./event_voucher.interface";
 export * from "./item.interface";
 export * from "./gift.interface";
 export * from "./account_item.interface";
+export * from "./combine_items.interface";
 
 export * from "./current_user.interface";
 export * from "./login_response.interface";

@@ -19,7 +19,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
   await app.startAllMicroservices();
-  await app.listen(1234);
+  await app.init();
 
   Logger.log("🚀 Notification application is running");
 }

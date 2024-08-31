@@ -5,9 +5,20 @@ import { BucketModule } from "../bucket/bucket.module";
 import { AuthModule } from "../auth/auth.module";
 import { EventModule } from "../event/event.module";
 import { VoucherModule } from "../voucher/voucher.module";
+import { ItemModule } from "../item/item.module";
+import { NotificationModule } from "../notification/notification.module";
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), UserModule, BucketModule, AuthModule, EventModule, VoucherModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    UserModule,
+    BucketModule,
+    AuthModule,
+    EventModule,
+    VoucherModule,
+    ItemModule,
+    NotificationModule,
+  ],
   controllers: [],
   providers: [],
 })
