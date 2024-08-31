@@ -22,7 +22,9 @@ jobs:
             git pull
 
             # Write secrets.env file to .env
-            echo "${{ secrets.ENV }}" > .env
+            cat << EOF > .env
+            ${{ secrets.ENV }}
+            EOF
 
             # Run copy-env.sh scripts
             bash scripts/copy-env.sh
