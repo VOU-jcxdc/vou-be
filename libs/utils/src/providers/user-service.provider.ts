@@ -7,8 +7,8 @@ export const userServiceProvider: IServiceProvider = {
   useFactory: (configService: ConfigService): ClientOptions => ({
     transport: Transport.TCP,
     options: {
-      host: configService.get("USER_SERVICE_HOST"),
-      port: configService.get("USER_SERVICE_PORT"),
+      host: configService.get("ACCOUNT_SERVICE_HOST"),
+      port: configService.get("ACCOUNT_SERVICE_PORT"),
     },
   }),
   inject: [ConfigService],

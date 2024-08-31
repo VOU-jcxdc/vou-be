@@ -38,12 +38,6 @@ nx run <service>:create-migration <filename>
 
 To apply migration to database, use this syntax (suppose you are in the root folder of project):
 
-- Win
-
-```
-.\scripts\migration.bat
-```
-
 - Unix
 
 ```
