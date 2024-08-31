@@ -4,9 +4,11 @@ import {
   AccountRoleEnum,
   AddVoucherToAccountDto,
   CreateEventDto,
+  CreateItemDto,
   DeleteVoucherDto,
   ICurrentUser,
   UpdateEventDto,
+  UpdateItemDto,
 } from "@types";
 import { Roles } from "../../decorators/roles.decorator";
 import { JwtAuthGuard, RoleGuard } from "../../guard";
@@ -27,6 +29,24 @@ export class EventController {
   @Roles(AccountRoleEnum.PLAYER)
   async assignVoucher(@CurrentUser() user: ICurrentUser, @Body() data: AddVoucherToAccountDto) {
     return this.eventService.assignVoucherInEvent(user.userId, data);
+  }
+
+  @Post("/:id/items/assigning")
+  @Roles(AccountRoleEnum.PLAYER)
+  async assignItem(@CurrentUser() user: ICurrentUser, @Param("id") eventId: string) {
+    return this.eventService.assignItemInEvent(user.userId, eventId);
+  }
+
+  @Post(":id/items")
+  @Roles(AccountRoleEnum.BRAND)
+  async createItems(@Param("id") eventId: string, @Body() dto: CreateItemDto) {
+    return this.eventService.createItemsInEvent(eventId, dto);
+  }
+
+  @Put(":id/items/:itemId")
+  @Roles(AccountRoleEnum.BRAND)
+  async updateItemInEvent(@Param("itemId") itemId: string, @Body() dto: UpdateItemDto) {
+    return this.eventService.updateItemDetail(itemId, dto);
   }
 
   @Put(":id")
@@ -51,6 +71,12 @@ export class EventController {
     return this.eventService.getVouchersInEvent(id);
   }
 
+  @Get(":id/items")
+  @Roles(AccountRoleEnum.BRAND, AccountRoleEnum.PLAYER)
+  async getItemsInEvent(@Param("id") id: string) {
+    return this.eventService.getItemsInEvent(id);
+  }
+
   @Get(":id")
   @Roles(AccountRoleEnum.BRAND, AccountRoleEnum.PLAYER)
   async getEventById(@CurrentUser() user: ICurrentUser, @Param("id") id: string) {
@@ -61,6 +87,12 @@ export class EventController {
   @Roles(AccountRoleEnum.BRAND)
   async deleteVouchersInEvent(@Param("id") id: string, @Body() data: DeleteVoucherDto) {
     return this.eventService.deleteVouchersInEvent(id, data);
+  }
+
+  @Delete(":id/items/:itemId")
+  @Roles(AccountRoleEnum.BRAND)
+  async deleteItemInEvent(@Param("itemId") itemId: string) {
+    return this.eventService.deleteItemInEvent(itemId);
   }
 
   @Get(":id/recipes")

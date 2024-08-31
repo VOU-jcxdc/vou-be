@@ -4,7 +4,7 @@ import { IItem } from "./item.interface";
 export interface IGift {
   senderId: string;
   receiverId: string;
-  gameId: string;
+  eventId: string;
   sendDate: Date;
   itemId: string;
   updatedOn: Date;
