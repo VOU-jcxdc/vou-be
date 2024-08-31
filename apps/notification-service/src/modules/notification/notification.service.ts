@@ -1,18 +1,63 @@
 import { Injectable } from "@nestjs/common";
 import { NotificationTokenModel } from "../model/notification-token.model";
 import { RpcException } from "@nestjs/microservices";
+import { FirebaseMessagingService } from "@shared-modules";
+import { NotificationModel } from "../model/notification.model";
 
 @Injectable()
 export class NotificationService {
-  constructor(private notificationTokeModel: NotificationTokenModel) {}
+  constructor(
+    private notificationTokenModel: NotificationTokenModel,
+    private notificationModel: NotificationModel,
+    private readonly firebaseMessagingService: FirebaseMessagingService
+  ) {}
 
   async upsertAccountToken(accountId: string, token: string) {
     try {
-      const existingToken = await this.notificationTokeModel.findOne({ accountId });
+      const existingToken = await this.notificationTokenModel.find({ accountId });
       existingToken
-        ? await this.notificationTokeModel.update({ accountId }, { token })
-        : await this.notificationTokeModel.create({ accountId, token });
+        ? await this.notificationTokenModel.updateOne({ accountId }, { token })
+        : await this.notificationTokenModel.save({ accountId, token });
       return "OK";
+    } catch (error) {
+      console.error(error);
+      throw new RpcException(error);
+    }
+  }
+
+  async sendNotificationToAccounts(accountIds: string[], title: string, body: string, topic?: string, data?: any) {
+    try {
+      const tokens = await this.notificationTokenModel.find({ accountId: { $in: accountIds } });
+      const deviceTokens = tokens.map((token) => ({ token: token.token, _id: token._id, accountId: token.accountId }));
+      for (const token of deviceTokens) {
+        await this.firebaseMessagingService.pushNotification(token.token, null, { title, body }, data);
+        this.notificationModel.save({
+          title,
+          content: body,
+          accountId: token.accountId,
+          notificationTokenId: token._id.toString(),
+          data: data || {},
+          isRead: false,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      throw new RpcException(error);
+    }
+  }
+
+  async getAccountNotifications(accountId: string) {
+    try {
+      return await this.notificationModel.findAllAccountNotifications(accountId);
+    } catch (error) {
+      console.error(error);
+      throw new RpcException(error);
+    }
+  }
+
+  async markNotificationsAsRead(notificationId: string[]) {
+    try {
+      return await this.notificationModel.updateMany({ _id: notificationId }, { isRead: true });
     } catch (error) {
       console.error(error);
       throw new RpcException(error);

@@ -18,4 +18,34 @@ export class NotificationService {
       throw new BadRequestException();
     }
   }
+
+  async getAccountNotifications(accountId: string) {
+    try {
+      return this.notiClient.send({ method: "GET", path: "/notifications" }, { accountId });
+    } catch (error) {
+      this.logger.error(error);
+      throw new BadRequestException();
+    }
+  }
+
+  async markManyNotificationsAsRead(notificationIds: string[]) {
+    try {
+      return this.notiClient.send({ method: "PUT", path: "/notifications/read" }, { notificationIds });
+    } catch (error) {
+      this.logger.error(error);
+      throw new BadRequestException();
+    }
+  }
+
+  async markNotificationAsRead(notificationId: string) {
+    try {
+      return this.notiClient.send(
+        { method: "PUT", path: `/notifications/read` },
+        { notificationIds: [notificationId] }
+      );
+    } catch (error) {
+      this.logger.error(error);
+      throw new BadRequestException();
+    }
+  }
 }

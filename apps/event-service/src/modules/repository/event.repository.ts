@@ -12,7 +12,8 @@ export class EventRepository extends BaseRepository<Event> {
   }
 
   async findAllByRole(user: ICurrentUser, offset: number, limit: number) {
-    const whereStatement = user.role === AccountRoleEnum.BRAND ? `brand_id = '${user.userId}'` : `1 = 1`;
+    const whereStatement =
+      user.role === AccountRoleEnum.BRAND ? `brand_id = '${user.userId}'` : `event.end_date > NOW()`;
 
     const events = await this.repository
       .createQueryBuilder("event")

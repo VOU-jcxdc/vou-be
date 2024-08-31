@@ -10,4 +10,14 @@ export class NotificationController {
   async upsertAccountToken(@Payload() data: { accountId: string; token: string }) {
     return this.notificationService.upsertAccountToken(data.accountId, data.token);
   }
+
+  @MessagePattern({ method: "GET", path: "/notifications" })
+  async getAccountNotifications(@Payload() data: { accountId: string }) {
+    return this.notificationService.getAccountNotifications(data.accountId);
+  }
+
+  @MessagePattern({ method: "PUT", path: "/notifications/read" })
+  async markAsRead(@Payload() data: { notificationIds: string[] }) {
+    return this.notificationService.markNotificationsAsRead(data.notificationIds);
+  }
 }
