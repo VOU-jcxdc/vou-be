@@ -8,7 +8,7 @@ export class CombineItemHelper {
   constructor(private readonly itemRepository: ItemRepository) {}
   async buildResponseData(rawData: Document<unknown, {}, CombineItems> & CombineItems & Required<{ _id: unknown }>) {
     const data = rawData.toObject();
-    const { _id, updatedOn, createdOn, targetId, __v, ...restData } = data;
+    const { _id, targetId, __v, ...restData } = data;
 
     const items = data.itemRecipe.map(async (it) => {
       const item = await this.itemRepository.findOne({ where: { id: it.itemId } });

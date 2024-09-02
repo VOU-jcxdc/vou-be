@@ -22,6 +22,9 @@ export * from "./item.interface";
 export * from "./gift.interface";
 export * from "./account_item.interface";
 export * from "./combine_items.interface";
+export * from "./qas.interface";
+export * from "./qa_record.interface";
+export * from "./rooms_game.interface";
 
 export * from "./current_user.interface";
 export * from "./login_response.interface";

@@ -17,17 +17,11 @@ export class CombineItems extends Document implements ICombineItems {
   @Prop({ type: Array, required: true })
   itemRecipe: IItemRecipe[];
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, enum: CombineItemTypeEnum, required: true })
   targetType: CombineItemTypeEnum;
 
   @Prop({ type: String, required: true })
   targetId: string;
-
-  @Prop()
-  createdOn: Date;
-
-  @Prop()
-  updatedOn: Date;
 }
 
 export const CombineItemsSchema = SchemaFactory.createForClass(CombineItems);
