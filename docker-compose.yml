@@ -29,6 +29,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    volumes:
+      - mongo-data:/data/db
 
   node_modules:
     build:
@@ -216,6 +218,7 @@ volumes:
   postgres-data:
   rabbitmq-data:
   redis-data:
+  mongo-data:
 
 networks:
   vou-network:
