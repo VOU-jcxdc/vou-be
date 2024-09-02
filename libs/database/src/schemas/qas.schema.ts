@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { IQAOption, IQAs } from "@types";
+import { IQAs } from "@types";
 import { Document } from "mongoose";
 
 @Schema({
@@ -15,10 +15,17 @@ export class QAs extends Document implements IQAs {
   question: string;
 
   @Prop({ type: Array, required: true })
-  options: IQAOption[];
+  options: string[];
 
   @Prop({ type: Number, required: true })
   answer: number;
+
+  // Hide timestamps
+  @Prop({ type: Date, select: false })
+  createdOn: Date;
+
+  @Prop({ type: Date, select: false })
+  updatedOn: Date;
 }
 
 export const QASchema = SchemaFactory.createForClass(QAs);

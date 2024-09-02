@@ -22,6 +22,10 @@ export class BaseModel<T extends Document> {
     return this.model.find(filter);
   }
 
+  async findOne(filter: FilterQuery<T>) {
+    return this.model.findOne(filter);
+  }
+
   async findByIdAndDelete(id: Types.ObjectId) {
     return this.model.findByIdAndDelete(id);
   }
@@ -32,5 +36,13 @@ export class BaseModel<T extends Document> {
 
   async updateMany(filter: FilterQuery<T>, update: UpdateQuery<T>) {
     return this.model.updateMany(filter, update);
+  }
+
+  async upsert(filter: FilterQuery<T>, update: UpdateQuery<T>) {
+    return this.model.findOneAndUpdate(filter, update, { upsert: true, new: true });
+  }
+
+  async saveMany(data: Partial<T>[]) {
+    return this.model.insertMany(data);
   }
 }

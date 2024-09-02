@@ -100,4 +100,10 @@ export class EventController {
   async getRecipesInEvent(@Param("id") id: string) {
     return this.eventService.getRecipesInEvent(id);
   }
+
+  @Get(":id/questions")
+  @Roles(AccountRoleEnum.BRAND)
+  async getQuestionsInEvent(@Param("id") id: string) {
+    return this.eventService.getQuestionsInEvent(id);
+  }
 }

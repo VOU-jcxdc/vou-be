@@ -22,6 +22,13 @@ export class CombineItems extends Document implements ICombineItems {
 
   @Prop({ type: String, required: true })
   targetId: string;
+
+  // Hide timestamps
+  @Prop({ type: Date, select: false })
+  createdOn: Date;
+
+  @Prop({ type: Date, select: false })
+  updatedOn: Date;
 }
 
 export const CombineItemsSchema = SchemaFactory.createForClass(CombineItems);
