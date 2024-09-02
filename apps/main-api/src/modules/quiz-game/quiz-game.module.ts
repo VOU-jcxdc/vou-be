@@ -1,9 +1,9 @@
 import { Module } from "@nestjs/common";
-import { SocketModule } from "../socket/socket.module";
 import { QuizGameService } from "./quiz-game.service";
+import { QuizGameController } from "./quiz-game.controller";
 
 @Module({
-  imports: [SocketModule],
   providers: [QuizGameService],
+  controllers: [QuizGameController],
 })
 export class QuizGameModule {}

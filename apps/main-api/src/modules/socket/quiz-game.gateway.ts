@@ -18,7 +18,7 @@ export class QuizGameGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   @WebSocketServer()
   private readonly server: Server;
   private readonly logger = new Logger(QuizGameGateway.name);
-
+  
   constructor(private readonly redisService: RedisService, private readonly jwtService: JwtService) {}
 
   async afterInit() {
