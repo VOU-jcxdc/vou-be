@@ -12,3 +12,4 @@ export * from "./account-item-status.enum";
 export * from "./voucher-usage-mode.enum";
 export * from "./gift-status.enum";
 export * from "./combine-item-type.enum";
+export * from "./room-game-status.enum";
