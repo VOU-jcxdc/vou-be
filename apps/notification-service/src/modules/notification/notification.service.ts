@@ -15,7 +15,7 @@ export class NotificationService {
   async upsertAccountToken(accountId: string, token: string) {
     try {
       const existingToken = await this.notificationTokenModel.find({ accountId });
-      existingToken
+      existingToken.length
         ? await this.notificationTokenModel.updateOne({ accountId }, { token })
         : await this.notificationTokenModel.save({ accountId, token });
       return "OK";
