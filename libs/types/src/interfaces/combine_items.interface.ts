@@ -10,6 +10,4 @@ export interface ICombineItems {
   itemRecipe: IItemRecipe[];
   targetType: CombineItemTypeEnum;
   targetId: string;
-  createdOn: Date;
-  updatedOn: Date;
 }

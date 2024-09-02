@@ -19,12 +19,6 @@ export class QAs extends Document implements IQAs {
 
   @Prop({ type: Number, required: true })
   answer: number;
-
-  @Prop({ type: Date, required: true })
-  updatedOn: Date;
-
-  @Prop({ type: Date, required: true })
-  createdOn: Date;
 }
 
 export const QASchema = SchemaFactory.createForClass(QAs);

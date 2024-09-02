@@ -22,12 +22,6 @@ export class CombineItems extends Document implements ICombineItems {
 
   @Prop({ type: String, required: true })
   targetId: string;
-
-  @Prop()
-  createdOn: Date;
-
-  @Prop()
-  updatedOn: Date;
 }
 
 export const CombineItemsSchema = SchemaFactory.createForClass(CombineItems);

@@ -5,6 +5,4 @@ export interface IRoomGame {
   players: string[];
   status: RoomGameStatus;
   eventId: string;
-  updatedOn: Date;
-  createdOn: Date;
 }

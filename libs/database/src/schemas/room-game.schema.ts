@@ -22,12 +22,6 @@ export class RoomGame extends Document implements IRoomGame {
 
   @Prop({ type: String, required: true })
   eventId: string;
-
-  @Prop({ type: Date, required: true })
-  updatedOn: Date;
-
-  @Prop({ type: Date, required: true })
-  createdOn: Date;
 }
 
 export const RoomGameSchema = SchemaFactory.createForClass(RoomGame);
