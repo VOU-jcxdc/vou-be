@@ -22,6 +22,7 @@ import { SocketModule } from "../socket/socket.module";
     NotificationModule,
     QuizgameModule,
     SocketModule,
+    QuizgameModule,
   ],
 })
 export class AppModule {}
