@@ -1,0 +1,25 @@
+{
+  "name": "quizgame-service",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/quizgame-service/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "quizgame-service:build",
+        "port": 9806
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "quizgame-service:build:development"
+        },
+        "production": {
+          "buildTarget": "quizgame-service:build:production"
+        }
+      }
+    }
+  }
+}

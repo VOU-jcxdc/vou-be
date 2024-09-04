@@ -7,6 +7,7 @@ import { EventModule } from "../event/event.module";
 import { VoucherModule } from "../voucher/voucher.module";
 import { ItemModule } from "../item/item.module";
 import { NotificationModule } from "../notification/notification.module";
+import { QuizgameModule } from "../quizgame/quizgame.module";
 
 @Module({
   imports: [
@@ -18,8 +19,7 @@ import { NotificationModule } from "../notification/notification.module";
     VoucherModule,
     ItemModule,
     NotificationModule,
+    QuizgameModule,
   ],
-  controllers: [],
-  providers: [],
 })
 export class AppModule {}
