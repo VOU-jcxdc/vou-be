@@ -1,32 +1,41 @@
-import { Logger, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
-import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
+import { Logger } from "@nestjs/common";
+import {
+  MessageBody,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  OnGatewayInit,
+} from "@nestjs/websockets";
 import { RedisService } from "@shared-modules";
 import { Server } from "socket.io";
+import { JwtService } from "@nestjs/jwt";
+import { WSAuthMiddleware } from "../../middlewares/socket.middware";
 
 @WebSocketGateway({ namespace: "quiz-game" })
-export class QuizGameGateway implements OnModuleInit, OnModuleDestroy {
+export class QuizGameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   private readonly server: Server;
   private readonly logger = new Logger(QuizGameGateway.name);
 
-  constructor(private readonly redisService: RedisService) {}
+  constructor(private readonly redisService: RedisService, private readonly jwtService: JwtService) {}
 
-  onModuleInit() {
-    this.server.on("connection", async (socket) => {
-      const playerId = socket.handshake.query.playerId;
-      this.logger.log(`Client ${playerId} connected: ${socket.id}`);
-      await this.redisService.set(`player-${playerId}`, socket.id, 3600 * 24); // 1 day
-
-      // Listen for the disconnect event on this socket
-      socket.on("disconnect", async () => {
-        this.logger.log(`Client ${playerId} disconnected: ${socket.id}`);
-        await this.redisService.del(`player-${playerId}`);
-      });
-    });
+  async afterInit() {
+    const middle = WSAuthMiddleware(this.jwtService);
+    this.server.use(middle);
   }
 
-  onModuleDestroy() {
-    this.server.close();
+  async handleConnection(client: any, ...args: any[]) {
+    const player = client.player;
+    await this.redisService.set(`player-${player.userId}`, client.id, 3600 * 24); // 1 day
+    console.log("handleConnection", client.id);
+    console.log("user", player);
+  }
+
+  async handleDisconnect(client: any) {
+    const player = client.player;
+    this.redisService.del(`player-${player.userId}`);
   }
 
   @SubscribeMessage("join-game")

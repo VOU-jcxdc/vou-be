@@ -33,3 +33,6 @@ export * from "./service-provider.interface";
 
 export * from "./notification_token.interface";
 export * from "./notification.interface";
+
+export * from "./socket-client.interface";
+export * from "./socket-middleware.interface";
