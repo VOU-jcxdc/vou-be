@@ -12,7 +12,7 @@ export class ParserController {
     return this.parserService.createQuestions(data);
   }
 
-  @MessagePattern({ method: "GET", path: "/events/:id/questions" })
+  @MessagePattern({ method: "GET", path: "/events/:eventId/questions" })
   async getQuestionsInEvent(@Payload() { id }: { id: string }) {
     return this.parserService.getQuestionsInEvent(id);
   }

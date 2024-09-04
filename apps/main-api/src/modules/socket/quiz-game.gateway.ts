@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { Logger } from "@nestjs/common";
 import {
   MessageBody,
@@ -45,28 +44,6 @@ export class QuizGameGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     this.server.emit("game-joined", {
       message: "I am new player",
     });
-=======
-import { Logger, OnModuleInit } from "@nestjs/common";
-import { SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { Server } from "socket.io";
-
-@WebSocketGateway({ namespace: "quiz-game" })
-export class QuizGameGateway implements OnModuleInit {
-  @WebSocketServer()
-  private readonly server: Server;
-
-  private readonly logger = new Logger(QuizGameGateway.name);
-
-  onModuleInit() {
-    this.server.on("connection", (socket) => {
-      this.logger.log(`Client connected: ${socket.id}`);
-    });
-  }
-
-  @SubscribeMessage("join-game")
-  handleMessage(client: any, payload: any): string {
-    console.log("join-game", payload);
->>>>>>> f01da73 (feat(vou-84): setup socket gateway)
     return "Hello world!";
   }
 }
