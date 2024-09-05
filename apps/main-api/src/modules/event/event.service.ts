@@ -236,15 +236,4 @@ export class EventService {
   async getQuestionsInEvent(id: string) {
     return this.quizgameClient.send({ method: "GET", path: "/events/:eventId/questions" }, { id });
   }
-
-  async getConfigsInEvent(eventId: string, user: ICurrentUser) {
-    return this.quizgameClient.send(
-      { method: "GET", path: "/events/:eventId/configs" },
-      { eventId, userId: user.userId }
-    );
-  }
-
-  async addConfigsInEvent(data: AddConfigsDto, user: ICurrentUser) {
-    return this.quizgameClient.send({ method: "POST", path: "/events/configs" }, { ...data, userId: user.userId });
-  }
 }

@@ -2,7 +2,6 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, U
 import { EventService } from "./event.service";
 import {
   AccountRoleEnum,
-  AddConfigsDto,
   AddVoucherToAccountDto,
   CreateEventDto,
   CreateItemDto,
@@ -106,17 +105,5 @@ export class EventController {
   @Roles(AccountRoleEnum.BRAND)
   async getQuestionsInEvent(@Param("id") id: string) {
     return this.eventService.getQuestionsInEvent(id);
-  }
-
-  @Get(":id/configs")
-  @Roles(AccountRoleEnum.PLAYER)
-  async getConfigsInEvent(@Param("id") id: string, @CurrentUser() user: ICurrentUser) {
-    return this.eventService.getConfigsInEvent(id, user);
-  }
-
-  @Post("configs")
-  @Roles(AccountRoleEnum.PLAYER)
-  async addConfigsInEvent(@Body() data: AddConfigsDto, @CurrentUser() user: ICurrentUser) {
-    return this.eventService.addConfigsInEvent(data, user);
   }
 }

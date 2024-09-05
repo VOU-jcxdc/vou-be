@@ -8,9 +8,10 @@ import { ClientProxyModule } from "@shared-modules";
 import { EventHelper } from "./event.helper";
 import { GameInSystemController } from "./game-in-system.controller";
 import { GameInSystemService } from "./game-in-system.service";
+import { GameConfigModule } from "../config/config.module";
 
 @Module({
-  imports: [ConfigModule, ClientProxyModule],
+  imports: [ConfigModule, ClientProxyModule, GameConfigModule],
   providers: [EventService, FavoriteEventService, EventHelper, GameInSystemService],
   controllers: [FavoriteEventController, EventController, GameInSystemController],
 })

@@ -16,4 +16,4 @@ export * from "./voucher/update-assign-voucher.dto";
 export * from "./item";
 export * from "./notification";
 export * from "./game-in-system";
-export * from "./quizgame";
+export * from "./config";

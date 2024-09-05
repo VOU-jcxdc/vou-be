@@ -6,5 +6,5 @@ export class AddConfigsDto {
   eventId: string;
 
   @IsNumber({ allowInfinity: false }, { message: "Invalid number" })
-  configs: number;
+  config: number;
 }

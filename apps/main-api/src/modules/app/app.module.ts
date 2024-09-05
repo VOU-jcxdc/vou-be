@@ -23,7 +23,6 @@ import { SocketModule } from "../socket/socket.module";
     QuizgameModule,
     SocketModule,
     QuizgameModule,
-    SocketModule,
   ],
 })
 export class AppModule {}
