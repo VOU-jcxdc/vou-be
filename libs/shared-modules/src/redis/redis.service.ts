@@ -45,4 +45,14 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
       return null;
     }
   }
+
+  async del(key: string) {
+    try {
+      await this.client.del(key);
+      return true;
+    } catch (error) {
+      this.logger.error(error);
+      return false;
+    }
+  }
 }
