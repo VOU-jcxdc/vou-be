@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ClientOptions, ClientProxy, ClientProxyFactory } from "@nestjs/microservices";
 import {
+  AddConfigsDto,
   AddVoucherToAccountDto,
   CreateEventDto,
   CreateItemDto,
@@ -233,6 +234,6 @@ export class EventService {
   }
 
   async getQuestionsInEvent(id: string) {
-    return this.quizgameClient.send({ method: "GET", path: "/events/:id/questions" }, { id });
+    return this.quizgameClient.send({ method: "GET", path: "/events/:eventId/questions" }, { id });
   }
 }
