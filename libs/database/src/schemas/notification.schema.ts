@@ -28,6 +28,13 @@ export class Notification extends Document implements INotification {
 
   @Prop({ type: Boolean, required: true })
   isRead: boolean;
+
+  // Hide timestamps
+  @Prop({ type: Date, select: false })
+  createdOn: Date;
+
+  @Prop({ type: Date, select: false })
+  updatedOn: Date;
 }
 
 export const NotificationSchema = SchemaFactory.createForClass(Notification);

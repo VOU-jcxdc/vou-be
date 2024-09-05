@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { IQAOption, IQAs, IRoomGame, RoomGameStatus } from "@types";
+import { IRoomGame, RoomGameStatus } from "@types";
 import { Document } from "mongoose";
 
 @Schema({
@@ -22,6 +22,13 @@ export class RoomGame extends Document implements IRoomGame {
 
   @Prop({ type: String, required: true })
   eventId: string;
+
+  // Hide timestamps
+  @Prop({ type: Date, select: false })
+  createdOn: Date;
+
+  @Prop({ type: Date, select: false })
+  updatedOn: Date;
 }
 
 export const RoomGameSchema = SchemaFactory.createForClass(RoomGame);

@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ClientOptions, ClientProxy, ClientProxyFactory } from "@nestjs/microservices";
 import {
+  AddConfigsDto,
   AddVoucherToAccountDto,
   CreateEventDto,
   CreateItemDto,
@@ -8,6 +9,7 @@ import {
   EVENT_SERVICE_PROVIDER_NAME,
   ICurrentUser,
   ITEM_SERVICE_PROVIDER_NAME,
+  QUIZGAME_SERVICE_PROVIDER_NAME,
   UpdateEventDto,
   UpdateItemDto,
   VOUCHER_SERVICE_PROVIDER_NAME,
@@ -21,16 +23,19 @@ export class EventService {
   private eventClient: ClientProxy;
   private voucherClient: ClientProxy;
   private itemClient: ClientProxy;
+  private quizgameClient: ClientProxy;
 
   constructor(
     @Inject(EVENT_SERVICE_PROVIDER_NAME) eventOptions: ClientOptions,
     @Inject(VOUCHER_SERVICE_PROVIDER_NAME) voucherOptions: ClientOptions,
     @Inject(ITEM_SERVICE_PROVIDER_NAME) itemOptions: ClientOptions,
+    @Inject(QUIZGAME_SERVICE_PROVIDER_NAME) quizgameOptions: ClientOptions,
     private readonly eventHelper: EventHelper
   ) {
     this.eventClient = ClientProxyFactory.create(eventOptions);
     this.voucherClient = ClientProxyFactory.create(voucherOptions);
     this.itemClient = ClientProxyFactory.create(itemOptions);
+    this.quizgameClient = ClientProxyFactory.create(quizgameOptions);
   }
 
   async createEvent(userId: string, dto: CreateEventDto) {
@@ -226,5 +231,9 @@ export class EventService {
 
   async getRecipesInEvent(eventId: string) {
     return this.itemClient.send({ method: "GET", path: "/events/:eventId/recipes" }, { eventId });
+  }
+
+  async getQuestionsInEvent(id: string) {
+    return this.quizgameClient.send({ method: "GET", path: "/events/:eventId/questions" }, { id });
   }
 }
