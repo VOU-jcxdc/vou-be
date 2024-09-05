@@ -18,9 +18,9 @@ export class AccountController {
   }
 
   @MessagePattern({ method: "GET", path: "/accounts" })
-  async getAllAccounts(@Payload() data: { offset: number; limit: number; role?: AccountRoleEnum }) {
-    const { offset, limit, role } = data;
-    return this.accountService.getAllAccounts(offset, limit, role);
+  async getAllAccounts(@Payload() data: { offset: number; limit: number; role?: AccountRoleEnum; keySearch: string }) {
+    const { offset, limit, role, keySearch } = data;
+    return this.accountService.getAllAccounts(offset, limit, role, keySearch);
   }
 
   @MessagePattern({ method: "GET", path: "/account/:id?role=${role}" })

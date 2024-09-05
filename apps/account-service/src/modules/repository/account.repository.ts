@@ -3,7 +3,7 @@ import { Injectable, NotAcceptableException, NotFoundException } from "@nestjs/c
 import { InjectRepository } from "@nestjs/typeorm";
 import { AccountRoleEnum, AccountStatusEnum, CreateAccountDto, IAccount } from "@types";
 import { isNil } from "lodash";
-import { Repository } from "typeorm";
+import { Like, Repository } from "typeorm";
 
 @Injectable()
 export class AccountRepository extends BaseRepository<Account> {
@@ -29,22 +29,46 @@ export class AccountRepository extends BaseRepository<Account> {
     return existedAccount;
   }
 
-  async getAllAccounts(offset: number, limit: number, role: AccountRoleEnum = undefined) {
+  async getAllAccounts(
+    offset: number,
+    limit: number,
+    role: AccountRoleEnum = undefined,
+    keySearch: string = undefined
+  ) {
+    // Construct the base query condition
+    const whereCondition: any = isNil(role) ? {} : { role };
+
+    // Add keySearch filter for email, phone, or username if provided
+    const searchConditions = isNil(keySearch)
+      ? [{}, {}, {}]
+      : [{ email: Like(`%${keySearch}%`) }, { phone: Like(`%${keySearch}%`) }, { username: Like(`%${keySearch}%`) }];
+
     const [accounts, total] = await Promise.all([
       this.repository.find({
-        where: isNil(role) ? {} : { role },
+        where: [
+          { ...whereCondition, ...searchConditions[0] },
+          { ...whereCondition, ...searchConditions[1] },
+          { ...whereCondition, ...searchConditions[2] },
+        ],
         skip: offset,
         take: limit,
         select: {
           id: true,
           username: true,
+          email: true,
           phone: true,
           role: true,
           createdOn: true,
           status: true,
         },
       }),
-      this.repository.count(),
+      this.repository.count({
+        where: [
+          { ...whereCondition, ...searchConditions[0] },
+          { ...whereCondition, ...searchConditions[1] },
+          { ...whereCondition, ...searchConditions[2] },
+        ],
+      }),
     ]);
 
     return { accounts, total, offset, limit };

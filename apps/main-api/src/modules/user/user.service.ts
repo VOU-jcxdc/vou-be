@@ -30,8 +30,8 @@ export class UserService {
     return this.client.send({ method: "GET", path: "/account/:id?role=${role}" }, { id, role });
   }
 
-  async getUsers(offset: number, limit: number, role: AccountRoleEnum = undefined) {
-    return this.client.send({ method: "GET", path: "/accounts" }, { offset, limit, role });
+  async getUsers(offset: number, limit: number, role: AccountRoleEnum = undefined, keySearch: string = undefined) {
+    return this.client.send({ method: "GET", path: "/accounts" }, { offset, limit, role, keySearch });
   }
 
   async getUserInfo(id: string) {

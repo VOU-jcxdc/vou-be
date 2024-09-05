@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Put, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseEnumPipe, ParseIntPipe, Put, Query, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { JwtAuthGuard, RoleGuard } from "../../guard";
 import { CurrentUser } from "../../decorators";
@@ -9,6 +9,15 @@ import { Roles } from "../../decorators/roles.decorator";
 @Controller("users")
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Get("")
+  async getUsers(
+    @Query("offset", ParseIntPipe) offset: number,
+    @Query("limit", ParseIntPipe) limit: number,
+    @Query("keySearch") keySearch?: string
+  ) {
+    return this.userService.getUsers(offset, limit, AccountRoleEnum.PLAYER, keySearch);
+  }
 
   @Get("profile")
   async getUser(@CurrentUser() user: ICurrentUser) {

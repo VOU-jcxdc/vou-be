@@ -38,9 +38,14 @@ export class AccountService {
     }
   }
 
-  async getAllAccounts(offset: number, limit: number, role: AccountRoleEnum = undefined) {
+  async getAllAccounts(
+    offset: number,
+    limit: number,
+    role: AccountRoleEnum = undefined,
+    keySearch: string = undefined
+  ) {
     try {
-      return this.accountRepository.getAllAccounts(offset, limit, role);
+      return this.accountRepository.getAllAccounts(offset, limit, role, keySearch);
     } catch (error) {
       this.logger.error(error);
       throw new RpcException(error);
