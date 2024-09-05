@@ -43,34 +43,24 @@ export class AccountRepository extends BaseRepository<Account> {
       ? [{}, {}, {}]
       : [{ email: Like(`%${keySearch}%`) }, { phone: Like(`%${keySearch}%`) }, { username: Like(`%${keySearch}%`) }];
 
-    const [accounts, total] = await Promise.all([
-      this.repository.find({
-        where: [
-          { ...whereCondition, ...searchConditions[0] },
-          { ...whereCondition, ...searchConditions[1] },
-          { ...whereCondition, ...searchConditions[2] },
-        ],
-        skip: offset,
-        take: limit,
-        select: {
-          id: true,
-          username: true,
-          email: true,
-          phone: true,
-          role: true,
-          createdOn: true,
-          status: true,
-        },
-      }),
-      this.repository.count({
-        where: [
-          { ...whereCondition, ...searchConditions[0] },
-          { ...whereCondition, ...searchConditions[1] },
-          { ...whereCondition, ...searchConditions[2] },
-        ],
-      }),
-    ]);
-
+    const [accounts, total] = await this.repository.findAndCount({
+      where: [
+        { ...whereCondition, ...searchConditions[0] },
+        { ...whereCondition, ...searchConditions[1] },
+        { ...whereCondition, ...searchConditions[2] },
+      ],
+      skip: offset,
+      take: limit,
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        phone: true,
+        role: true,
+        createdOn: true,
+        status: true,
+      },
+    });
     return { accounts, total, offset, limit };
   }
 
