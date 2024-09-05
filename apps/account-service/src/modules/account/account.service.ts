@@ -3,10 +3,16 @@ import { AccountRepository } from "../repository/account.repository";
 import { AccountRoleEnum, CreateAccountDto, UdpateAccountDto, UpdateAccountByAdminDto } from "@types";
 import { AccountHelper } from "./account.helper";
 import { RpcException } from "@nestjs/microservices";
+import { GameConfigService } from "../config/config.service";
 @Injectable()
 export class AccountService {
   private readonly logger: Logger = new Logger(AccountService.name);
-  constructor(private readonly accountRepository: AccountRepository, private readonly accountHelper: AccountHelper) {}
+
+  constructor(
+    private readonly accountRepository: AccountRepository,
+    private readonly accountHelper: AccountHelper,
+    private readonly gameConfigService: GameConfigService
+  ) {}
 
   async createAccount(value: CreateAccountDto) {
     try {
@@ -17,6 +23,7 @@ export class AccountService {
         password: hashedPassword,
       });
       await this.accountHelper.createInfoData(value.role, value.data, newAccount.id);
+      await this.gameConfigService.addGameConfig(newAccount.id, value.role);
       return this.accountHelper.buildCreateAccountResponse(newAccount);
     } catch (error) {
       this.logger.error(error);
