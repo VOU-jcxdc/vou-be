@@ -1,7 +1,5 @@
 import { Logger } from "@nestjs/common";
 import {
-  MessageBody,
-  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
   OnGatewayConnection,
@@ -17,41 +15,24 @@ import { ISocketClient } from "@types";
 import amqp, { ChannelWrapper } from "amqp-connection-manager";
 import { ConfigService } from "@nestjs/config";
 import { ConfirmChannel } from "amqplib";
+import { QuizgameService } from "../quizgame/quizgame.service";
 
 @WebSocketGateway({ namespace: "quiz-game" })
 export class QuizGameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   private readonly server: Server;
   private readonly logger = new Logger(QuizGameGateway.name);
-  private readonly mockquestions = [
-    {
-      question: "What is the capital of France?",
-      options: ["Paris", "Marseille", "Lyon", "Toulouse"],
-      answer: 1,
-    },
-    {
-      question: "What is the capital of Italy?",
-      options: ["Milan", "Rome", "Venice", "Florence"],
-      answer: 2,
-    },
-    {
-      question: "What is the capital of Germany?",
-      options: ["Berlin", "Munich", "Hamburg", "Frankfurt"],
-      answer: 0,
-    },
-    {
-      question: "What is the capital of Spain?",
-      options: ["Madrid", "Barcelona", "Valencia", "Seville"],
-      answer: 0,
-    },
-  ];
-
   private channelWrapper: ChannelWrapper;
   private configService: ConfigService;
+  private readonly waitingPlayerTime: number = 10; // 10 seconds
+  private readonly waitingQuestionTime: number = 10; // 10 seconds
+  private readonly waitingAnswerTime: number = 10; // 10 seconds
+  private readonly waitingShowAnswerTime: number = 10; // 10 seconds
 
   constructor(
     private readonly redisService: RedisService,
     private readonly jwtService: JwtService,
+    private readonly quizGameService: QuizgameService,
     configService: ConfigService
   ) {
     this.configService = configService;
@@ -68,23 +49,23 @@ export class QuizGameGateway implements OnGatewayInit, OnGatewayConnection, OnGa
       await channel.consume("quizGameQueue", async (message) => {
         if (message) {
           console.log("Message", message.content.toString());
-          //const { eventId } = JSON.parse(message.content.toString());
-          //const questions = await this.getQuestions(eventId);
-          const numQuestion = this.mockquestions.length;
+          const { roomId } = JSON.parse(message.content.toString());
+          const questions = await this.quizGameService.getQuestionsInRoomGame(roomId);
+          console.log("Questions", questions);
+          const numQuestion = questions.length;
           this.server.emit("waiting-players", {
             message: "Waiting for players",
-            questions: this.mockquestions,
           });
-          let timeLeft = 10; // Time left in seconds
+          let waitingPlayerTimeLeft = this.waitingPlayerTime; // Time left in seconds
 
           const intervalId = setInterval(() => {
-            timeLeft--;
-            console.log(`Time left: ${timeLeft} seconds`);
+            waitingPlayerTimeLeft--;
+            console.log(`Time left: ${waitingPlayerTimeLeft} seconds`);
 
-            if (timeLeft <= 0) {
+            if (waitingPlayerTimeLeft <= 0) {
               clearInterval(intervalId);
             }
-          }, 1000);
+          }, 1000); // after 1 second, decrease 1 second
 
           this.prepareAndStartGame(10, numQuestion, intervalId);
         }
@@ -94,27 +75,31 @@ export class QuizGameGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   }
 
   async handleConnection(@ConnectedSocket() client: ISocketClient, ...args: any[]) {
-    const player = client.player;
-    console.log("handleConnection", client.id);
-    console.log("user", player);
+    try {
+      const player = client.player;
+      console.log("handleConnection", client.id);
+      console.log("user", player);
 
-    // Get eventId from query
-    const eventId = client.handshake.query.eventId;
+      // Get roomId from query
+      const roomId = client.handshake.query.roomId;
 
-    // Save userId and socketId to redis
-    await this.redisService.set(`quizgame-player-${player.userId}-event-${eventId}`, client.id, 3600 * 24); // 1 day
-    this.server.emit("player-joined", {
-      message: "New player joined",
-    });
+      // Save userId and socketId to redis
+      await this.redisService.set(`quizgame-player-${player.userId}-room-${roomId}`, client.id, 3600 * 24); // 1 day
+      this.server.emit("player-joined", {
+        message: "New player joined",
+      });
+    } catch (error) {
+      this.logger.error(error);
+    }
   }
 
   async handleDisconnect(@ConnectedSocket() client: ISocketClient) {
     const player = client.player;
-    // Get eventId from query
-    const eventId = client.handshake.query.eventId;
+    // Get roomId from query
+    const roomId = client.handshake.query.roomId;
 
     // Remove userId and socketId from redis
-    await this.redisService.del(`quizgame-player-${player.userId}-event-${eventId}`);
+    await this.redisService.del(`quizgame-player-${player.userId}-room-${roomId}`);
     this.server.emit("player-left", {
       message: "Player left",
     });
@@ -125,7 +110,7 @@ export class QuizGameGateway implements OnGatewayInit, OnGatewayConnection, OnGa
       console.log("Timeout completed");
 
       this.server.emit("game-start", {});
-      const clientKeys = await this.redisService.keys(`quizgame-player-*-event-1234`);
+      const clientKeys = await this.redisService.keys(`quizgame-player-*-room-1234`);
       const clients = await Promise.all(
         clientKeys.map(async (key) => {
           const socketId = await this.redisService.get(key);
@@ -137,25 +122,27 @@ export class QuizGameGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   }
 
   async startGame(clients: string[], numQuestion: number, intervalId: any) {
+    const totalWaitingTime = (this.waitingQuestionTime + this.waitingAnswerTime + this.waitingShowAnswerTime) * 1000;
     console.log("start the game");
     for (let i = 0; i < numQuestion; i++) {
       setTimeout(() => {
         this.server.to(clients).emit("start-question", {
           noQa: i,
         });
-      }, i * 20000);
+      }, i * totalWaitingTime);
+
+      setTimeout(() => {
+        this.server.to(clients).emit("answer-question", {
+          message: `Answer question ${i + 1}`,
+        });
+      }, i * totalWaitingTime + this.waitingQuestionTime * 1000);
 
       setTimeout(() => {
         clearInterval(intervalId);
-        this.server.to(clients).emit("end-question", {
-          message: `End question ${i + 1}`,
+        this.server.to(clients).emit("show-answer", {
+          message: `Show answer ${i + 1}`,
         });
-      }, i * 20000 + 10000);
+      }, i * totalWaitingTime + (this.waitingQuestionTime + this.waitingAnswerTime) * 1000);
     }
-  }
-
-  async getQuestions(eventId: string) {
-    // Get questions from microservice
-    return [];
   }
 }
