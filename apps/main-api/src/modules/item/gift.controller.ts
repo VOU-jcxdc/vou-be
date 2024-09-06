@@ -1,7 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
-import { ItemService } from "./item.service";
 import { JwtAuthGuard, RoleGuard } from "../../guard";
-import { AccountRoleEnum, CreateGiftRequestDto, ICurrentUser } from "@types";
+import { AccountRoleEnum, CreateGiftRequestDto, ICurrentUser, SendGiftDto, SendGiftGatewayDto } from "@types";
 import { CurrentUser } from "../../decorators";
 import { Roles } from "../../decorators/roles.decorator";
 import { GiftService } from "./gift.service";
@@ -25,6 +24,11 @@ export class GiftController {
   @Post("")
   async createGiftRequest(@Body() dto: CreateGiftRequestDto) {
     return this.service.createGiftRequest(dto);
+  }
+
+  @Post("sending")
+  async sendGift(@CurrentUser() user: ICurrentUser, @Body() dto: SendGiftGatewayDto) {
+    return this.service.sendGift({ senderId: user.userId, ...dto });
   }
 
   @Put("/:giftId")

@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller } from "@nestjs/common";
 import { GiftService } from "./gift.service";
-import { CreateGiftRequestDto } from "@types";
+import { CreateGiftRequestDto, SendGiftDto } from "@types";
 import { MessagePattern, Payload } from "@nestjs/microservices";
 
 @Controller()
@@ -18,7 +18,7 @@ export class GiftController {
   }
 
   @MessagePattern({ method: "POST", path: "gifts" })
-  createGiftRequest(@Body() data: CreateGiftRequestDto) {
+  createGiftRequest(@Payload() data: CreateGiftRequestDto) {
     return this.giftService.createGiftRequest(data);
   }
 
@@ -30,5 +30,10 @@ export class GiftController {
   @MessagePattern({ method: "DELETE", path: "gifts/:giftId" })
   rejectGiftRequest(@Payload() { accountId, giftId }: { accountId: string; giftId: string }) {
     return this.giftService.rejectGiftRequest(giftId, accountId);
+  }
+
+  @MessagePattern({ method: "POST", path: "gifts/sending" })
+  sendGift(@Payload() data: SendGiftDto) {
+    return this.giftService.sendGift(data);
   }
 }

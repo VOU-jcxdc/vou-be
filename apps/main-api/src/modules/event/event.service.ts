@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ClientOptions, ClientProxy, ClientProxyFactory } from "@nestjs/microservices";
 import {
-  AddConfigsDto,
   AddVoucherToAccountDto,
   CreateEventDto,
   CreateItemDto,
@@ -9,6 +8,7 @@ import {
   EVENT_SERVICE_PROVIDER_NAME,
   ICurrentUser,
   ITEM_SERVICE_PROVIDER_NAME,
+  ItemTypeEnum,
   QUIZGAME_SERVICE_PROVIDER_NAME,
   UpdateEventDto,
   UpdateItemDto,
@@ -17,6 +17,7 @@ import {
 import { catchError, lastValueFrom } from "rxjs";
 import { EventHelper } from "./event.helper";
 import { Event } from "@database";
+import { v4 as uuidv4 } from "uuid";
 
 @Injectable()
 export class EventService {
@@ -66,6 +67,30 @@ export class EventService {
       );
 
     await lastValueFrom(rawVouchers);
+
+    // 'Config' items
+    const itemReq = {
+      items: [
+        {
+          id: event.id,
+          name: "Config",
+          imageId: uuidv4(),
+          type: ItemTypeEnum.CONFIG,
+          quantity: 1,
+        },
+      ],
+      eventId: event.id,
+    };
+
+    const rawItems = this.itemClient.send({ method: "POST", path: "/items" }, itemReq).pipe(
+      catchError((error) => {
+        const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
+        const message = error.message || "An error occurred";
+        throw new HttpException(message, statusCode);
+      })
+    );
+
+    await lastValueFrom(rawItems);
 
     return this.eventHelper.buildEventResponse(event);
   }

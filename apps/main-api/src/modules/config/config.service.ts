@@ -10,8 +10,8 @@ export class GameConfigService {
 
   async getConfigsInEvent(eventId: string, user: ICurrentUser) {
     try {
-      const userConfig = await this.redisService.get(`config-${user.userId}-*`);
-      const eventConfig = await this.redisService.get(`config-${user.userId}-${eventId}`);
+      const userConfig = await this.redisService.get(`config-user-${user.userId}-event-*`);
+      const eventConfig = await this.redisService.get(`config-user-${user.userId}-event-${eventId}`);
 
       return {
         userConfig: userConfig ? Number(userConfig) : 0,
@@ -25,8 +25,10 @@ export class GameConfigService {
 
   async addConfigsInEvent(data: AddConfigsDto, user: ICurrentUser) {
     try {
-      const rawEventConfigs = data.eventId ? await this.redisService.get(`config-${user.userId}-${data.eventId}`) : 0;
-      const rawUserConfigs = await this.redisService.get(`config-${user.userId}-*`);
+      const rawEventConfigs = data.eventId
+        ? await this.redisService.get(`config-user-${user.userId}-event-${data.eventId}`)
+        : 0;
+      const rawUserConfigs = await this.redisService.get(`config-user-${user.userId}-event-*`);
 
       let eventConfigs = rawEventConfigs ? Number(rawEventConfigs) : 0;
       let userConfigs = rawUserConfigs ? Number(rawUserConfigs) : 0;
@@ -51,8 +53,8 @@ export class GameConfigService {
       }
 
       // Save configs
-      if (data.eventId) await this.redisService.set(`config-${user.userId}-${data.eventId}`, eventConfigs);
-      await this.redisService.set(`config-${user.userId}-*`, userConfigs);
+      if (data.eventId) await this.redisService.set(`config-user-${user.userId}-event-${data.eventId}`, eventConfigs);
+      await this.redisService.set(`config-user-${user.userId}-event-*`, userConfigs);
 
       return {
         userConfig: userConfigs,
@@ -67,7 +69,7 @@ export class GameConfigService {
   async validateConfigsInEvent(data: ValidateConfigsDto, user: ICurrentUser) {
     try {
       const rawEventConfigs = data.eventId ? await this.redisService.get(`config-${user.userId}-${data.eventId}`) : 0;
-      const rawUserConfigs = await this.redisService.get(`config-${user.userId}-*`);
+      const rawUserConfigs = await this.redisService.get(`config-user-${user.userId}-event-*`);
 
       const eventConfigs = rawEventConfigs ? Number(rawEventConfigs) : 0;
       const userConfigs = rawUserConfigs ? Number(rawUserConfigs) : 0;
