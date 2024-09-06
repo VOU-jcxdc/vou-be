@@ -14,9 +14,10 @@ export class AdminController {
   async getUsers(
     @Query("offset", ParseIntPipe) offset: number,
     @Query("limit", ParseIntPipe) limit: number,
-    @Query("role", new ParseEnumPipe(AccountRoleEnum, { optional: true })) role: AccountRoleEnum
+    @Query("role", new ParseEnumPipe(AccountRoleEnum, { optional: true })) role: AccountRoleEnum,
+    @Query("keySearch") keySearch?: string
   ) {
-    return this.userService.getUsers(offset, limit, role);
+    return this.userService.getUsers(offset, limit, role, keySearch);
   }
 
   @Get("user/:id")
