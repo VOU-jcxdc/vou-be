@@ -14,95 +14,148 @@ import { Server } from "socket.io";
 import { JwtService } from "@nestjs/jwt";
 import { WSAuthMiddleware } from "../../middlewares/socket.middware";
 import { ISocketClient } from "@types";
+import amqp, { ChannelWrapper } from "amqp-connection-manager";
+import { ConfigService } from "@nestjs/config";
+import { ConfirmChannel } from "amqplib";
 
 @WebSocketGateway({ namespace: "quiz-game" })
 export class QuizGameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   private readonly server: Server;
   private readonly logger = new Logger(QuizGameGateway.name);
+  private readonly mockquestions = [
+    {
+      question: "What is the capital of France?",
+      options: ["Paris", "Marseille", "Lyon", "Toulouse"],
+      answer: 1,
+    },
+    {
+      question: "What is the capital of Italy?",
+      options: ["Milan", "Rome", "Venice", "Florence"],
+      answer: 2,
+    },
+    {
+      question: "What is the capital of Germany?",
+      options: ["Berlin", "Munich", "Hamburg", "Frankfurt"],
+      answer: 0,
+    },
+    {
+      question: "What is the capital of Spain?",
+      options: ["Madrid", "Barcelona", "Valencia", "Seville"],
+      answer: 0,
+    },
+  ];
 
-  constructor(private readonly redisService: RedisService, private readonly jwtService: JwtService) {}
+  private channelWrapper: ChannelWrapper;
+  private configService: ConfigService;
+
+  constructor(
+    private readonly redisService: RedisService,
+    private readonly jwtService: JwtService,
+    configService: ConfigService
+  ) {
+    this.configService = configService;
+  }
 
   async afterInit() {
+    console.log("Socket server initialized");
     const middle = WSAuthMiddleware(this.jwtService);
     this.server.use(middle);
+    const connection = amqp.connect([this.configService.get("RMQ_URLS")]);
+    this.channelWrapper = connection.createChannel();
+    await this.channelWrapper.addSetup(async (channel: ConfirmChannel) => {
+      await channel.assertQueue("quizGameQueue", { durable: true });
+      await channel.consume("quizGameQueue", async (message) => {
+        if (message) {
+          console.log("Message", message.content.toString());
+          //const { eventId } = JSON.parse(message.content.toString());
+          //const questions = await this.getQuestions(eventId);
+          const numQuestion = this.mockquestions.length;
+          this.server.emit("waiting-players", {
+            message: "Waiting for players",
+            questions: this.mockquestions,
+          });
+          let timeLeft = 10; // Time left in seconds
+
+          const intervalId = setInterval(() => {
+            timeLeft--;
+            console.log(`Time left: ${timeLeft} seconds`);
+
+            if (timeLeft <= 0) {
+              clearInterval(intervalId);
+            }
+          }, 1000);
+
+          this.prepareAndStartGame(10, numQuestion, intervalId);
+        }
+        channel.ack(message);
+      });
+    });
   }
 
   async handleConnection(@ConnectedSocket() client: ISocketClient, ...args: any[]) {
-    // const player = client.player;
-    // await this.redisService.set(`player-${player.userId}`, client.id, 3600 * 24); // 1 day
-
-    // console.log("handleConnection", client.id);
-    // console.log("user", player);
+    const player = client.player;
+    console.log("handleConnection", client.id);
+    console.log("user", player);
 
     // Get eventId from query
     const eventId = client.handshake.query.eventId;
 
     // Save userId and socketId to redis
-    await this.redisService.set(`quizgame-player-${client.player.userId}-event-${eventId}`, client.id, 3600 * 24); // 1 day
+    await this.redisService.set(`quizgame-player-${player.userId}-event-${eventId}`, client.id, 3600 * 24); // 1 day
+    this.server.emit("player-joined", {
+      message: "New player joined",
+    });
   }
 
   async handleDisconnect(@ConnectedSocket() client: ISocketClient) {
-    // const player = client.player;
-    // this.redisService.del(`player-${player.userId}`);
-
+    const player = client.player;
     // Get eventId from query
     const eventId = client.handshake.query.eventId;
 
     // Remove userId and socketId from redis
-    await this.redisService.del(`quizgame-player-${client.player.userId}-event-${eventId}`);
+    await this.redisService.del(`quizgame-player-${player.userId}-event-${eventId}`);
+    this.server.emit("player-left", {
+      message: "Player left",
+    });
   }
 
-  @SubscribeMessage("start-game")
-  async handleMessage(@MessageBody() payload: string) {
-    // console.log("socket", client.id);
-    // console.log("player", client.player);
-    // console.log("join-game", payload);
-    // this.server.emit("game-joined", {
-    //   message: "I am new player",
-    // });
-    // return "Hello world!";
+  async prepareAndStartGame(timeLeft: number, numQuestion: number, intervalId: any) {
+    setTimeout(async () => {
+      console.log("Timeout completed");
 
-    // Get client joined game with eventId = 1234 from redis -> Pattern 'quizgame-player-{userId}-event-{eventId}'
-    // userId must replace with regex
-    const clientKeys = await this.redisService.keys(`quizgame-player-*-event-1234`);
-    const clients = await Promise.all(
-      clientKeys.map(async (key) => {
-        const socketId = await this.redisService.get(key);
-        return socketId;
-      })
-    );
-    console.log("clients", clients);
+      this.server.emit("game-start", {});
+      const clientKeys = await this.redisService.keys(`quizgame-player-*-event-1234`);
+      const clients = await Promise.all(
+        clientKeys.map(async (key) => {
+          const socketId = await this.redisService.get(key);
+          return socketId;
+        })
+      );
+      this.startGame(clients, numQuestion, intervalId);
+    }, timeLeft * 1000);
+  }
 
-    // Start game
-    for (const client of clients) {
-      this.server.to(client).emit("game-start", {
-        message: "Game started",
-      });
+  async startGame(clients: string[], numQuestion: number, intervalId: any) {
+    console.log("start the game");
+    for (let i = 0; i < numQuestion; i++) {
+      setTimeout(() => {
+        this.server.to(clients).emit("start-question", {
+          noQa: i,
+        });
+      }, i * 20000);
+
+      setTimeout(() => {
+        clearInterval(intervalId);
+        this.server.to(clients).emit("end-question", {
+          message: `End question ${i + 1}`,
+        });
+      }, i * 20000 + 10000);
     }
+  }
 
-    const mockquestions = [
-      {
-        question: "What is the capital of France?",
-        options: ["Paris", "Marseille", "Lyon", "Toulouse"],
-        answer: 1,
-      },
-      {
-        question: "What is the capital of Italy?",
-        options: ["Milan", "Rome", "Venice", "Florence"],
-        answer: 2,
-      },
-    ];
-
-    // Send questions to players each 10 seconds
-    let i = 0;
-    const interval = setInterval(() => {
-      console.log("Question", mockquestions[i]);
-      for (const client of clients) this.server.to(client).emit("questions", mockquestions[i]);
-      i++;
-      if (i >= mockquestions.length) {
-        clearInterval(interval);
-      }
-    }, 10000);
+  async getQuestions(eventId: string) {
+    // Get questions from microservice
+    return [];
   }
 }

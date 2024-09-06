@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { QuizGameGateway } from "./quiz-game.gateway";
-import { RedisModule } from "@shared-modules";
+import { RabbitmqModule, RedisModule } from "@shared-modules";
 import { JwtModule } from "@nestjs/jwt";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 
@@ -17,6 +17,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
         },
       }),
     }),
+    RabbitmqModule,
   ],
   providers: [QuizGameGateway],
   exports: [QuizGameGateway],
