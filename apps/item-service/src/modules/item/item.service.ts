@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { ItemRepository } from "../repository/item.repository";
-import { CreateItemDto, UpdateItemDto } from "@types";
+import { CreateItemDto, ItemTypeEnum, UpdateItemDto } from "@types";
 import { RpcException } from "@nestjs/microservices";
 import { AccountItemRepository } from "../repository/account-item.repository";
 import { CombineItemModel } from "../model/combine_item.model";
@@ -176,6 +176,16 @@ export class ItemService {
       });
       const responseData = data.map((it) => this.combineItemHelper.buildResponseData(it));
       return Promise.all(responseData);
+    } catch (error) {
+      this.logger.error(error);
+      throw new RpcException(error);
+    }
+  }
+
+  async isConfigItem(itemId: string) {
+    try {
+      const item = await this.itemRepository.findOne({ where: { id: itemId } });
+      return item.type === ItemTypeEnum.CONFIG;
     } catch (error) {
       this.logger.error(error);
       throw new RpcException(error);

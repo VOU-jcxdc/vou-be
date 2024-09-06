@@ -18,7 +18,7 @@ export class GiftController {
   }
 
   @MessagePattern({ method: "POST", path: "gifts" })
-  createGiftRequest(@Body() data: CreateGiftRequestDto) {
+  createGiftRequest(@Payload() data: CreateGiftRequestDto) {
     return this.giftService.createGiftRequest(data);
   }
 
