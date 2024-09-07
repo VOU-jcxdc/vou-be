@@ -12,11 +12,12 @@ export class UserController {
 
   @Get("")
   async getUsers(
+    @CurrentUser() user: ICurrentUser,
     @Query("offset", ParseIntPipe) offset: number,
     @Query("limit", ParseIntPipe) limit: number,
     @Query("keySearch") keySearch?: string
   ) {
-    return this.userService.getUsers(offset, limit, AccountRoleEnum.PLAYER, keySearch);
+    return this.userService.getUsers(offset, limit, AccountRoleEnum.PLAYER, keySearch, user.userId);
   }
 
   @Get("profile")

@@ -84,7 +84,7 @@ export class GiftService {
 
       // Handle normal item
       const { senderId, receiverId, itemId } = request;
-      const accountItem = await this.itemService.receiveItem(receiverId, itemId, request.quantity);
+      const accountItem = await this.itemService.loseItem(receiverId, itemId, request.quantity);
       await this.itemService.receiveItem(senderId, itemId, request.quantity);
       await this.giftRepository.updateOne(
         { where: { id: giftId } },

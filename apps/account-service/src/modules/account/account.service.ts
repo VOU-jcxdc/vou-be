@@ -49,10 +49,11 @@ export class AccountService {
     offset: number,
     limit: number,
     role: AccountRoleEnum = undefined,
-    keySearch: string = undefined
+    keySearch: string = undefined,
+    currentUserId: string = undefined
   ) {
     try {
-      return this.accountRepository.getAllAccounts(offset, limit, role, keySearch);
+      return this.accountRepository.getAllAccounts(offset, limit, role, keySearch, currentUserId);
     } catch (error) {
       this.logger.error(error);
       throw new RpcException(error);
