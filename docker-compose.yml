@@ -214,6 +214,27 @@ services:
     networks:
       - vou-network
 
+  quizgame-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_NAME: quizgame-service
+        STAGE: dev
+    ports:
+      - "${QUIZGAME_SERVICE_PORT}:${QUIZGAME_SERVICE_PORT}"
+    env_file: .env
+    container_name: quizgame-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migration:
+        condition: service_completed_successfully
+      mongo:
+        condition: service_healthy
+    networks:
+      - vou-network
+
 volumes:
   postgres-data:
   rabbitmq-data:
