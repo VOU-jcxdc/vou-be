@@ -10,7 +10,7 @@ import {
 import { catchError, lastValueFrom } from "rxjs";
 
 @Injectable()
-export class CombineItemService {
+export class RecipeService {
   private itemClient: ClientProxy;
   private voucherClient: ClientProxy;
 

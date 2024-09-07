@@ -4,7 +4,7 @@ import { CreateItemDto, ItemTypeEnum, UpdateItemDto } from "@types";
 import { RpcException } from "@nestjs/microservices";
 import { AccountItemRepository } from "../repository/account-item.repository";
 import { CombineItemModel } from "../model/combine_item.model";
-import { CombineItemHelper } from "../combine-item/combine_item.helper";
+import { RecipeHelper } from "../recipe/recipe.helper";
 
 import { AccountItemHelper } from "./account-item.helper";
 import { ItemHelper } from "./item.helper";
@@ -17,7 +17,7 @@ export class ItemService {
     private readonly accountItemHelper: AccountItemHelper,
     private readonly itemHelper: ItemHelper,
     private readonly combineItemModel: CombineItemModel,
-    private readonly combineItemHelper: CombineItemHelper
+    private readonly recipeHelper: RecipeHelper
   ) {}
 
   async createItems({ items, eventId }: CreateItemDto & { eventId: string }) {
@@ -185,7 +185,7 @@ export class ItemService {
       const data = await this.combineItemModel.find({
         itemRecipe: { $elemMatch: { itemId: id } },
       });
-      const responseData = data.map((it) => this.combineItemHelper.buildResponseData(it));
+      const responseData = data.map((it) => this.recipeHelper.buildResponseData(it));
       return Promise.all(responseData);
     } catch (error) {
       this.logger.error(error);

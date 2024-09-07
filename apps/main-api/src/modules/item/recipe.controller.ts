@@ -1,13 +1,13 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard, RoleGuard } from "../../guard";
-import { CombineItemService } from "./combine_item.service";
+import { RecipeService } from "./recipe.service";
 import { AccountRoleEnum, CreateRecipeDto, UpdateRecipeDto } from "@types";
 import { Roles } from "../../decorators/roles.decorator";
 
 @UseGuards(JwtAuthGuard, RoleGuard)
 @Controller("items/recipes")
-export class CombineItemController {
-  constructor(private readonly combineItemService: CombineItemService) {}
+export class RecipeController {
+  constructor(private readonly combineItemService: RecipeService) {}
 
   @Roles(AccountRoleEnum.BRAND)
   @Post()

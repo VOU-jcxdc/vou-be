@@ -5,7 +5,7 @@ import { ItemRepository } from "../repository/item.repository";
 import { CombineItemTypeEnum } from "@types";
 
 @Injectable()
-export class CombineItemHelper {
+export class RecipeHelper {
   constructor(private readonly itemRepository: ItemRepository) {}
   async buildResponseData(rawData: Document<unknown, {}, CombineItems> & CombineItems & Required<{ _id: unknown }>) {
     const data = rawData.toObject();
