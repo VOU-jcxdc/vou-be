@@ -37,8 +37,6 @@ export class CombineItemService {
         return this.isCraftable(it.itemId, it.quantity);
       });
 
-      isCraftableConstraint.push(this.isCraftable(mappedDto.targetId, 1));
-
       const resolvedConstraints = await Promise.all(isCraftableConstraint);
       if (resolvedConstraints.some((it) => it === false)) {
         throw new RpcException("Item not craftable");

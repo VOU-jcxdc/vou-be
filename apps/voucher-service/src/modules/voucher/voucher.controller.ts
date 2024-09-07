@@ -8,6 +8,7 @@ import {
   UpdateVoucherDto,
 } from "@types";
 import { MessagePattern, Payload } from "@nestjs/microservices";
+import { method } from "lodash";
 
 @Controller()
 export class VoucherController {
@@ -58,5 +59,15 @@ export class VoucherController {
   deleteVouchersInEvent(@Payload() data: { eventId: string } & DeleteVoucherDto) {
     const { eventId, voucherIds } = data;
     return this.voucherService.deleteVouchersInEvent(eventId, voucherIds);
+  }
+
+  @MessagePattern({ method: "POST", path: "/craftable-validation" })
+  isCraftable(@Payload() data: { voucherId: string; quantity: number }) {
+    return this.voucherService.isCraftable(data.voucherId, data.quantity);
+  }
+
+  @MessagePattern({ method: "GET", path: "/vouchers/:id" })
+  getVoucher(@Payload() data: { voucherId: string }) {
+    return this.voucherService.getVoucher(data.voucherId);
   }
 }

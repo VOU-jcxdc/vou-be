@@ -7,6 +7,11 @@ import { CombineItemService } from "./combine_item.service";
 export class CombineItemController {
   constructor(private readonly itemService: CombineItemService) {}
 
+  @MessagePattern({ method: "POST", path: "/craftable-validation" })
+  isCraftable(@Payload() data: { itemId: string; quantity: number }) {
+    return this.itemService.isCraftable(data.itemId, data.quantity);
+  }
+
   @MessagePattern({ method: "POST", path: "/recipes" })
   createRecipe(@Payload() dto: CreateRecipeDto) {
     return this.itemService.createRecipe(dto);

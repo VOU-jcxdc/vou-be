@@ -2,6 +2,7 @@ import { CombineItems } from "@database";
 import { Injectable } from "@nestjs/common";
 import { Document } from "mongoose";
 import { ItemRepository } from "../repository/item.repository";
+import { CombineItemTypeEnum } from "@types";
 
 @Injectable()
 export class CombineItemHelper {
@@ -19,17 +20,25 @@ export class CombineItemHelper {
       };
     });
 
-    const target = await this.itemRepository.findOne({ where: { id: targetId } });
+    if (data.targetType === CombineItemTypeEnum.ITEM) {
+      const target = await this.itemRepository.findOne({ where: { id: targetId } });
+
+      return {
+        id: _id,
+        ...restData,
+        itemRecipe: await Promise.all(items),
+        target: {
+          id: targetId,
+          name: target.name,
+          imageId: target.imageId,
+        },
+      };
+    }
 
     return {
       id: _id,
       ...restData,
       itemRecipe: await Promise.all(items),
-      target: {
-        id: targetId,
-        name: target.name,
-        imageId: target.imageId,
-      },
     };
   }
 }
