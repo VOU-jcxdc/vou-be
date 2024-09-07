@@ -18,9 +18,11 @@ export class AccountController {
   }
 
   @MessagePattern({ method: "GET", path: "/accounts" })
-  async getAllAccounts(@Payload() data: { offset: number; limit: number; role?: AccountRoleEnum; keySearch: string }) {
-    const { offset, limit, role, keySearch } = data;
-    return this.accountService.getAllAccounts(offset, limit, role, keySearch);
+  async getAllAccounts(
+    @Payload() data: { offset: number; limit: number; role?: AccountRoleEnum; keySearch: string; currentUser?: string }
+  ) {
+    const { offset, limit, role, keySearch, currentUser } = data;
+    return this.accountService.getAllAccounts(offset, limit, role, keySearch, currentUser);
   }
 
   @MessagePattern({ method: "GET", path: "/account/:id?role=${role}" })
