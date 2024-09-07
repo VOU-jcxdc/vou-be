@@ -8,5 +8,6 @@ import { CsvModule } from "nest-csv-parser";
   imports: [CsvModule, ClientProxyModule],
   controllers: [QuizgameController],
   providers: [QuizgameService],
+  exports: [QuizgameService],
 })
 export class QuizgameModule {}

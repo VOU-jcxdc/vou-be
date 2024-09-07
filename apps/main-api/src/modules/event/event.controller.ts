@@ -106,4 +106,10 @@ export class EventController {
   async getQuestionsInEvent(@Param("id") id: string) {
     return this.eventService.getQuestionsInEvent(id);
   }
+
+  @Get(":eventId/games/:gameId")
+  @Roles(AccountRoleEnum.PLAYER)
+  async getGameInEvent(@Param("gameId") gameId: string, @Param("eventId") eventId: string) {
+    return this.eventService.getGameInEvent(gameId, eventId);
+  }
 }

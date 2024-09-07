@@ -13,4 +13,8 @@ export class GameInSystemService {
   async updateGameInSystem(id: string, gameInSystemData: UpdateGameInSystemDto) {
     return this.gameInSystemRepository.updateOne({ where: { id } }, gameInSystemData);
   }
+
+  async getGameInSystemById(id: string) {
+    return this.gameInSystemRepository.findOne({ where: { id } });
+  }
 }

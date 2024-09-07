@@ -55,4 +55,14 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
       return false;
     }
   }
+
+  async keys(pattern: string) {
+    try {
+      const keys = await this.client.keys(pattern);
+      return keys;
+    } catch (error) {
+      this.logger.error(error);
+      return [];
+    }
+  }
 }

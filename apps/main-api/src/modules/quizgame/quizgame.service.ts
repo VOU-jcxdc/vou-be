@@ -1,9 +1,8 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { BadRequestException, HttpException, HttpStatus, Inject, Injectable, Logger } from "@nestjs/common";
 import { ClientOptions, ClientProxy, ClientProxyFactory } from "@nestjs/microservices";
 import { QUIZGAME_SERVICE_PROVIDER_NAME } from "@types";
-import { Multer } from "multer";
 import { CsvParser, ParsedData } from "nest-csv-parser";
-import { format } from "path";
+import { catchError, lastValueFrom } from "rxjs";
 import { Readable } from "stream";
 
 class QAData {
@@ -15,6 +14,7 @@ class QAData {
 @Injectable()
 export class QuizgameService {
   private quizgameClient: ClientProxy;
+  private readonly logger = new Logger(QuizgameService.name);
 
   constructor(
     @Inject(QUIZGAME_SERVICE_PROVIDER_NAME) quizgameOptions: ClientOptions,
@@ -48,5 +48,21 @@ export class QuizgameService {
         data: formattedData,
       }
     );
+  }
+
+  async getQuestionsInRoomGame(roomId: string) {
+    try {
+      const data = this.quizgameClient.send({ method: "GET", path: "/quiz-game/questions/:roomId" }, { roomId }).pipe(
+        catchError((error) => {
+          const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
+          const message = error.message || "An error occurred";
+          throw new HttpException(message, statusCode);
+        })
+      );
+      return lastValueFrom(data);
+    } catch (error) {
+      this.logger.error(error);
+      throw new BadRequestException(error);
+    }
   }
 }
