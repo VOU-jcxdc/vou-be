@@ -6,10 +6,12 @@ import { ItemController } from "./item.controller";
 import { GiftController } from "./gift.controller";
 import { GiftService } from "./gift.service";
 import { ItemService } from "./item.service";
+import { CombineItemController } from "./combine_item.controller";
+import { CombineItemService } from "./combine_item.service";
 
 @Module({
   imports: [ClientProxyModule],
-  controllers: [RecipeController, ItemController, GiftController],
-  providers: [RecipeService, ItemService, GiftService],
+  controllers: [RecipeController, CombineItemController, ItemController, GiftController],
+  providers: [RecipeService, ItemService, GiftService, CombineItemService],
 })
 export class ItemModule {}

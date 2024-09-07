@@ -4,6 +4,7 @@ import { ConfigModule } from "@nestjs/config";
 import { RecipeModule } from "../recipe/recipe.module";
 import { ItemModule } from "../item/item.module";
 import { GiftModule } from "../gift/gift.module";
+import { CombineItemModule } from "../combine-items/combine-item.module";
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { GiftModule } from "../gift/gift.module";
     RecipeModule,
     GiftModule,
     ItemModule,
+    CombineItemModule,
   ],
 })
 export class AppModule {}

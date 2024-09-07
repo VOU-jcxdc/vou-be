@@ -7,7 +7,7 @@ import {
   UpdateAsssignVoucherDto,
   UpdateVoucherDto,
 } from "@types";
-import { MessagePattern, Payload } from "@nestjs/microservices";
+import { EventPattern, MessagePattern, Payload } from "@nestjs/microservices";
 import { method } from "lodash";
 
 @Controller()
@@ -36,6 +36,7 @@ export class VoucherController {
   }
 
   @MessagePattern({ method: "POST", path: "/vouchers/assigning" })
+  @EventPattern({ method: "POST", path: "/vouchers/assigning" })
   assignVoucher(@Payload() data: AddVoucherToAccountDto & { accountId: string }) {
     const { accountId, ...rest } = data;
     return this.voucherService.upsertAccountVoucher(accountId, rest);
