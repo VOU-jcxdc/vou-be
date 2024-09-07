@@ -3,7 +3,7 @@ import { Injectable, NotAcceptableException, NotFoundException } from "@nestjs/c
 import { InjectRepository } from "@nestjs/typeorm";
 import { AccountRoleEnum, AccountStatusEnum, CreateAccountDto, IAccount } from "@types";
 import { isNil } from "lodash";
-import { Like, Repository } from "typeorm";
+import { Like, ILike, Not, Repository } from "typeorm";
 
 @Injectable()
 export class AccountRepository extends BaseRepository<Account> {
@@ -33,22 +33,26 @@ export class AccountRepository extends BaseRepository<Account> {
     offset: number,
     limit: number,
     role: AccountRoleEnum = undefined,
-    keySearch: string = undefined
+    keySearch: string = undefined,
+    currentUser: string = undefined
   ) {
     // Construct the base query condition
     const whereCondition: any = isNil(role) ? {} : { role };
+    const excludeUserCondition: any = isNil(currentUser) ? {} : { id: Not(currentUser) };
 
     // Add keySearch filter for email, phone, or username if provided
     const searchConditions = isNil(keySearch)
       ? [{}, {}, {}]
-      : [{ email: Like(`%${keySearch}%`) }, { phone: Like(`%${keySearch}%`) }, { username: Like(`%${keySearch}%`) }];
+      : [{ email: ILike(`%${keySearch}%`) }, { phone: ILike(`%${keySearch}%`) }, { username: ILike(`%${keySearch}%`) }];
 
     const [accounts, total] = await this.repository.findAndCount({
-      where: [
-        { ...whereCondition, ...searchConditions[0] },
-        { ...whereCondition, ...searchConditions[1] },
-        { ...whereCondition, ...searchConditions[2] },
-      ],
+      where: searchConditions.map((condition: any) => {
+        return {
+          ...whereCondition,
+          ...excludeUserCondition,
+          ...condition,
+        };
+      }),
       skip: offset,
       take: limit,
       select: {

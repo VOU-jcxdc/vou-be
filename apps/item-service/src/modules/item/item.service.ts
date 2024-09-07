@@ -7,6 +7,7 @@ import { CombineItemModel } from "../model/combine_item.model";
 import { CombineItemHelper } from "../combine-item/combine_item.helper";
 
 import { AccountItemHelper } from "./account-item.helper";
+import { ItemHelper } from "./item.helper";
 @Injectable()
 export class ItemService {
   private readonly logger: Logger = new Logger(ItemService.name);
@@ -14,6 +15,7 @@ export class ItemService {
     private readonly itemRepository: ItemRepository,
     private readonly accountItemRepository: AccountItemRepository,
     private readonly accountItemHelper: AccountItemHelper,
+    private readonly itemHelper: ItemHelper,
     private readonly combineItemModel: CombineItemModel,
     private readonly combineItemHelper: CombineItemHelper
   ) {}
@@ -36,9 +38,19 @@ export class ItemService {
 
   async getItemsByEventId(eventId: string) {
     try {
-      return this.itemRepository.findAll({
+      const items = await this.itemRepository.findAll({
         where: { eventId },
       });
+
+      // Using Promise.all to wait for all async operations
+      const mapped = await Promise.all(
+        items.map(async (item) => {
+          return this.itemHelper.buildResponseWithOriginalQuantity(item);
+        })
+      );
+
+      console.log("Mapped", mapped);
+      return mapped;
     } catch (error) {
       this.logger.error(error);
       throw new RpcException(error);
@@ -47,7 +59,8 @@ export class ItemService {
 
   async getItemDetail(itemId: string) {
     try {
-      return this.itemRepository.findOne({ where: { id: itemId } });
+      const item = await this.itemRepository.findOne({ where: { id: itemId } });
+      return this.itemHelper.buildResponseWithOriginalQuantity(item);
     } catch (error) {
       this.logger.error(error);
       throw new RpcException(error);

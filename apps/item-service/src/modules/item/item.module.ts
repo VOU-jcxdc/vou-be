@@ -7,11 +7,12 @@ import { ConfigModule } from "@nestjs/config";
 import { ItemRepositoryModule } from "../repository/item-repository.module";
 import { AccountItemRepositoryModule } from "../repository/account-item-repository.module";
 import { AccountItemHelper } from "./account-item.helper";
+import { ItemHelper } from "./item.helper";
 
 @Module({
   imports: [ItemRepositoryModule, CombineItemModelModule, AccountItemRepositoryModule, ConfigModule],
   controllers: [ItemController],
-  providers: [ItemService, CombineItemHelper, AccountItemHelper],
+  providers: [ItemService, CombineItemHelper, AccountItemHelper, ItemHelper],
   exports: [ItemService],
 })
 export class ItemModule {}

@@ -22,4 +22,8 @@ export class AccountItemRepository extends BaseRepository<AccountItem> {
     if (accountItem.quantity < expectedQuantity) throw new RpcException("Not enough quantity of the requested item");
     return accountItem;
   }
+
+  async countTotalItems(itemId: string) {
+    return this.repository.sum("quantity", { itemId });
+  }
 }
