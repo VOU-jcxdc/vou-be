@@ -45,4 +45,8 @@ export class BaseModel<T extends Document> {
   async saveMany(data: Partial<T>[]) {
     return this.model.insertMany(data);
   }
+
+  async deleteMany(filter: FilterQuery<T>) {
+    return this.model.deleteMany(filter);
+  }
 }

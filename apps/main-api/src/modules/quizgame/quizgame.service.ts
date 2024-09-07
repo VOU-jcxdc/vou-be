@@ -1,53 +1,66 @@
 import { BadRequestException, HttpException, HttpStatus, Inject, Injectable, Logger } from "@nestjs/common";
 import { ClientOptions, ClientProxy, ClientProxyFactory } from "@nestjs/microservices";
-import { QUIZGAME_SERVICE_PROVIDER_NAME } from "@types";
-import { CsvParser, ParsedData } from "nest-csv-parser";
-import { catchError, lastValueFrom } from "rxjs";
+import { IQAs, QUIZGAME_SERVICE_PROVIDER_NAME } from "@types";
+import { catchError, lastValueFrom, of } from "rxjs";
 import { Readable } from "stream";
-
-class QAData {
-  question: string;
-  options: string;
-  answer: string;
-}
-
+import { parse } from "csv-parse";
 @Injectable()
 export class QuizgameService {
   private quizgameClient: ClientProxy;
   private readonly logger = new Logger(QuizgameService.name);
 
-  constructor(
-    @Inject(QUIZGAME_SERVICE_PROVIDER_NAME) quizgameOptions: ClientOptions,
-    private readonly csvParser: CsvParser
-  ) {
+  constructor(@Inject(QUIZGAME_SERVICE_PROVIDER_NAME) quizgameOptions: ClientOptions) {
     this.quizgameClient = ClientProxyFactory.create(quizgameOptions);
   }
   async createQuestions(eventId: string, file: Express.Multer.File) {
-    const bufferStream = Readable.from(file.buffer.toString());
-    const data: ParsedData<QAData> = await this.csvParser.parse(bufferStream, QAData);
-    const formattedData = [];
+    try {
+      const bufferStream = Readable.from(file.buffer.toString());
+      const formattedData: IQAs[] = [];
 
-    if (data && data.list) {
-      data.list.forEach((item) => {
-        item.options = JSON.parse(item.options);
-        item.answer = JSON.parse(item.answer);
+      return new Promise((resolve, reject) => {
+        bufferStream
+          .pipe(parse({ delimiter: "," }))
+          .on("data", (row) => {
+            const data =
+              row.length === 1
+                ? row[0].split(/[,;]/).filter((item: string) => item !== "") // Export CSV with Excel
+                : row.filter((item: string) => item !== ""); // Standard CSV file (Google Sheets)
+            formattedData.push({
+              question: data[0],
+              options: data.slice(1, data.length - 1),
+              answer: data[data.length - 1],
+              eventId,
+            });
+          })
+          .on("end", async () => {
+            if (formattedData.length > 0) {
+              const data = this.quizgameClient
+                .send({ method: "POST", path: "/quiz-game/questions" }, { data: formattedData, eventId })
+                .pipe(
+                  catchError((error) => {
+                    const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
+                    const message = error.message || "An error occurred";
+                    reject(new HttpException(message, statusCode));
+                    return of({ message: message });
+                  })
+                );
+              const result = await lastValueFrom(data);
+              resolve(result);
+            } else {
+              reject(new BadRequestException("No data found"));
+            }
+          })
+          .on("error", (error) => {
+            this.logger.error(error);
+            reject(new BadRequestException(error));
+            bufferStream.destroy();
+            return;
+          });
       });
-      data.list.map((item) => {
-        formattedData.push({
-          question: item.question,
-          options: item.options,
-          answer: Number(item.answer),
-        });
-      });
+    } catch (error) {
+      this.logger.error(error);
+      throw new BadRequestException(error);
     }
-
-    return this.quizgameClient.send(
-      { method: "POST", path: "/quiz-game/questions" },
-      {
-        eventId,
-        data: formattedData,
-      }
-    );
   }
 
   async getQuestionsInRoomGame(roomId: string) {

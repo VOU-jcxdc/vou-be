@@ -20,6 +20,9 @@ export class QAs extends Document implements IQAs {
   @Prop({ type: Number, required: true })
   answer: number;
 
+  @Prop({ type: String, required: true })
+  eventId: string;
+
   // Hide timestamps
   @Prop({ type: Date, select: false })
   createdOn: Date;
