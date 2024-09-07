@@ -12,7 +12,7 @@ import { ItemHelper } from "./item.helper";
 @Module({
   imports: [ItemRepositoryModule, CombineItemModelModule, AccountItemRepositoryModule, ConfigModule],
   controllers: [ItemController],
-  providers: [ItemService, RecipeHelper, AccountItemHelper],
+  providers: [ItemService, RecipeHelper, AccountItemHelper, ItemHelper],
   exports: [ItemService],
 })
 export class ItemModule {}

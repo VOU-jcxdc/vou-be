@@ -19,11 +19,11 @@ export class QuestionController {
 
   @MessagePattern({ method: "GET", path: "/events/:eventId/room-game" })
   async getRoomGame(@Payload() { eventId }: { eventId: string }) {
-    return this.parserService.getRoomGame(eventId);
+    return this.questionService.getRoomGame(eventId);
   }
 
   @MessagePattern({ method: "GET", path: "/quiz-game/questions/:roomId" })
   async getQuestionsInRoomGame(@Payload() { roomId }: { roomId: string }) {
-    return this.parserService.getQuestionsInRoomGame(roomId);
+    return this.questionService.getQuestionsInRoomGame(roomId);
   }
 }
