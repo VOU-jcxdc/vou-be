@@ -16,4 +16,9 @@ export class GameInSystemController {
   async updateGameInSystem(@Payload() data: { id: string; gameInSystemData: UpdateGameInSystemDto }) {
     return this.gameInSystemService.updateGameInSystem(data.id, data.gameInSystemData);
   }
+
+  @MessagePattern({ method: "GET", path: "/games-in-system/:id" })
+  async getGameInSystemById(@Payload() { id }: { id: string }) {
+    return this.gameInSystemService.getGameInSystemById(id);
+  }
 }

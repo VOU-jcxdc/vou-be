@@ -2,8 +2,10 @@ import {
   Body,
   Controller,
   FileTypeValidator,
+  Get,
   ParseFilePipe,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from "@nestjs/common";
@@ -31,5 +33,10 @@ export class QuizgameController {
     @Body("eventId") eventId: string
   ) {
     return this.quizgameService.createQuestions(eventId, file);
+  }
+
+  @Get("questions")
+  async getQuestionsInRoomGame(@Query("roomId") roomId: string) {
+    return this.quizgameService.getQuestionsInRoomGame(roomId);
   }
 }

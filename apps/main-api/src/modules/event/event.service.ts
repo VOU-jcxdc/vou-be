@@ -7,6 +7,7 @@ import {
   DeleteVoucherDto,
   EVENT_SERVICE_PROVIDER_NAME,
   ICurrentUser,
+  IEvent,
   ITEM_SERVICE_PROVIDER_NAME,
   ItemTypeEnum,
   QUIZGAME_SERVICE_PROVIDER_NAME,
@@ -131,7 +132,7 @@ export class EventService {
       offset: data.offset,
       limit: data.limit,
       events: await Promise.all(
-        data.events.map((event: Event & { images: string[] }) => this.eventHelper.buildEventResponse(event))
+        data.events.map((event: IEvent & { images: string[] }) => this.eventHelper.buildEventResponse(event))
       ),
     };
   }
@@ -260,5 +261,30 @@ export class EventService {
 
   async getQuestionsInEvent(id: string) {
     return this.quizgameClient.send({ method: "GET", path: "/events/:eventId/questions" }, { id });
+  }
+
+  async getGameInEvent(gameId: string, eventId: string) {
+    const gameInfoData = this.eventClient.send({ method: "GET", path: "/games-in-system/:id" }, { id: gameId }).pipe(
+      catchError((error) => {
+        const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
+        const message = error.message || "An error occurred";
+        throw new HttpException(message, statusCode);
+      })
+    );
+
+    const gameInfo = await lastValueFrom(gameInfoData);
+
+    const roomGameData = this.quizgameClient
+      .send({ method: "GET", path: "/events/:eventId/room-game" }, { eventId })
+      .pipe(
+        catchError((error) => {
+          const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
+          const message = error.message || "An error occurred";
+          throw new HttpException(message, statusCode);
+        })
+      );
+
+    const roomGame = await lastValueFrom(roomGameData);
+    return { ...gameInfo, roomGame };
   }
 }

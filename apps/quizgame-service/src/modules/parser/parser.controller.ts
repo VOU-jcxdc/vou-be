@@ -16,4 +16,14 @@ export class ParserController {
   async getQuestionsInEvent(@Payload() { id }: { id: string }) {
     return this.parserService.getQuestionsInEvent(id);
   }
+
+  @MessagePattern({ method: "GET", path: "/events/:eventId/room-game" })
+  async getRoomGame(@Payload() { eventId }: { eventId: string }) {
+    return this.parserService.getRoomGame(eventId);
+  }
+
+  @MessagePattern({ method: "GET", path: "/quiz-game/questions/:roomId" })
+  async getQuestionsInRoomGame(@Payload() { roomId }: { roomId: string }) {
+    return this.parserService.getQuestionsInRoomGame(roomId);
+  }
 }
