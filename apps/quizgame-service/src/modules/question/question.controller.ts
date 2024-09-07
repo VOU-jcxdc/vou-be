@@ -1,29 +1,29 @@
 import { Controller } from "@nestjs/common";
-import { ParserService } from "./parser.service";
+import { QuestionService } from "./question.service";
 import { MessagePattern, Payload } from "@nestjs/microservices";
 import { IQAs } from "@types";
 
 @Controller()
-export class ParserController {
-  constructor(private readonly parserService: ParserService) {}
+export class QuestionController {
+  constructor(private readonly questionService: QuestionService) {}
 
   @MessagePattern({ method: "POST", path: "/quiz-game/questions" })
   async createQuestions(@Payload() data: { data: IQAs[]; eventId: string }) {
-    return this.parserService.createQuestions(data);
+    return this.questionService.createQuestions(data);
   }
 
   @MessagePattern({ method: "GET", path: "/events/:eventId/questions" })
   async getQuestionsInEvent(@Payload() { id }: { id: string }) {
-    return this.parserService.getQuestionsInEvent(id);
+    return this.questionService.getQuestionsInEvent(id);
   }
 
   @MessagePattern({ method: "GET", path: "/events/:eventId/room-game" })
   async getRoomGame(@Payload() { eventId }: { eventId: string }) {
-    return this.parserService.getRoomGame(eventId);
+    return this.questionService.getRoomGame(eventId);
   }
 
   @MessagePattern({ method: "GET", path: "/quiz-game/questions/:roomId" })
   async getQuestionsInRoomGame(@Payload() { roomId }: { roomId: string }) {
-    return this.parserService.getQuestionsInRoomGame(roomId);
+    return this.questionService.getQuestionsInRoomGame(roomId);
   }
 }

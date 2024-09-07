@@ -1,6 +1,7 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { CreateCombineItemDto, ICurrentUser, ITEM_SERVICE_PROVIDER_NAME } from "@types";
 import { ClientOptions, ClientProxy, ClientProxyFactory } from "@nestjs/microservices";
-import { CreateRecipeDto, ITEM_SERVICE_PROVIDER_NAME, UpdateRecipeDto } from "@types";
+import { catchError, lastValueFrom } from "rxjs";
 
 @Injectable()
 export class CombineItemService {
@@ -10,19 +11,19 @@ export class CombineItemService {
     this.itemClient = ClientProxyFactory.create(itemOptions);
   }
 
-  createRecipe(dto: CreateRecipeDto) {
-    return this.itemClient.send({ method: "POST", path: "/recipes" }, dto);
-  }
+  async combineItems(user: ICurrentUser, dto: CreateCombineItemDto) {
+    const rawItemHandler = this.itemClient
+      .send({ method: "POST", path: "/items/combine-items" }, { userId: user.userId, ...dto })
+      .pipe(
+        catchError((error) => {
+          const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
+          const message = error.message || "An error occurred";
+          throw new HttpException(message, statusCode);
+        })
+      );
 
-  updateRecipe(id: string, dto: UpdateRecipeDto) {
-    return this.itemClient.send({ method: "PUT", path: "/recipes" }, { id, ...dto });
-  }
+    const itemHandler = await lastValueFrom(rawItemHandler);
 
-  getRecipe(id: string) {
-    return this.itemClient.send({ method: "GET", path: "/recipes/:id" }, { id });
-  }
-
-  deleteRecipe(id: string) {
-    return this.itemClient.send({ method: "DELETE", path: "/recipes/:id" }, { id });
+    return itemHandler;
   }
 }

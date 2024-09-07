@@ -1,8 +1,8 @@
 import { Module } from "@nestjs/common";
-import { ParserModule } from "../parser/parser.module";
+import { QuestionModule } from "../question/question.module";
 import { ConfigModule } from "@nestjs/config";
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), ParserModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), QuestionModule],
 })
 export class AppModule {}

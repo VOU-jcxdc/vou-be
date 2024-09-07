@@ -13,7 +13,6 @@ export class GameInSystemService {
   async getAllGamesInSystem() {
     const rawData = this.eventClient.send({ method: "GET", path: "/games-in-system" }, {}).pipe(
       catchError((error) => {
-        console.log("error", error);
         const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
         const message = error.message || "An error occurred";
         throw new HttpException(message, statusCode);
