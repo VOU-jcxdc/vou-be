@@ -178,4 +178,28 @@ export class VoucherService {
       throw new RpcException(error);
     }
   }
+
+  async isCraftable(voucherId: string, quantity: number) {
+    try {
+      const activeVoucher = await this.voucherRepo.findOne({
+        where: { id: voucherId, status: VoucherStatusEnum.ACTIVE },
+      });
+      if (activeVoucher.status !== VoucherStatusEnum.ACTIVE) throw new RpcException("Voucher is not available");
+
+      const data = await this.eventVoucherRepo.findOne({ where: { voucherId } });
+      if (!data) throw new RpcException("Item not found");
+      if (data.quantity < quantity) return false;
+      return true;
+    } catch (error) {
+      throw new RpcException(error);
+    }
+  }
+
+  async getVoucher(voucherId: string) {
+    try {
+      return this.voucherRepo.findOne({ where: { id: voucherId } });
+    } catch (error) {
+      throw new RpcException(error);
+    }
+  }
 }

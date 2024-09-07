@@ -1,35 +1,18 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
-import { JwtAuthGuard, RoleGuard } from "../../guard";
+import { Body, Controller, Post, UseGuards } from "@nestjs/common";
 import { CombineItemService } from "./combine_item.service";
-import { AccountRoleEnum, CreateRecipeDto, UpdateRecipeDto } from "@types";
+import { AccountRoleEnum, CreateCombineItemDto, ICurrentUser } from "@types";
+import { JwtAuthGuard, RoleGuard } from "../../guard";
 import { Roles } from "../../decorators/roles.decorator";
+import { CurrentUser } from "../../decorators";
 
 @UseGuards(JwtAuthGuard, RoleGuard)
-@Controller("items/recipes")
+@Controller("items/combine-items")
 export class CombineItemController {
   constructor(private readonly combineItemService: CombineItemService) {}
 
-  @Roles(AccountRoleEnum.BRAND)
+  @Roles(AccountRoleEnum.PLAYER)
   @Post()
-  createRecipe(@Body() dto: CreateRecipeDto) {
-    return this.combineItemService.createRecipe(dto);
-  }
-
-  @Roles(AccountRoleEnum.BRAND)
-  @Put(":id")
-  updateRecipe(@Param("id") id: string, @Body() dto: UpdateRecipeDto) {
-    return this.combineItemService.updateRecipe(id, dto);
-  }
-
-  @Roles(AccountRoleEnum.BRAND, AccountRoleEnum.PLAYER)
-  @Get(":id")
-  getRecipe(@Param("id") id: string) {
-    return this.combineItemService.getRecipe(id);
-  }
-
-  @Roles(AccountRoleEnum.BRAND)
-  @Delete(":id")
-  deleteRecipe(@Param("id") id: string) {
-    return this.combineItemService.deleteRecipe(id);
+  combineItems(@CurrentUser() user: ICurrentUser, @Body() dto: CreateCombineItemDto) {
+    return this.combineItemService.combineItems(user, dto);
   }
 }

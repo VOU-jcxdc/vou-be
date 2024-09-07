@@ -4,7 +4,7 @@ import { RoomGameModel } from "../model/room-game.model";
 import { QAModel } from "../model/qa.model";
 
 @Injectable()
-export class ParserHelper {
+export class QuestionHelper {
   constructor(private readonly roomGameModel: RoomGameModel, private readonly qaModel: QAModel) {}
 
   async buildDataResponse(roomGameId: Types.ObjectId) {

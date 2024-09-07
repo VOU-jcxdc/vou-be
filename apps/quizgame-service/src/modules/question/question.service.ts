@@ -3,18 +3,13 @@ import { QAModel } from "../model/qa.model";
 import { IQAs, RoomGameStatus } from "@types";
 import { RoomGameModel } from "../model/room-game.model";
 import { Types } from "mongoose";
-import { ParserHelper } from "./parser.helper";
 import { RpcException } from "@nestjs/microservices";
 
 @Injectable()
-export class ParserService {
-  private readonly logger = new Logger(ParserService.name);
+export class QuestionService {
+  private readonly logger = new Logger(QuestionService.name);
 
-  constructor(
-    private readonly qaModel: QAModel,
-    private readonly roomGameModel: RoomGameModel,
-    private readonly parserHelper: ParserHelper
-  ) {}
+  constructor(private readonly qaModel: QAModel, private readonly roomGameModel: RoomGameModel) {}
 
   async createQuestions(data: { data: IQAs[]; eventId: string }) {
     try {
@@ -33,7 +28,7 @@ export class ParserService {
         }
       );
 
-      return this.parserHelper.buildDataResponse(roomGame._id as Types.ObjectId);
+      return qas;
     } catch (error) {
       this.logger.error(error);
       throw new RpcException(error);

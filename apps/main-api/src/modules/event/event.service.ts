@@ -17,8 +17,6 @@ import {
 } from "@types";
 import { catchError, lastValueFrom } from "rxjs";
 import { EventHelper } from "./event.helper";
-import { Event } from "@database";
-import { v4 as uuidv4 } from "uuid";
 
 @Injectable()
 export class EventService {
@@ -75,7 +73,7 @@ export class EventService {
         {
           id: event.id,
           name: "Config",
-          imageId: uuidv4(),
+          imageId: "143d1e47-4c69-4a5b-a8c1-0a23ddb66b4b",
           type: ItemTypeEnum.CONFIG,
           quantity: 1,
         },
