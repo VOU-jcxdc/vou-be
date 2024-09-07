@@ -48,8 +48,6 @@ export class ItemService {
           return this.itemHelper.buildResponseWithOriginalQuantity(item);
         })
       );
-
-      console.log("Mapped", mapped);
       return mapped;
     } catch (error) {
       this.logger.error(error);

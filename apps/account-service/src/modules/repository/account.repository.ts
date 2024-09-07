@@ -34,11 +34,11 @@ export class AccountRepository extends BaseRepository<Account> {
     limit: number,
     role: AccountRoleEnum = undefined,
     keySearch: string = undefined,
-    currentUser: string = undefined
+    currentUserId: string = undefined
   ) {
     // Construct the base query condition
     const whereCondition: any = isNil(role) ? {} : { role };
-    const excludeUserCondition: any = isNil(currentUser) ? {} : { id: Not(currentUser) };
+    const excludeUserCondition: any = isNil(currentUserId) ? {} : { id: Not(currentUserId) };
 
     // Add keySearch filter for email, phone, or username if provided
     const searchConditions = isNil(keySearch)

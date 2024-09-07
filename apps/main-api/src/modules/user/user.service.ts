@@ -35,9 +35,9 @@ export class UserService {
     limit: number,
     role: AccountRoleEnum = undefined,
     keySearch: string = undefined,
-    currentUser: string = undefined
+    currentUserId: string = undefined
   ) {
-    return this.client.send({ method: "GET", path: "/accounts" }, { offset, limit, role, keySearch, currentUser });
+    return this.client.send({ method: "GET", path: "/accounts" }, { offset, limit, role, keySearch, currentUserId });
   }
 
   async getUserInfo(id: string) {
