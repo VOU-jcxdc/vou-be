@@ -24,7 +24,7 @@ export class RecipeService {
 
   async createRecipe(dto: CreateRecipeDto) {
     // Check target item is craftable
-    const req = { itemId: dto.targetId, voucherId: dto.targetId, quantity: 1 };
+    const req = { itemId: dto.targetId, eventVoucherId: dto.targetId, quantity: 1 };
     const client = dto.targetType === CombineItemTypeEnum.ITEM ? this.itemClient : this.voucherClient;
 
     const rawIsCraftable = client.send({ method: "POST", path: "/craftable-validation" }, req).pipe(
@@ -53,7 +53,7 @@ export class RecipeService {
 
     if (itemResponse.targetType === CombineItemTypeEnum.VOUCHER) {
       const rawVoucherResponse = this.voucherClient
-        .send({ method: "GET", path: "/vouchers/:id" }, { voucherId: dto.targetId })
+        .send({ method: "GET", path: "/event-vouchers/:id" }, { voucherId: dto.targetId })
         .pipe(
           catchError((error) => {
             const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
@@ -66,7 +66,7 @@ export class RecipeService {
 
       return {
         ...itemResponse,
-        voucher: {
+        target: {
           id: voucherResponse.id,
           name: voucherResponse.name,
         },
@@ -80,8 +80,40 @@ export class RecipeService {
     return this.itemClient.send({ method: "PUT", path: "/recipes" }, { id, ...dto });
   }
 
-  getRecipe(id: string) {
-    return this.itemClient.send({ method: "GET", path: "/recipes/:id" }, { id });
+  async getRecipe(id: string) {
+    const rawResponse = this.itemClient.send({ method: "GET", path: "/recipes/:id" }, { id }).pipe(
+      catchError((error) => {
+        const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
+        const message = error.message || "An error occurred";
+        throw new HttpException(message, statusCode);
+      })
+    );
+
+    const response = await lastValueFrom(rawResponse);
+
+    if (response.targetType === CombineItemTypeEnum.ITEM) return response;
+
+    if (response.targetType === CombineItemTypeEnum.VOUCHER) {
+      const rawVoucherResponse = this.voucherClient
+        .send({ method: "GET", path: "/event-vouchers/:id" }, { voucherId: response.targetId })
+        .pipe(
+          catchError((error) => {
+            const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
+            const message = error.message || "An error occurred";
+            throw new HttpException(message, statusCode);
+          })
+        );
+
+      const voucherResponse = await lastValueFrom(rawVoucherResponse);
+
+      return {
+        ...response,
+        target: {
+          id: voucherResponse.id,
+          name: voucherResponse.name,
+        },
+      };
+    }
   }
 
   deleteRecipe(id: string) {

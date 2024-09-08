@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { VoucherRepository } from "../repository/voucher.repository";
 import {
   AddVoucherToAccountDto,
@@ -14,6 +14,8 @@ import { RpcException } from "@nestjs/microservices";
 import moment from "moment";
 @Injectable()
 export class VoucherService {
+  private readonly logger = new Logger(VoucherService.name);
+
   constructor(
     private readonly voucherRepo: VoucherRepository,
     private readonly eventVoucherRepo: EventVoucherRepository,
@@ -34,6 +36,7 @@ export class VoucherService {
       await this.eventVoucherRepo.saveMany(eventVouchers);
       return { eventId, vouchers: [...savedVouchers] };
     } catch (error) {
+      this.logger.error(error);
       throw new RpcException(error);
     }
   }
@@ -47,6 +50,7 @@ export class VoucherService {
         },
       });
     } catch (error) {
+      this.logger.error(error);
       throw new RpcException(error);
     }
   }
@@ -57,6 +61,7 @@ export class VoucherService {
         where: { id: voucherId },
       });
     } catch (error) {
+      this.logger.error(error);
       throw new RpcException(error);
     }
   }
@@ -65,6 +70,7 @@ export class VoucherService {
     try {
       return this.voucherRepo.updateOne({ where: { id: voucherId } }, data);
     } catch (error) {
+      this.logger.error(error);
       throw new RpcException(error);
     }
   }
@@ -73,6 +79,7 @@ export class VoucherService {
     try {
       return this.eventVoucherRepo.deleteVouchersInEvent(eventId, voucherIds);
     } catch (error) {
+      this.logger.error(error);
       throw new RpcException(error);
     }
   }
@@ -86,6 +93,7 @@ export class VoucherService {
         },
       });
     } catch (error) {
+      this.logger.error(error);
       throw new RpcException(error);
     }
   }
@@ -96,6 +104,7 @@ export class VoucherService {
         where: { brandId },
       });
     } catch (error) {
+      this.logger.error(error);
       throw new RpcException(error);
     }
   }
@@ -134,7 +143,7 @@ export class VoucherService {
           )
         : this.accountVoucherRepo.save({ accountId, voucherId, quantity });
     } catch (error) {
-      console.log("error", error);
+      this.logger.error(error);
       throw new RpcException(error);
     }
   }
@@ -175,22 +184,25 @@ export class VoucherService {
             { quantity: accountVoucher.quantity - quantity }
           );
     } catch (error) {
+      this.logger.error(error);
       throw new RpcException(error);
     }
   }
 
-  async isCraftable(voucherId: string, quantity: number) {
+  async isCraftable(eventVoucherId: string, quantity: number) {
     try {
-      const activeVoucher = await this.voucherRepo.findOne({
-        where: { id: voucherId, status: VoucherStatusEnum.ACTIVE },
-      });
+      const relatedEventVoucher = await this.eventVoucherRepo.findOne({ where: { id: eventVoucherId } });
+      if (!relatedEventVoucher) throw new RpcException("No voucher related to this event");
+
+      const activeVoucher = await this.voucherRepo.findOne({ where: { id: relatedEventVoucher.voucherId } });
       if (activeVoucher.status !== VoucherStatusEnum.ACTIVE) throw new RpcException("Voucher is not available");
 
-      const data = await this.eventVoucherRepo.findOne({ where: { voucherId } });
+      const data = await this.eventVoucherRepo.findOne({ where: { id: eventVoucherId } });
       if (!data) throw new RpcException("Item not found");
       if (data.quantity < quantity) return false;
       return true;
     } catch (error) {
+      this.logger.error(error);
       throw new RpcException(error);
     }
   }
@@ -198,6 +210,17 @@ export class VoucherService {
   async getVoucher(voucherId: string) {
     try {
       return this.voucherRepo.findOne({ where: { id: voucherId } });
+    } catch (error) {
+      throw new RpcException(error);
+    }
+  }
+
+  async getEventVoucher(eventVoucherId: string) {
+    try {
+      const eventVoucher = await this.eventVoucherRepo.findOne({ where: { id: eventVoucherId } });
+      if (!eventVoucher) throw new RpcException("Event voucher not found");
+
+      return this.voucherRepo.findOne({ where: { id: eventVoucher.voucherId } });
     } catch (error) {
       throw new RpcException(error);
     }
