@@ -9,6 +9,7 @@ import { ItemModule } from "../item/item.module";
 import { NotificationModule } from "../notification/notification.module";
 import { QuizgameModule } from "../quizgame/quizgame.module";
 import { SocketModule } from "../socket/socket.module";
+import { AIEndpointModule } from "../ai-endpoint/ai_endpoint.module";
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { SocketModule } from "../socket/socket.module";
     QuizgameModule,
     SocketModule,
     QuizgameModule,
+    AIEndpointModule,
   ],
 })
 export class AppModule {}
