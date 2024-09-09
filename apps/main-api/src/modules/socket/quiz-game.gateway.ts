@@ -38,7 +38,8 @@ export class QuizGameGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     private readonly jwtService: JwtService,
     private readonly quizGameService: QuizgameService,
     configService: ConfigService,
-    @Inject("QUIZGAME_SERVICE") private readonly quizGameClient: ClientProxy
+    @Inject("QUIZGAME_SERVICE") private readonly quizGameClient: ClientProxy,
+    @Inject("QUIZGAME_VOUCHER_SERVICE") private readonly quizGameVoucherClient: ClientProxy
   ) {
     this.configService = configService;
   }
@@ -62,11 +63,15 @@ export class QuizGameGateway implements OnGatewayInit, OnGatewayConnection, OnGa
           const getAIEndpoint = this.configService.get<string>("AI_ENDPOINT");
 
           // Send questions to AI without waiting for response
-          for (let i = 0; i < questions.length; i++) {
-            axios.post(getAIEndpoint + "/api/videos", {
-              id: roomId + "-" + i.toString(),
-              text: questions[i].question + " " + questions[i].options.join(";"),
-            });
+          try {
+            for (let i = 0; i < questions.length; i++) {
+              axios.post(getAIEndpoint + "/api/videos", {
+                id: roomId + "-" + i.toString(),
+                text: questions[i].question + " " + questions[i].options.join(";"),
+              });
+            }
+          } catch (error) {
+            this.logger.error(error);
           }
 
           const numQuestion = questions.length;
@@ -183,14 +188,24 @@ export class QuizGameGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   }
 
   async finishGame(roomId: string) {
-    const playersRanking = await this.quizGameService.getPlayersRanking(roomId);
+    const { playersRank, eventId } = await this.quizGameService.getPlayersRanking(roomId);
+    console.log("Players rank in room game", playersRank);
     this.quizGameClient.emit(
       { method: "PUT", path: "/quiz-game/room-game/:roomId" },
       { roomId, status: RoomGameStatus.FINISHED, players: [], action: "" }
     );
+    this.quizGameVoucherClient.emit(
+      { method: "POST", path: "/vouchers/assigning/quizgame-winner" },
+      { eventId, accountId: playersRank[0].player.userId }
+    );
     this.server.emit("game-finished", {
       message: "Game finished",
-      playersRanking,
+      playersRank,
+    });
+
+    const clientWinner = await this.redisService.get(`quizgame-player-${playersRank[0].player.userId}-room-${roomId}`);
+    this.server.to(clientWinner).emit("you-win", {
+      message: "Congratulations! You have won the game, and you will receive a voucher!!!",
     });
   }
 

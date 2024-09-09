@@ -41,6 +41,11 @@ export class VoucherController {
     return this.voucherService.upsertAccountVoucher(accountId, rest);
   }
 
+  @EventPattern({ method: "POST", path: "/vouchers/assigning/quizgame-winner" })
+  assignVoucherToQuizgameWinner(@Payload() { eventId, accountId }: { eventId: string; accountId: string }) {
+    return this.voucherService.assignVoucherToQuizGameWinner(eventId, accountId);
+  }
+
   @MessagePattern({ method: "PUT", path: "/vouchers/:voucherId" })
   updateVoucherDetail(@Payload() data: UpdateVoucherDto & { voucherId: string }) {
     const { voucherId, ...rest } = data;
