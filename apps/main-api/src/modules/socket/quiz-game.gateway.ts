@@ -16,6 +16,7 @@ import amqp, { ChannelWrapper } from "amqp-connection-manager";
 import { ConfigService } from "@nestjs/config";
 import { ConfirmChannel } from "amqplib";
 import { QuizgameService } from "../quizgame/quizgame.service";
+import axios from "axios";
 
 @WebSocketGateway({ namespace: "quiz-game" })
 export class QuizGameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -51,6 +52,17 @@ export class QuizGameGateway implements OnGatewayInit, OnGatewayConnection, OnGa
           console.log("Message", message.content.toString());
           const { roomId } = JSON.parse(message.content.toString());
           const questions = await this.quizGameService.getQuestionsInRoomGame(roomId);
+
+          const getAIEndpoint = this.configService.get<string>("AI_ENDPOINT");
+
+          // Send questions to AI without waiting for response
+          for (let i = 0; i < questions.length; i++) {
+            axios.post(getAIEndpoint + "/api/videos", {
+              id: roomId + "-" + i.toString(),
+              text: questions[i].question + " " + questions[i].options.join(";"),
+            });
+          }
+
           console.log("Questions", questions);
           const numQuestion = questions.length;
           this.server.emit("waiting-players", {
