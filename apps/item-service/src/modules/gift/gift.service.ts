@@ -70,8 +70,8 @@ export class GiftService {
 
       // Handle config item
       if (await this.itemService.isConfigItem(request.itemId)) {
-        await this.gameConfigService.loseItem(request.senderId, request.itemId, request.quantity);
-        await this.gameConfigService.receiveItem(request.receiverId, request.itemId, request.quantity);
+        await this.gameConfigService.loseItem(request.receiverId, request.itemId, request.quantity);
+        await this.gameConfigService.receiveItem(request.senderId, request.itemId, request.quantity);
         await this.giftRepository.updateOne(
           { where: { id: giftId } },
           {
