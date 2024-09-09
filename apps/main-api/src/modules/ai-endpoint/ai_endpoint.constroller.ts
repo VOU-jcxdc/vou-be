@@ -1,16 +1,13 @@
 import { Controller, Get } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { AiEndpointService } from "./ai_endpoint.service";
 
 @Controller("ai-endpoints")
 export class AIEndpointController {
-  private endpoint: string;
-
-  constructor(private readonly configService: ConfigService) {
-    this.endpoint = this.configService.get<string>("AI_ENDPOINT");
-  }
+  constructor(private readonly aiEndpointService: AiEndpointService) {}
 
   @Get()
   async getAIEndpoint() {
-    return this.endpoint;
+    return this.aiEndpointService.getAIEndpoint();
   }
 }
