@@ -1,16 +1,21 @@
 import { BadRequestException, HttpException, HttpStatus, Inject, Injectable, Logger } from "@nestjs/common";
 import { ClientOptions, ClientProxy, ClientProxyFactory } from "@nestjs/microservices";
-import { IQAs, QUIZGAME_SERVICE_PROVIDER_NAME } from "@types";
+import { IPlayerScore, IQAs, QUIZGAME_SERVICE_PROVIDER_NAME, USER_SERVICE_PROVIDER_NAME } from "@types";
 import { catchError, lastValueFrom, of } from "rxjs";
 import { Readable } from "stream";
 import { parse } from "csv-parse";
 @Injectable()
 export class QuizgameService {
   private quizgameClient: ClientProxy;
+  private accountClient: ClientProxy;
   private readonly logger = new Logger(QuizgameService.name);
 
-  constructor(@Inject(QUIZGAME_SERVICE_PROVIDER_NAME) quizgameOptions: ClientOptions) {
+  constructor(
+    @Inject(QUIZGAME_SERVICE_PROVIDER_NAME) quizgameOptions: ClientOptions,
+    @Inject(USER_SERVICE_PROVIDER_NAME) userOptions: ClientOptions
+  ) {
     this.quizgameClient = ClientProxyFactory.create(quizgameOptions);
+    this.accountClient = ClientProxyFactory.create(userOptions);
   }
   async createQuestions(eventId: string, file: Express.Multer.File) {
     try {
@@ -93,5 +98,52 @@ export class QuizgameService {
       this.logger.error(error);
       throw new BadRequestException(error);
     }
+  }
+
+  async checkAvailableRoomGame(roomId: string) {
+    const available = this.quizgameClient
+      .send({ method: "POST", path: "/quiz-game/room-game/:roomId/available" }, { roomId })
+      .pipe(
+        catchError((error) => {
+          const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
+          const message = error.message || "An error occurred";
+          throw new HttpException(message, statusCode);
+        })
+      );
+    return lastValueFrom(available);
+  }
+
+  async getPlayersRanking(roomId: string) {
+    const data = this.quizgameClient
+      .send({ method: "GET", path: "/quiz-game/room-game/:roomId/players/ranking" }, { roomId })
+      .pipe(
+        catchError((error) => {
+          const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
+          const message = error.message || "An error occurred";
+          throw new HttpException(message, statusCode);
+        })
+      );
+
+    const result = await lastValueFrom(data);
+    const playersRanking = await Promise.all(
+      result.map(async (playerScore: IPlayerScore) => {
+        const info = this.accountClient.send({ method: "GET", path: "/account/:id" }, { id: playerScore.userId }).pipe(
+          catchError((error) => {
+            const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
+            const message = error.message || "An error occurred";
+            throw new HttpException(message, statusCode);
+          })
+        );
+        const infoValue = await lastValueFrom(info);
+        return {
+          score: playerScore.score,
+          player: {
+            username: infoValue.username,
+            bucketId: infoValue.bucketId,
+          },
+        };
+      })
+    );
+    return playersRanking;
   }
 }
