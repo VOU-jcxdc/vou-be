@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { IPlayerAnswer, IQARecord } from "@types";
+import { IPlayerScore, IQARecord } from "@types";
 import { Document } from "mongoose";
 
 @Schema({
@@ -12,10 +12,10 @@ import { Document } from "mongoose";
 })
 export class QARecord extends Document implements IQARecord {
   @Prop({ type: String, required: true })
-  QAId: string;
+  roomId: string;
 
   @Prop({ type: Array, required: true })
-  playerAnswer: IPlayerAnswer[];
+  playerScore: IPlayerScore[];
 
   // Hide timestamps
   @Prop({ type: Date, select: false })

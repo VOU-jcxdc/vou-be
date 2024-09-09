@@ -22,6 +22,17 @@ async function bootstrap() {
     },
   });
 
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: [process.env.RABBITMQ_URL || "amqp://localhost:5672"],
+      queue: "roomGameStatus_queue",
+      queueOptions: {
+        durable: false,
+      },
+    },
+  });
+
   await app.startAllMicroservices();
   await app.init();
 
