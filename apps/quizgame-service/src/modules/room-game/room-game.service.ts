@@ -135,13 +135,13 @@ export class RoomGameService {
   async rankingPlayers(roomId: string) {
     try {
       const existingRoomGameRecord = await this.qaRecordModel.findOne({ roomId });
+      const existingRoomGame = await this.roomGameModel.findById(Types.ObjectId.createFromHexString(roomId));
       if (_.isNil(existingRoomGameRecord)) {
         throw new RpcException("Room game record not found");
       }
 
-      const playerScores = existingRoomGameRecord.playerScore;
-      const sortedPlayers = _.orderBy(playerScores, ["score"], ["desc"]);
-      return sortedPlayers;
+      const sortedPlayers: IPlayerScore[] = _.orderBy(existingRoomGameRecord.playerScore, ["score"], ["desc"]) || [];
+      return { playersRank: [...sortedPlayers], eventId: existingRoomGame.eventId };
     } catch (error) {
       this.logger.error(error);
       throw new RpcException(error);

@@ -225,4 +225,17 @@ export class VoucherService {
       throw new RpcException(error);
     }
   }
+
+  async assignVoucherToQuizGameWinner(eventId: string, accountId: string) {
+    try {
+      const eventVouchers = await this.eventVoucherRepo.findAll({ where: { eventId } });
+      if (!eventVouchers || eventVouchers.length === 0) throw new RpcException("No voucher available");
+
+      const voucher = eventVouchers[0];
+      return this.upsertAccountVoucher(accountId, { eventVoucherId: voucher.id, quantity: 1 });
+    } catch (error) {
+      this.logger.error(error);
+      throw new RpcException(error);
+    }
+  }
 }

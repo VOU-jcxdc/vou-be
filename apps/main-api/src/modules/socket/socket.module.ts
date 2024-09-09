@@ -32,6 +32,18 @@ import { ClientsModule, Transport } from "@nestjs/microservices";
         }),
         inject: [ConfigService],
       },
+      {
+        name: "QUIZGAME_VOUCHER_SERVICE",
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [configService.get<string>("RMQ_URLS")],
+            queue: "main_queue",
+            queueOptions: { durable: false },
+          },
+        }),
+        inject: [ConfigService],
+      },
     ]),
 
     RabbitmqModule,
