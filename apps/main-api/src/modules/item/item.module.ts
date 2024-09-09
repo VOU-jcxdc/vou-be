@@ -8,10 +8,11 @@ import { GiftService } from "./gift.service";
 import { ItemService } from "./item.service";
 import { CombineItemController } from "./combine_item.controller";
 import { CombineItemService } from "./combine_item.service";
+import { RecipeHelper } from "./recipe.helper";
 
 @Module({
   imports: [ClientProxyModule],
   controllers: [RecipeController, CombineItemController, ItemController, GiftController],
-  providers: [RecipeService, ItemService, GiftService, CombineItemService],
+  providers: [RecipeService, ItemService, GiftService, CombineItemService, RecipeHelper],
 })
 export class ItemModule {}
