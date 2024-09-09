@@ -8,7 +8,7 @@ export const quizgameServiceProvider: IServiceProvider = {
     transport: Transport.TCP,
     options: {
       host: configService.get("QUIZGAME_SERVICE_HOST"),
-      port: configService.get("QUIZGAME_SERVICE_PORT"),
+      port: configService.get("QUIZGAME_SERVICE_PORT_LB"),
     },
   }),
   inject: [ConfigService],

@@ -8,7 +8,7 @@ export const eventServierProvider: IServiceProvider = {
     transport: Transport.TCP,
     options: {
       host: configService.get("EVENT_SERVICE_HOST"),
-      port: configService.get("EVENT_SERVICE_PORT"),
+      port: configService.get("EVENT_SERVICE_PORT_LB"),
     },
   }),
   inject: [ConfigService],
