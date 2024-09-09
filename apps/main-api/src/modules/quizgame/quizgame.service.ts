@@ -78,4 +78,20 @@ export class QuizgameService {
       throw new BadRequestException(error);
     }
   }
+
+  async createRoomGame(eventId: string) {
+    try {
+      const data = this.quizgameClient.send({ method: "POST", path: "/quiz-game/room-game" }, { eventId }).pipe(
+        catchError((error) => {
+          const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
+          const message = error.message || "An error occurred";
+          throw new HttpException(message, statusCode);
+        })
+      );
+      return lastValueFrom(data);
+    } catch (error) {
+      this.logger.error(error);
+      throw new BadRequestException(error);
+    }
+  }
 }
