@@ -184,7 +184,10 @@ export class QuizGameGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
   async finishGame(roomId: string) {
     const playersRanking = await this.quizGameService.getPlayersRanking(roomId);
-    console.log("Players ranking", playersRanking);
+    this.quizGameClient.emit(
+      { method: "PUT", path: "/quiz-game/room-game/:roomId" },
+      { roomId, status: RoomGameStatus.FINISHED, players: [], action: "" }
+    );
     this.server.emit("game-finished", {
       message: "Game finished",
       playersRanking,

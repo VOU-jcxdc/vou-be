@@ -53,30 +53,23 @@ export class RoomGameService {
       if (_.isNil(qas) || qas.length === 0) {
         throw new RpcException("Cannot create room game without questions");
       }
-      const roomGame = await this.roomGameModel.upsert(
-        {
-          eventId,
-        },
-        {
-          QAs: qas.map((it) => {
-            return String(it._id);
-          }),
-          players: [],
-          status: RoomGameStatus.PLANNING,
-          eventId: eventId,
-        }
-      );
 
-      await this.qaRecordModel.save({ roomId: String(roomGame._id), playerScore: [] });
+      const newRoomGame: any = await this.roomGameModel.save({
+        eventId,
+        QAs: qas.map((it) => String(it._id)),
+        players: [],
+      });
+
+      await this.qaRecordModel.save({ roomId: String(newRoomGame._id), playerScore: [] });
 
       // Publish to quizgame socket games
       this.rabbitMqService.publishToQueue("roomGameQueue", {
-        roomId: roomGame._id,
+        roomId: newRoomGame._id,
       });
 
       return {
-        id: roomGame._id,
-        status: roomGame.status,
+        id: newRoomGame._id,
+        status: newRoomGame.status,
       };
     } catch (error) {
       this.logger.error(error);
@@ -97,10 +90,16 @@ export class RoomGameService {
             throw new RpcException("Cannot join room game");
           }
           players = _.union(players, data.players);
+          const playerDefaultScore: IPlayerScore[] = data.players.map((player) => ({
+            userId: player,
+            score: 0,
+          }));
+          await this.qaRecordModel.updateOne({ roomId }, { playerScore: playerDefaultScore });
         } else {
           players = _.difference(players, data.players);
         }
       }
+
       await this.roomGameModel.updateOne(
         { _id: roomId },
         {
@@ -108,12 +107,6 @@ export class RoomGameService {
           players: players,
         }
       );
-
-      const playerDefaultScore: IPlayerScore[] = data.players.map((player) => ({
-        userId: player,
-        score: 0,
-      }));
-      await this.qaRecordModel.updateOne({ roomId }, { playerScore: playerDefaultScore });
     } catch (error) {
       this.logger.error(error);
       throw new RpcException(error);
