@@ -23,6 +23,7 @@ jobs:
 
             # Copy nginx config
             cp -f ./nginx/vou.social.conf /etc/nginx/sites-available/vou.social.conf
+            cp -f ./nginx/vou.social.stream.conf /etc/nginx/stream/vou.social.stream.conf
 
             # Test nginx config
             nginx -t
