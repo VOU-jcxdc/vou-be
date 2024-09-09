@@ -8,25 +8,25 @@ export class GameConfigService {
 
   constructor(private readonly redisService: RedisService) {}
 
-  async receiveItem(receiverId: string, itemId: string, quantity: number) {
+  async receiveItem(senderId: string, itemId: string, quantity: number) {
     try {
-      const rawEventConfigs = await this.redisService.get(`config-user-${receiverId}-event-${itemId}`);
+      const rawEventConfigs = await this.redisService.get(`config-user-${senderId}-event-${itemId}`);
       const eventConfig = rawEventConfigs ? Number(rawEventConfigs) : 0;
-      return this.redisService.set(`config-user-${receiverId}-event-${itemId}`, quantity + eventConfig);
+      return this.redisService.set(`config-user-${senderId}-event-${itemId}`, quantity + eventConfig);
     } catch (error) {
       this.logger.error(error);
       throw new RpcException(error);
     }
   }
 
-  async loseItem(senderId: string, itemId: string, quantity: number) {
+  async loseItem(receiverId: string, itemId: string, quantity: number) {
     try {
-      const rawEventConfigs = await this.redisService.get(`config-user-${senderId}-event-${itemId}`);
+      const rawEventConfigs = await this.redisService.get(`config-user-${receiverId}-event-${itemId}`);
       const eventConfig = rawEventConfigs ? Number(rawEventConfigs) : 0;
 
       if (eventConfig < quantity) throw new Error("Not enough configs");
 
-      return this.redisService.set(`config-user-${senderId}-event-${itemId}`, eventConfig - quantity);
+      return this.redisService.set(`config-user-${receiverId}-event-${itemId}`, eventConfig - quantity);
     } catch (error) {
       this.logger.error(error);
       throw new RpcException(error);
