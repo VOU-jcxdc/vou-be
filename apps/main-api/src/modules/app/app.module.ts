@@ -23,7 +23,6 @@ import { AIEndpointModule } from "../ai-endpoint/ai_endpoint.module";
     NotificationModule,
     QuizgameModule,
     SocketModule,
-    QuizgameModule,
     AIEndpointModule,
   ],
 })
