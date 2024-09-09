@@ -38,6 +38,7 @@ export class RecipeHelper {
     return {
       id: _id,
       ...restData,
+      targetId,
       itemRecipe: await Promise.all(items),
     };
   }
