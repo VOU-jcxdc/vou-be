@@ -1,7 +1,7 @@
 import { BadRequestException, HttpException, HttpStatus, Inject, Injectable, Logger } from "@nestjs/common";
 import { ClientOptions, ClientProxy, ClientProxyFactory } from "@nestjs/microservices";
 import { IPlayerScore, IQAs, QUIZGAME_SERVICE_PROVIDER_NAME, USER_SERVICE_PROVIDER_NAME } from "@types";
-import { catchError, lastValueFrom, of } from "rxjs";
+import { Observable, catchError, lastValueFrom, of } from "rxjs";
 import { Readable } from "stream";
 import { parse } from "csv-parse";
 @Injectable()
@@ -114,7 +114,7 @@ export class QuizgameService {
   }
 
   async getPlayersRanking(roomId: string) {
-    const data = this.quizgameClient
+    const data: Observable<{ playersRank: IPlayerScore[]; eventId: string }> = this.quizgameClient
       .send({ method: "GET", path: "/quiz-game/room-game/:roomId/players/ranking" }, { roomId })
       .pipe(
         catchError((error) => {
@@ -125,8 +125,8 @@ export class QuizgameService {
       );
 
     const result = await lastValueFrom(data);
-    const playersRanking = await Promise.all(
-      result.map(async (playerScore: IPlayerScore) => {
+    const playersRank = await Promise.all(
+      result.playersRank.map(async (playerScore: IPlayerScore) => {
         const info = this.accountClient.send({ method: "GET", path: "/account/:id" }, { id: playerScore.userId }).pipe(
           catchError((error) => {
             const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
@@ -138,12 +138,13 @@ export class QuizgameService {
         return {
           score: playerScore.score,
           player: {
+            userId: playerScore.userId,
             username: infoValue.username,
             bucketId: infoValue.bucketId,
           },
         };
       })
     );
-    return playersRanking;
+    return { playersRank, eventId: result.eventId };
   }
 }
