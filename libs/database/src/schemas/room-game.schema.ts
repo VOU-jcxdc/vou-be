@@ -14,10 +14,10 @@ export class RoomGame extends Document implements IRoomGame {
   @Prop({ type: Array, required: true })
   QAs: string[];
 
-  @Prop({ type: Array, required: true })
+  @Prop({ type: Array, required: true, default: [] })
   players: string[];
 
-  @Prop({ type: String, enum: RoomGameStatus, required: true })
+  @Prop({ type: String, enum: RoomGameStatus, default: RoomGameStatus.PLANNING, required: true })
   status: RoomGameStatus;
 
   @Prop({ type: String, required: true })

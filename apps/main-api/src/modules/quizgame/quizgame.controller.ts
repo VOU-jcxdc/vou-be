@@ -35,6 +35,11 @@ export class QuizgameController {
     return this.quizgameService.createQuestions(eventId, file);
   }
 
+  @Post("room-game")
+  async createRoomGame(@Body("eventId") eventId: string) {
+    return this.quizgameService.createRoomGame(eventId);
+  }
+
   @Get("questions")
   async getQuestionsInRoomGame(@Query("roomId") roomId: string) {
     return this.quizgameService.getQuestionsInRoomGame(roomId);
