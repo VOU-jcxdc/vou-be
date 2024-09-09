@@ -8,6 +8,7 @@ import {
   VOUCHER_SERVICE_PROVIDER_NAME,
 } from "@types";
 import { catchError, lastValueFrom } from "rxjs";
+import { RecipeHelper } from "./recipe.helper";
 
 @Injectable()
 export class RecipeService {
@@ -16,7 +17,8 @@ export class RecipeService {
 
   constructor(
     @Inject(ITEM_SERVICE_PROVIDER_NAME) itemOptions: ClientOptions,
-    @Inject(VOUCHER_SERVICE_PROVIDER_NAME) voucherOptions: ClientOptions
+    @Inject(VOUCHER_SERVICE_PROVIDER_NAME) voucherOptions: ClientOptions,
+    private readonly recipeHelper: RecipeHelper
   ) {
     this.itemClient = ClientProxyFactory.create(itemOptions);
     this.voucherClient = ClientProxyFactory.create(voucherOptions);
@@ -41,7 +43,7 @@ export class RecipeService {
       throw new HttpException("Item not craftable", HttpStatus.BAD_REQUEST);
     }
 
-    const rawItemResponse = this.itemClient.send({ method: "POST", path: "/recipes" }, dto).pipe(
+    const rawResponse = this.itemClient.send({ method: "POST", path: "/recipes" }, dto).pipe(
       catchError((error) => {
         const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
         const message = error.message || "An error occurred";
@@ -49,35 +51,23 @@ export class RecipeService {
       })
     );
 
-    const itemResponse = await lastValueFrom(rawItemResponse);
+    const response = await lastValueFrom(rawResponse);
 
-    if (itemResponse.targetType === CombineItemTypeEnum.VOUCHER) {
-      const rawVoucherResponse = this.voucherClient
-        .send({ method: "GET", path: "/event-vouchers/:id" }, { voucherId: dto.targetId })
-        .pipe(
-          catchError((error) => {
-            const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
-            const message = error.message || "An error occurred";
-            throw new HttpException(message, statusCode);
-          })
-        );
-
-      const voucherResponse = await lastValueFrom(rawVoucherResponse);
-
-      return {
-        ...itemResponse,
-        target: {
-          id: voucherResponse.id,
-          name: voucherResponse.name,
-        },
-      };
-    }
-
-    return itemResponse;
+    return this.recipeHelper.buildReponseData(response);
   }
 
   updateRecipe(id: string, dto: UpdateRecipeDto) {
-    return this.itemClient.send({ method: "PUT", path: "/recipes" }, { id, ...dto });
+    const rawResponse = this.itemClient.send({ method: "PUT", path: "/recipes" }, { id, ...dto }).pipe(
+      catchError((error) => {
+        const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
+        const message = error.message || "An error occurred";
+        throw new HttpException(message, statusCode);
+      })
+    );
+
+    const response = lastValueFrom(rawResponse);
+
+    return this.recipeHelper.buildReponseData(response);
   }
 
   async getRecipe(id: string) {
@@ -91,29 +81,7 @@ export class RecipeService {
 
     const response = await lastValueFrom(rawResponse);
 
-    if (response.targetType === CombineItemTypeEnum.ITEM) return response;
-
-    if (response.targetType === CombineItemTypeEnum.VOUCHER) {
-      const rawVoucherResponse = this.voucherClient
-        .send({ method: "GET", path: "/event-vouchers/:id" }, { voucherId: response.targetId })
-        .pipe(
-          catchError((error) => {
-            const statusCode = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
-            const message = error.message || "An error occurred";
-            throw new HttpException(message, statusCode);
-          })
-        );
-
-      const voucherResponse = await lastValueFrom(rawVoucherResponse);
-
-      return {
-        ...response,
-        target: {
-          id: voucherResponse.id,
-          name: voucherResponse.name,
-        },
-      };
-    }
+    return this.recipeHelper.buildReponseData(response);
   }
 
   deleteRecipe(id: string) {
