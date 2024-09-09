@@ -8,7 +8,7 @@ export const itemServiceProvider: IServiceProvider = {
     transport: Transport.TCP,
     options: {
       host: configService.get("ITEM_SERVICE_HOST"),
-      port: configService.get("ITEM_SERVICE_PORT"),
+      port: configService.get("ITEM_SERVICE_PORT_LB"),
     },
   }),
   inject: [ConfigService],

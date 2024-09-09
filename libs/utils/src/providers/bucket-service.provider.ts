@@ -8,7 +8,7 @@ export const bucketServiceProvider: IServiceProvider = {
     transport: Transport.TCP,
     options: {
       host: configService.get("BUCKET_SERVICE_HOST"),
-      port: configService.get("BUCKET_SERVICE_PORT"),
+      port: configService.get("BUCKET_SERVICE_PORT_LB"),
     },
   }),
   inject: [ConfigService],
