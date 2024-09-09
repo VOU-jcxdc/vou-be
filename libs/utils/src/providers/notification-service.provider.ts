@@ -8,7 +8,7 @@ export const notificationServiceProvider: IServiceProvider = {
     transport: Transport.TCP,
     options: {
       host: configService.get("NOTIFICATION_SERVICE_HOST"),
-      port: configService.get("NOTIFICATION_SERVICE_PORT"),
+      port: configService.get("NOTIFICATION_SERVICE_PORT_LB"),
     },
   }),
   inject: [ConfigService],

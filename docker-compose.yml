@@ -76,6 +76,9 @@ services:
     networks:
       - vou-network
     env_file: .env
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - DISABLE_COMMANDS=FLUSHDB,FLUSHALL,CONFIG
     ports:
       - "6379:6379"
     volumes:

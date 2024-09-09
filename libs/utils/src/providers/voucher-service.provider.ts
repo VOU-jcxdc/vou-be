@@ -8,7 +8,7 @@ export const voucherServiceProvider: IServiceProvider = {
     transport: Transport.TCP,
     options: {
       host: configService.get("VOUCHER_SERVICE_HOST"),
-      port: configService.get("VOUCHER_SERVICE_PORT"),
+      port: configService.get("VOUCHER_SERVICE_PORT_LB"),
     },
   }),
   inject: [ConfigService],
