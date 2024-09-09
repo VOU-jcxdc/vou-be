@@ -30,19 +30,6 @@ export class QuestionService {
     }
   }
 
-  async getRoomGame(eventId: string) {
-    try {
-      const roomGame = await this.roomGameModel.findOne({ eventId });
-      return {
-        id: roomGame._id,
-        status: roomGame.status,
-      };
-    } catch (error) {
-      this.logger.error(error);
-      throw new RpcException(error);
-    }
-  }
-
   async getQuestionsInRoomGame(roomId: string) {
     try {
       const roomGame = await this.roomGameModel.findById(Types.ObjectId.createFromHexString(roomId));
@@ -54,40 +41,6 @@ export class QuestionService {
           return this.qaModel.findById(Types.ObjectId.createFromHexString(id));
         })
       );
-    } catch (error) {
-      this.logger.error(error);
-      throw new RpcException(error);
-    }
-  }
-
-  async createRoomGame(eventId: string) {
-    try {
-      const qas = await this.qaModel.find({ eventId });
-      if (_.isNil(qas) || qas.length === 0) {
-        throw new RpcException("Cannot create room game without questions");
-      }
-      return this.roomGameModel.upsert(
-        {
-          eventId,
-        },
-        {
-          QAs: qas.map((it) => {
-            return String(it._id);
-          }),
-          players: [],
-          status: RoomGameStatus.PLANNING,
-          eventId: eventId,
-        }
-      );
-    } catch (error) {
-      this.logger.error(error);
-      throw new RpcException(error);
-    }
-  }
-
-  async updateRoomGame(roomId: string, data: { status: RoomGameStatus; players: string[] }) {
-    try {
-      return this.roomGameModel.updateOne({ _id: Types.ObjectId.createFromHexString(roomId) }, data);
     } catch (error) {
       this.logger.error(error);
       throw new RpcException(error);

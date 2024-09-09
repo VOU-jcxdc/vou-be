@@ -4,6 +4,7 @@ import { RabbitmqModule, RedisModule } from "@shared-modules";
 import { JwtModule } from "@nestjs/jwt";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { QuizgameModule } from "../quizgame/quizgame.module";
+import { ClientsModule, Transport } from "@nestjs/microservices";
 
 @Module({
   imports: [
@@ -18,6 +19,21 @@ import { QuizgameModule } from "../quizgame/quizgame.module";
         },
       }),
     }),
+    ClientsModule.registerAsync([
+      {
+        name: "QUIZGAME_SERVICE",
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [configService.get<string>("RMQ_URLS")],
+            queue: "roomGameStatus_queue",
+            queueOptions: { durable: false },
+          },
+        }),
+        inject: [ConfigService],
+      },
+    ]),
+
     RabbitmqModule,
     QuizgameModule,
   ],

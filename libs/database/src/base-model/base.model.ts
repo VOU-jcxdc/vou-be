@@ -38,6 +38,10 @@ export class BaseModel<T extends Document> {
     return this.model.updateMany(filter, update);
   }
 
+  async updateWithTransaction(session: any, filter: FilterQuery<T>, update: UpdateQuery<T>) {
+    return this.model.updateMany(filter, update, { session });
+  }
+
   async upsert(filter: FilterQuery<T>, update: UpdateQuery<T>) {
     return this.model.findOneAndUpdate(filter, update, { upsert: true, new: true });
   }

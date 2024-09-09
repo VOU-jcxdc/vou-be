@@ -1,9 +1,9 @@
-export interface IPlayerAnswer {
+export interface IPlayerScore {
   userId: string;
-  answer: number;
+  score: number;
 }
 
 export interface IQARecord {
-  QAId: string;
-  playerAnswer: IPlayerAnswer[];
+  roomId: string;
+  playerScore: IPlayerScore[];
 }
