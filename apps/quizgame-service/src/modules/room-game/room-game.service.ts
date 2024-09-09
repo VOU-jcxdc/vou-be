@@ -20,7 +20,7 @@ export class RoomGameService {
 
   async getRoomGame(eventId: string) {
     try {
-      const roomGame = await this.roomGameModel.findOne({ eventId });
+      const roomGame = await this.roomGameModel.findOne({ eventId, status: RoomGameStatus.WAITING });
       if (_.isNil(roomGame)) {
         return null;
       }
